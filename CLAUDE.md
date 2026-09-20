@@ -65,10 +65,15 @@ app) gewoon in het web-bereik. Dit is een eenmalige paneelinstelling, niet iets 
 via FTP/SSH te regelen is — nog te controleren/zetten.
 
 > Security note: `deploy.php` bevat hardcoded FTP-credentials (zoals ook bij lijstje).
-> Niet in logs of commits laten lekken buiten dit bestand; `credentials.md` staat al
-> in `.gitignore`.
+> Staat daarom, anders dan bij lijstje, in `.gitignore` — gaat dus nooit mee in een
+> commit. Bij een verse checkout ontbreekt het bestand dus en moet het opnieuw
+> aangemaakt worden (credentials staan in `credentials.md`).
+
+**Eerste deploy**: omdat `deploy.php` niet in git zit, is er geen deploy-geschiedenis
+om "commit eerst" tegen te toetsen. Gebruik voor de allereerste keer `php deploy.php all`.
 
 ## Repository
 
-GitHub: `git@github.com:appzguru/boxtrackerboy.git` (zie credentials.md). Lokaal nog
-geen git-repo geïnitialiseerd.
+GitHub: `git@github.com:appzguru/boxtrackerboy.git` (zie credentials.md). Lokaal
+geïnitialiseerd op 2026-09-20, eerste commit gemaakt, **nog niet gepusht** — dat is
+een bewuste keuze geweest, niet iets wat automatisch gebeurt.
