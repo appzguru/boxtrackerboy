@@ -12,10 +12,8 @@
     <a href="<?= base_url('/') ?>" class="btn-ghost" style="text-align:center;">Naar start</a>
   </div>
 </div>
-<div id="scan-overlay"></div>
 <?= $this->endSection() ?>
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('assets/js/scan.js') ?>"></script>
 <script>
 document.getElementById('scan-next').addEventListener('click', function () {
   Boxtracker.scanOnce(document.getElementById('scan-overlay'), function (url) {

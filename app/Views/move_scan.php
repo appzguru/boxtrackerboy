@@ -52,7 +52,6 @@
 </div>
 <?= $this->endSection() ?>
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('assets/js/scan.js') ?>"></script>
 <script>
 var scanUrl = <?= json_encode(base_url('verplaats/' . $batch . '/scan')) ?>;
 var count = <?= count($items) ?>;

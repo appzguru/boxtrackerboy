@@ -40,8 +40,22 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, label:focus-w
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
 
+/* ---- vaste topbar (start + scan), overal behalve login ---- */
+.app-topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  height: 56px; max-width: 520px; margin: 0 auto;
+  display: flex; align-items: center; gap: 10px; padding: 0 14px;
+  background: rgba(245, 246, 248, .92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  transition: transform .22s ease;
+}
+.app-topbar.hidden { transform: translateY(-100%); }
+.app-topbar-btn { width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border); color: var(--text); }
+.app-topbar-btn:active { transform: scale(.93); }
+.app-topbar-btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+
 /* ---- app shell ---- */
-.screen { display: flex; flex-direction: column; min-height: 100dvh; max-width: 520px; margin: 0 auto; background: var(--bg); }
+.screen { display: flex; flex-direction: column; min-height: 100dvh; max-width: 520px; margin: 0 auto; background: var(--bg); padding-top: 56px; }
 .header { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 16px; flex: none; }
 .header-title { flex: 1; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
 .content { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 4px 20px 28px; gap: 20px; }
@@ -107,4 +121,5 @@ textarea.field { min-height: 124px; padding: 14px 16px; line-height: 1.45; resiz
   .screen { max-width: none; }
   .content { max-width: 900px; margin: 0 auto; width: 100%; }
   .grid-wide { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+  .app-topbar { max-width: none; }
 }
