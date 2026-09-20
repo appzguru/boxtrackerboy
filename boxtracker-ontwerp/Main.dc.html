@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Boxtracker app</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8;}
+*{box-sizing:border-box;}
+h1,h2,h3,p{margin:0;}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left;}
+button:focus-visible,input:focus-visible,textarea:focus-visible,label:focus-within{outline:2px solid #3547F5;outline-offset:2px;}
+input,textarea{font-family:inherit;}
+input::placeholder,textarea::placeholder{color:#7B8494;}
+.pbtn{transition:background .12s,transform .08s;}
+.pbtn:hover{background:#2A3BE0!important;}
+.pbtn:active{transform:scale(.985);}
+.pbtn:disabled{background:#D9DDE6!important;color:#77808F!important;cursor:not-allowed;transform:none;}
+.sbtn:hover,.ib:hover{background:#F0F2F6!important;}
+.chip:hover,.row:hover,.tile:hover{filter:brightness(.96);}
+.ghost:hover{background:#EAEDFF;}
+.sbtn:active,.tile:active,.row:active,.chip:active{transform:scale(.985);}
+.sw{appearance:none;-webkit-appearance:none;width:52px;height:32px;border-radius:16px;background:#D5DAE1;position:relative;transition:background .15s;flex:none;margin:0;cursor:pointer;}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,18,22,.25);transition:transform .15s;}
+.sw:checked{background:#3547F5;}
+.sw:checked::after{transform:translateX(20px);}
+@keyframes scanline{0%{top:12%}50%{top:84%}100%{top:12%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes grow{from{width:4%}to{width:100%}}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+@keyframes rise{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.sk{animation:pulse 1.2s ease-in-out infinite;background:#E4E7EE;border-radius:12px;}
+.up{animation:grow 1.4s linear forwards;}
+.pop{animation:pop .16s ease-out;}
+.rise{animation:rise .22s ease-out;}
+.scanline{animation:scanline 2.6s ease-in-out infinite;}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;overflow:hidden;background:#F5F6F8;color:#0F1216;font-family:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif;">
+
+<sc-if value="{{ s.home }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:24px 20px 20px;gap:24px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="width:36px;height:36px;border-radius:11px;background:#3547F5;color:#FFFFFF;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></svg></div>
+    <div style="font-size:17px;font-weight:600;letter-spacing:-0.02em;">Boxtracker</div>
+  </div>
+  <h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;font-size:38px;line-height:1.02;">Waar staat<br>alles?</h1>
+  <form onSubmit="{{ submitHomeSearch }}" style="position:relative;margin:0;">
+    <span style="position:absolute;left:18px;top:0;height:58px;display:flex;align-items:center;color:#5B6573;pointer-events:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>
+    <label for="q-home" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Zoeken</label>
+    <input id="q-home" type="search" value="{{ q }}" onChange="{{ setQ }}" placeholder="Zoek: orgel, Irma, 47" autocomplete="off" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;padding-left:50px;">
+  </form>
+
+  <sc-if value="{{ hasBoxes }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:10px;">
+      <sc-for list="{{ stats }}" as="st" hint-placeholder-count="3">
+        <button type="button" class="tile" onClick="{{ st.open }}" style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:16px 14px 14px;display:flex;flex-direction:column;gap:6px;">
+          <span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:38px;font-weight:600;letter-spacing:-0.05em;line-height:1;">{{ st.n }}</span>
+          <span style="font-size:14px;font-weight:500;color:#5B6573;">{{ st.label }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
+      <button type="button" class="sbtn" onClick="{{ goOverview }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg> Overzicht</button>
+      <button type="button" class="sbtn" onClick="{{ goImport }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg> Labels</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ noBoxes }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:22px 20px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-size:22px;font-weight:700;letter-spacing:-0.03em;">Nog geen dozen</div>
+      <div style="display:flex;gap:14px;align-items:flex-start;"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;width:30px;height:30px;flex:none;border-radius:10px;background:#EAEDFF;color:#2433C7;display:flex;align-items:center;justify-content:center;font-weight:600;">1</span><span style="font-size:16px;line-height:1.4;padding-top:3px;">Print de stickers met QR-code en nummer.</span></div>
+      <div style="display:flex;gap:14px;align-items:flex-start;"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;width:30px;height:30px;flex:none;border-radius:10px;background:#EAEDFF;color:#2433C7;display:flex;align-items:center;justify-content:center;font-weight:600;">2</span><span style="font-size:16px;line-height:1.4;padding-top:3px;">Importeer de lijst met stickernummers als CSV.</span></div>
+    </div>
+  </sc-if>
+
+  <div style="border:1.5px dashed #BAC1CF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Prototype · sticker scannen</div>
+    <div style="font-size:14px;line-height:1.45;color:#5B6573;">In het echt scan je met de telefooncamera. Tik hier een sticker om dat na te bootsen.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <sc-for list="{{ demoChips }}" as="c" hint-placeholder-count="5">
+        <button type="button" class="chip" onClick="{{ c.run }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;color:#0F1216;"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:600;">{{ c.label }}</span><span style="color:#5B6573;">{{ c.sub }}</span></button>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <button type="button" onClick="{{ demoEmpty }}" style="min-height:44px;font-size:14px;font-weight:600;color:#3547F5;">Leeg starten</button>
+      <button type="button" onClick="{{ demoReset }}" style="min-height:44px;font-size:14px;font-weight:600;color:#3547F5;">Voorbeelddata terug</button>
+    </div>
+  </div>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <sc-if value="{{ hasBoxes }}" hint-placeholder-val="{{ true }}"><button type="button" class="pbtn" onClick="{{ startMove }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg> Dozen verplaatsen</button></sc-if>
+  <sc-if value="{{ noBoxes }}" hint-placeholder-val="{{ false }}"><button type="button" class="pbtn" onClick="{{ goImport }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg> Labels importeren</button></sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.box }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:4px 20px 28px;gap:20px;">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+    <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:76px;font-weight:600;letter-spacing:-0.05em;line-height:0.95;"><span style="color:#7C8696;font-size:44px;letter-spacing:-0.02em;">#</span>{{ bx.nr }}</div>
+    <span style="display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;background:{{ bx.pillBg }};color:{{ bx.pillFg }};margin-bottom:6px;">{{ bx.status }}</span>
+  </div>
+  <sc-if value="{{ bx.hasTags }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <sc-if value="{{ bx.fragile }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E6EB;font-size:14px;font-weight:600;color:#0F1216;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0zM12 14v6M8.5 20h7"/></svg> Fragiel</span></sc-if>
+      <sc-if value="{{ bx.first }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E6EB;font-size:14px;font-weight:600;color:#0F1216;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 12v7h16v-7M12 14V3M8 7l4-4 4 4"/></svg> Eerst openen</span></sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ boxLoading }}" hint-placeholder-val="{{ false }}">
+    <div class="sk" style="height:132px;border-radius:20px;"></div>
+    <div class="sk" style="height:104px;border-radius:20px;"></div>
+    <div class="sk" style="height:180px;border-radius:20px;"></div>
+  </sc-if>
+
+  <sc-if value="{{ boxReady }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Staat nu</div>
+      <div style="font-size:27px;font-weight:700;line-height:1.14;letter-spacing:-0.03em;">{{ bx.place }}</div>
+      <div style="height:1px;background:#E3E6EB;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Moet naar</span><span style="font-size:18px;font-weight:600;letter-spacing:-0.01em;">{{ bx.dest }}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Eigenaar</span><span style="font-size:16px;font-weight:500;">{{ bx.owner }}</span></div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:12px;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Inhoud</div>
+      <div style="font-size:18px;line-height:1.5;white-space:pre-line;">{{ bx.content }}</div>
+      <sc-if value="{{ bx.hasRemoved }}" hint-placeholder-val="{{ false }}">
+        <div style="height:1px;background:#E3E6EB;"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Eruit gehaald</div>
+          <sc-for list="{{ bx.removed }}" as="rm" hint-placeholder-count="1">
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:15px;line-height:1.4;"><span>{{ rm.text }}</span><span style="color:#5B6573;flex:none;font-size:13px;padding-top:2px;">{{ rm.when }}</span></div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Foto's</div>
+      <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:10px;">
+        <sc-for list="{{ bx.photos }}" as="p" hint-placeholder-count="2"><button type="button" class="tile" onClick="{{ p.open }}" aria-label="Foto vergroten" style="position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:{{ p.bg }};display:flex;align-items:center;justify-content:center;color:#5B6573;width:100%;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/></svg>
+<sc-if value="{{ p.hasUrl }}" hint-placeholder-val="{{ false }}"><img src="{{ p.url }}" alt="Foto van de doos" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;"></sc-if>
+<sc-if value="{{ p.loading }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(255,255,255,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;"><div style="font-size:12px;font-weight:600;color:#0F1216;">Uploaden</div><div style="width:60%;height:5px;border-radius:3px;background:#DDE1EA;overflow:hidden;"><div class="up" style="height:5px;background:#3547F5;border-radius:3px;"></div></div></div></sc-if></button></sc-for><label style="position:relative;aspect-ratio:1/1;border-radius:16px;border:1.5px dashed #B3BBCB;background:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#3547F5;font-size:13px;font-weight:600;cursor:pointer;width:100%;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Foto</span><input type="file" accept="image/*" capture="environment" onChange="{{ onPhotoBox }}" aria-label="Foto toevoegen" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;"></label>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Reis van de doos</div>
+      <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:18px 18px 4px;">
+        <sc-for list="{{ bx.journey }}" as="j" hint-placeholder-count="3">
+          <div style="display:flex;gap:14px;">
+            <div style="display:flex;flex-direction:column;align-items:center;width:14px;flex:none;">
+              <div style="width:14px;height:14px;border-radius:50%;margin-top:4px;background:{{ j.dot }};"></div>
+              <div style="flex:1;width:2px;background:#E3E6EB;margin-top:4px;{{ j.lineHide }}"></div>
+            </div>
+            <div style="padding-bottom:18px;display:flex;flex-direction:column;gap:2px;min-width:0;">
+              <div style="font-size:16px;font-weight:600;letter-spacing:-0.01em;">{{ j.title }}</div>
+              <div style="font-size:14px;color:#5B6573;line-height:1.35;">{{ j.sub }}</div>
+              <sc-if value="{{ j.hasNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;line-height:1.35;">{{ j.note }}</div></sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ bx.active }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
+        <button type="button" class="sbtn" onClick="{{ goEdit }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg> Bewerken</button>
+        <button type="button" class="sbtn" onClick="{{ openOpenSheet }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 12v7h16v-7M12 14V3M8 7l4-4 4 4"/></svg> Doos geopend</button>
+        <button type="button" class="sbtn" onClick="{{ doUnpack }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;grid-column:span 2;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg> Doos uitgepakt</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ bx.unpacked }}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{ goEdit }}" style="min-height:48px;font-size:15px;font-weight:600;color:#3547F5;display:flex;align-items:center;gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg> Bewerken</button>
+    </sc-if>
+  </sc-if>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <sc-if value="{{ bx.active }}" hint-placeholder-val="{{ true }}"><button type="button" class="pbtn" onClick="{{ moveThis }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg> Doos verplaatsen</button></sc-if>
+  <sc-if value="{{ bx.unpacked }}" hint-placeholder-val="{{ false }}"><button type="button" class="sbtn" onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;height:58px;">Terug naar start</button></sc-if>
+</div>
+
+<sc-if value="{{ openSheet }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:0;top:0;width:390px;height:844px;z-index:20;">
+    <button type="button" aria-label="Sluiten" onClick="{{ closeSheet }}" style="position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(15,18,22,0.45);"></button>
+    <div class="rise" style="position:absolute;left:0;bottom:0;width:100%;background:#FFFFFF;border-radius:28px 28px 0 0;padding:22px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-size:22px;font-weight:700;letter-spacing:-0.03em;">Wat is eruit gehaald?</div>
+      <label for="open-note" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Wat is eruit gehaald</label>
+      <textarea id="open-note" value="{{ openNote }}" onChange="{{ setOpenNote }}" rows="3" placeholder="Bijv. twee kabels en de bladmuziek" style="width:100%;min-height:96px;border-radius:16px;border:1px solid #E3E6EB;background:#F5F6F8;padding:14px 16px;font-size:17px;line-height:1.4;resize:none;color:#0F1216;"></textarea>
+      <button type="button" class="pbtn" disabled="{{ openDisabled }}" onClick="{{ submitOpen }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">Noteren</button>
+      <button type="button" class="ghost" onClick="{{ closeSheet }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;box-sizing:border-box;border-radius:14px;color:#3547F5;font-size:16px;font-weight:600;">Annuleren</button>
+    </div>
+  </div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.form }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:4px 20px 28px;gap:26px;">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+    <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:76px;font-weight:600;letter-spacing:-0.05em;line-height:0.95;"><span style="color:#7C8696;font-size:44px;letter-spacing:-0.02em;">#</span>{{ f.nr }}</div>
+    <span style="display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;background:{{ f.pillBg }};color:{{ f.pillFg }};margin-bottom:6px;">{{ f.pillText }}</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <label for="f-content" style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Inhoud</label>
+      <button type="button" onClick="{{ toggleDictate }}" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;font-size:15px;font-weight:600;{{ micStyle }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>{{ micLabel }}</button>
+    </div>
+    <textarea id="f-content" value="{{ f.content }}" onChange="{{ onContent }}" rows="4" placeholder="Wat zit erin?" style="width:100%;min-height:124px;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:14px 16px;font-size:18px;line-height:1.45;resize:none;color:#0F1216;"></textarea>
+    <sc-if value="{{ hasDictNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:#5B6573;line-height:1.4;">{{ dictNote }}</div></sc-if>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Eigenaar</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <sc-for list="{{ ownerChips }}" as="c" hint-placeholder-count="5"><button type="button" class="chip" onClick="{{ c.pick }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;{{ c.style }}">{{ c.name }}</button></sc-for>
+      <button type="button" class="chip" onClick="{{ ownerOtherPick }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;{{ ownerOtherStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M12 5v14M5 12h14"/></svg> Andere</button>
+    </div>
+    <sc-if value="{{ ownerOtherOn }}" hint-placeholder-val="{{ false }}">
+      <label for="owner-other" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Naam eigenaar</label>
+      <input id="owner-other" type="text" value="{{ f.owner }}" onChange="{{ onOwnerOther }}" placeholder="Naam" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;height:52px;">
+    </sc-if>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Bestemming in het nieuwe huis</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <sc-for list="{{ destChips }}" as="c" hint-placeholder-count="8"><button type="button" class="chip" onClick="{{ c.pick }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;{{ c.style }}">{{ c.name }}</button></sc-for>
+      <button type="button" class="chip" onClick="{{ destOtherPick }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;{{ destOtherStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M12 5v14M5 12h14"/></svg> Andere</button>
+    </div>
+    <sc-if value="{{ destOtherOn }}" hint-placeholder-val="{{ false }}">
+      <label for="dest-other" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Bestemming</label>
+      <input id="dest-other" type="text" value="{{ f.dest }}" onChange="{{ onDestOther }}" placeholder="Kamer of plek" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;height:52px;">
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ f.isNew }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label for="f-place" style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Huidige plek</label>
+      <input id="f-place" type="text" value="{{ f.place }}" onChange="{{ onPlace }}" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;height:54px;">
+    </div>
+  </sc-if>
+
+  <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+    <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:0 18px;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:12px;font-size:17px;font-weight:600;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0zM12 14v6M8.5 20h7"/></svg> Fragiel</span>
+      <input type="checkbox" class="sw" checked="{{ f.fragile }}" onChange="{{ toggleFragile }}">
+    </label>
+    <div style="height:1px;background:#E3E6EB;"></div>
+    <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:0 18px;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:12px;font-size:17px;font-weight:600;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 12v7h16v-7M12 14V3M8 7l4-4 4 4"/></svg> Eerst openen</span>
+      <input type="checkbox" class="sw" checked="{{ f.first }}" onChange="{{ toggleFirst }}">
+    </label>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Foto's</div>
+    <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:10px;">
+      <sc-for list="{{ fphotos }}" as="p" hint-placeholder-count="2"><div style="position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:{{ p.bg }};display:flex;align-items:center;justify-content:center;color:#5B6573;width:100%;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/></svg>
+<sc-if value="{{ p.hasUrl }}" hint-placeholder-val="{{ false }}"><img src="{{ p.url }}" alt="Foto van de doos" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;"></sc-if>
+<sc-if value="{{ p.loading }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(255,255,255,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;"><div style="font-size:12px;font-weight:600;color:#0F1216;">Uploaden</div><div style="width:60%;height:5px;border-radius:3px;background:#DDE1EA;overflow:hidden;"><div class="up" style="height:5px;background:#3547F5;border-radius:3px;"></div></div></div></sc-if></div></sc-for><label style="position:relative;aspect-ratio:1/1;border-radius:16px;border:1.5px dashed #B3BBCB;background:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#3547F5;font-size:13px;font-weight:600;cursor:pointer;width:100%;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Foto</span><input type="file" accept="image/*" capture="environment" onChange="{{ onPhotoForm }}" aria-label="Foto toevoegen" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;"></label>
+    </div>
+  </div>
+
+  <sc-if value="{{ f.isNew }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:center;gap:12px;font-size:15px;color:#5B6573;">
+      <label for="f-packer">Ingepakt door</label>
+      <input id="f-packer" type="text" value="{{ f.packer }}" onChange="{{ onPacker }}" style="height:44px;width:150px;border-radius:12px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 12px;font-size:16px;color:#0F1216;">
+    </div>
+  </sc-if>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <button type="button" class="pbtn" disabled="{{ saveDisabled }}" onClick="{{ saveForm }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">{{ saveLabel }}</button>
+  <sc-if value="{{ needContent }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:13px;color:#5B6573;">Vul eerst in wat erin zit</div></sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.saved }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 32px;text-align:center;">
+  <div class="pop" style="width:92px;height:92px;border-radius:50%;background:#EAEDFF;color:#3547F5;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:56px;font-weight:600;letter-spacing:-0.05em;line-height:1;">#{{ sv.nr }}</div>
+  <div style="font-size:22px;font-weight:700;letter-spacing:-0.03em;">Doos opgeslagen</div>
+  <div style="font-size:16px;line-height:1.45;color:#5B6573;">{{ sv.sub }}</div>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <button type="button" class="pbtn" onClick="{{ saveNext }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/></svg> Volgende doos scannen</button>
+  <button type="button" class="ghost" onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;box-sizing:border-box;border-radius:14px;color:#3547F5;font-size:16px;font-weight:600;">Naar start</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.moveDest }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:4px 20px 24px;gap:22px;">
+  <h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;">{{ md.title }}</h1>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <sc-for list="{{ destRows }}" as="r" hint-placeholder-count="5">
+      <button type="button" class="row" onClick="{{ r.pick }}" style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:62px;padding:0 18px;{{ r.style }}">
+        <span style="font-size:17px;font-weight:600;letter-spacing:-0.01em;">{{ r.name }}</span>
+        <span style="width:26px;height:26px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#FFFFFF;{{ r.ring }}"><sc-if value="{{ r.on }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></sc-if></span>
+      </button>
+    </sc-for>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <label for="dest-typed" style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Nieuwe plek typen</label>
+    <input id="dest-typed" type="text" value="{{ destTyped }}" onChange="{{ setDestTyped }}" placeholder="Bijv. Opslag · rij 3" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;">
+  </div>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <button type="button" class="pbtn" disabled="{{ destDisabled }}" onClick="{{ moveDestGo }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">{{ md.go }}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.moveScan }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button><div style="flex:1;font-size:17px;font-weight:600;letter-spacing:-0.01em;">Dozen scannen</div></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 16px 18px;gap:14px;">
+  <sc-if value="{{ camOk }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;flex:none;height:248px;border-radius:24px;background:#E4E8EF;overflow:hidden;">
+      <div style="position:absolute;left:26px;top:26px;width:30px;height:30px;border-top:3px solid #0F1216;border-left:3px solid #0F1216;border-top-left-radius:10px;"></div>
+      <div style="position:absolute;right:26px;top:26px;width:30px;height:30px;border-top:3px solid #0F1216;border-right:3px solid #0F1216;border-top-right-radius:10px;"></div>
+      <div style="position:absolute;left:26px;bottom:26px;width:30px;height:30px;border-bottom:3px solid #0F1216;border-left:3px solid #0F1216;border-bottom-left-radius:10px;"></div>
+      <div style="position:absolute;right:26px;bottom:26px;width:30px;height:30px;border-bottom:3px solid #0F1216;border-right:3px solid #0F1216;border-bottom-right-radius:10px;"></div>
+      <div class="scanline" style="position:absolute;left:44px;right:44px;height:3px;border-radius:2px;background:#3547F5;"></div>
+      <div style="position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:14px;font-weight:500;color:#4A5360;">Richt op de QR-code op de sticker</div>
+      <sc-if value="{{ flash.on }}" hint-placeholder-val="{{ false }}">
+        <div class="pop" style="position:absolute;left:0;top:0;width:100%;height:100%;background:{{ flash.bg }};color:{{ flash.fg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 24px;text-align:center;">
+          <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:1;">{{ flash.big }}</div>
+          <div style="font-size:19px;font-weight:600;letter-spacing:-0.01em;">{{ flash.small }}</div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+  <sc-if value="{{ camAsk }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;flex:none;height:248px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;">
+      <div style="width:56px;height:56px;border-radius:50%;background:#EAEDFF;color:#3547F5;display:flex;align-items:center;justify-content:center;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
+      <div style="font-size:19px;font-weight:700;letter-spacing:-0.02em;">Camera toestaan</div>
+      <div style="font-size:14px;line-height:1.4;color:#5B6573;">Nodig om stickers te scannen. De camera-beelden worden nergens opgeslagen.</div>
+      <button type="button" class="pbtn" onClick="{{ allowCam }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;height:48px;width:auto;padding:0 24px;font-size:16px;">Camera aanzetten</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{ camDenied }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;flex:none;padding:22px 22px 20px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:19px;font-weight:700;letter-spacing:-0.02em;">Camera staat uit</div>
+      <div style="font-size:15px;line-height:1.45;color:#4A5360;">Open de browserinstellingen, kies Site-instellingen, dan Camera, en zet die voor deze pagina op Toestaan. Kom daarna terug en probeer het opnieuw.</div>
+      <button type="button" class="sbtn" onClick="{{ allowCam }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg> Opnieuw proberen</button>
+    </div>
+  </sc-if>
+
+  <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;flex:none;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <div style="min-width:0;flex:1;"><div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Naar</div><div style="font-size:22px;font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-top:4px;">{{ sc.dest }}</div></div>
+    <div style="text-align:right;flex:none;"><div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:56px;font-weight:600;line-height:1;letter-spacing:-0.05em;">{{ sc.count }}</div><div style="font-size:13px;font-weight:500;color:#5B6573;">gescand</div></div>
+  </div>
+
+  <div style="flex:none;border:1.5px dashed #BAC1CF;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Prototype · tik een sticker</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <sc-for list="{{ scanChips }}" as="c" hint-placeholder-count="5"><button type="button" class="chip" onClick="{{ c.run }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;color:#0F1216;"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:600;">{{ c.label }}</span><span style="color:#5B6573;">{{ c.sub }}</span></button></sc-for>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <button type="button" onClick="{{ demoCamAsk }}" style="min-height:44px;font-size:14px;font-weight:600;color:#3547F5;">Toon toestemming</button>
+      <button type="button" onClick="{{ demoCamDenied }}" style="min-height:44px;font-size:14px;font-weight:600;color:#3547F5;">Toon geweigerd</button>
+    </div>
+  </div>
+
+  <sc-if value="{{ sc.has }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:none;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Gescand</div>
+      <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+        <sc-for list="{{ scanList }}" as="r" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:0 16px;border-top:{{ r.bt }};">
+            <span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;letter-spacing:-0.03em;width:52px;flex:none;">{{ r.nr }}</span>
+            <span style="flex:1;min-width:0;font-size:15px;color:#4A5360;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.line }}</span>
+            <span style="color:#10633B;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <button type="button" class="pbtn" onClick="{{ finishMove }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">{{ sc.finish }}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.moveDone }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:56px 24px 24px;gap:18px;">
+  <div class="pop" style="width:56px;height:56px;border-radius:18px;background:#DDF4E7;color:#10633B;display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:104px;font-weight:600;letter-spacing:-0.06em;line-height:0.9;">{{ mdone.n }}</div>
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:18px;font-weight:500;color:#4A5360;">{{ mdone.lead }}</div>
+    <div style="font-size:30px;font-weight:700;letter-spacing:-0.035em;line-height:1.1;">{{ mdone.dest }}</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+    <sc-for list="{{ mdone.list }}" as="r" hint-placeholder-count="6"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E6EB;font-size:16px;font-weight:600;">{{ r.nr }}</span></sc-for>
+  </div>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <button type="button" class="pbtn" onClick="{{ newRound }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg> Nieuwe ronde</button>
+  <button type="button" class="ghost" onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;box-sizing:border-box;border-radius:14px;color:#3547F5;font-size:16px;font-weight:600;">Terug naar start</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.search }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button><div style="flex:1;position:relative;"><span style="position:absolute;left:14px;top:0;height:48px;display:flex;align-items:center;color:#5B6573;pointer-events:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span><label for="q-search" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Zoeken</label><input id="q-search" type="search" value="{{ q }}" onChange="{{ setQ }}" placeholder="Zoek: orgel, Irma, 47" autocomplete="off" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;height:48px;padding-left:44px;font-size:16px;"></div></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:8px 20px 24px;gap:12px;">
+  <sc-if value="{{ srch.blank }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;line-height:1.45;color:#5B6573;padding:8px 2px;">Zoek op inhoud, eigenaar of nummer. Het antwoord is altijd de plek.</div></sc-if>
+  <sc-if value="{{ srch.some }}" hint-placeholder-val="{{ true }}">
+    <div style="font-size:14px;font-weight:500;color:#5B6573;padding:0 2px;">{{ srch.count }}</div>
+    <sc-for list="{{ results }}" as="r" hint-placeholder-count="3">
+      <button type="button" class="row" onClick="{{ r.open }}" style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;width:100%;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+        <span style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;">
+          <span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;background:#F0F2F6;border-radius:8px;padding:4px 10px;">#{{ r.nr }}</span>
+          <span style="font-size:14px;font-weight:500;color:#5B6573;">Moet naar {{ r.dest }}</span>
+        </span>
+        <span style="font-size:25px;font-weight:700;letter-spacing:-0.03em;line-height:1.15;">{{ r.place }}</span>
+        <span style="font-size:15px;color:#4A5360;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;">{{ r.line }}</span>
+      </button>
+    </sc-for>
+  </sc-if>
+  <sc-if value="{{ srch.none }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:22px 20px;display:flex;flex-direction:column;gap:12px;">
+      <div style="font-size:21px;font-weight:700;letter-spacing:-0.03em;line-height:1.2;">{{ srch.noneTitle }}</div>
+      <div style="font-size:15px;line-height:1.5;color:#4A5360;">Inhoud is alleen vindbaar als die is ingevuld. Probeer een ander woord, of blader door alle dozen.</div>
+      <button type="button" class="sbtn" onClick="{{ browseAll }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;width:100%;box-sizing:border-box;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;color:#0F1216;font-size:15px;font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg> Alle dozen bekijken</button>
+    </div>
+  </sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.overview }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:4px 20px 32px;gap:24px;">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;"><h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;">Overzicht</h1><span style="font-size:15px;font-weight:500;color:#5B6573;">{{ ov.total }}</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    <sc-for list="{{ ovOwners }}" as="c" hint-placeholder-count="6"><button type="button" class="chip" onClick="{{ c.pick }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;{{ c.style }}">{{ c.name }}</button></sc-for>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Per status</div>
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+      <sc-for list="{{ ovStatus }}" as="r" hint-placeholder-count="3">
+        <button type="button" class="row" onClick="{{ r.open }}" style="display:flex;flex-direction:column;gap:9px;width:100%;padding:15px 18px;border-top:{{ r.bt }};">
+          <span style="display:flex;justify-content:space-between;align-items:center;width:100%;"><span style="font-size:16px;font-weight:600;">{{ r.label }}</span><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;letter-spacing:-0.03em;">{{ r.n }}</span></span>
+          <span style="display:block;width:100%;height:6px;border-radius:3px;background:#EEF0F5;"><span style="display:block;height:6px;border-radius:3px;background:#3547F5;width:{{ r.w }};"></span></span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Per plek</div>
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+      <sc-for list="{{ ovPlaces }}" as="r" hint-placeholder-count="6">
+        <button type="button" class="row" onClick="{{ r.open }}" style="display:flex;flex-direction:column;gap:9px;width:100%;padding:15px 18px;border-top:{{ r.bt }};">
+          <span style="display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;"><span style="font-size:16px;font-weight:600;">{{ r.label }}</span><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;letter-spacing:-0.03em;">{{ r.n }}</span></span>
+          <span style="display:block;width:100%;height:6px;border-radius:3px;background:#EEF0F5;"><span style="display:block;height:6px;border-radius:3px;background:#3547F5;width:{{ r.w }};"></span></span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Per bestemming</div>
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+      <sc-for list="{{ ovDests }}" as="r" hint-placeholder-count="6">
+        <button type="button" class="row" onClick="{{ r.open }}" style="display:flex;flex-direction:column;gap:9px;width:100%;padding:15px 18px;border-top:{{ r.bt }};">
+          <span style="display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;"><span style="font-size:16px;font-weight:600;">{{ r.label }}</span><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;letter-spacing:-0.03em;">{{ r.n }}</span></span>
+          <span style="display:block;width:100%;height:6px;border-radius:3px;background:#EEF0F5;"><span style="display:block;height:6px;border-radius:3px;background:#3547F5;width:{{ r.w }};"></span></span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.list }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:4px 20px 32px;gap:16px;">
+  <div style="display:flex;flex-direction:column;gap:6px;"><h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;font-size:28px;">{{ lst.title }}</h1><div style="font-size:15px;font-weight:500;color:#5B6573;">{{ lst.count }}</div></div>
+  <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:4px;padding:4px;border-radius:14px;background:#E9ECF2;">
+    <button type="button" onClick="{{ setSortNr }}" style="height:44px;border-radius:11px;font-size:15px;font-weight:600;text-align:center;{{ sortNrStyle }}">Nummer</button>
+    <button type="button" onClick="{{ setSortRec }}" style="height:44px;border-radius:11px;font-size:15px;font-weight:600;text-align:center;{{ sortRecStyle }}">Laatst gewijzigd</button>
+  </div>
+  <sc-if value="{{ lst.some }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+      <sc-for list="{{ listRows }}" as="r" hint-placeholder-count="6">
+        <button type="button" class="row" onClick="{{ r.open }}" style="display:flex;align-items:center;gap:14px;width:100%;min-height:66px;padding:0 16px;border-top:{{ r.bt }};">
+          <span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:21px;font-weight:600;letter-spacing:-0.03em;width:48px;flex:none;">{{ r.nr }}</span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.line }}</span>
+            <span style="font-size:13px;color:#5B6573;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.place }}</span>
+          </span>
+          <sc-if value="{{ r.fragile }}" hint-placeholder-val="{{ false }}"><span style="color:#7A4B00;flex:none;" title="Fragiel"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0zM12 14v6M8.5 20h7"/></svg></span></sc-if>
+          <sc-if value="{{ r.first }}" hint-placeholder-val="{{ false }}"><span style="color:#2433C7;flex:none;" title="Eerst openen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 12v7h16v-7M12 14V3M8 7l4-4 4 4"/></svg></span></sc-if>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ lst.none }}" hint-placeholder-val="{{ false }}"><div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:22px 20px;font-size:16px;color:#4A5360;line-height:1.45;">Geen dozen in deze lijst.</div></sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.imp }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:4px 20px 24px;gap:20px;">
+  <h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;">Labels importeren</h1>
+  <p style="font-size:16px;line-height:1.5;color:#4A5360;">Kies een CSV-bestand met de stickernummers. Elke regel wordt een lege doos, klaar om te scannen.</p>
+  <sc-if value="{{ impIdle }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:18px 20px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Voorbeeld</div>
+      <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:16px;line-height:1.6;color:#0F1216;">nummer<br>061<br>062<br>063</div>
+      <div style="font-size:14px;color:#5B6573;line-height:1.4;">Het nummer staat in de eerste kolom. Nummers die al bestaan worden overgeslagen.</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ impReading }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:22px 20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-size:18px;font-weight:700;letter-spacing:-0.02em;">Bestand wordt ingelezen</div>
+      <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;color:#5B6573;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ imp.file }}</div>
+      <div style="height:8px;border-radius:4px;background:#EEF0F5;overflow:hidden;"><div style="height:8px;border-radius:4px;background:#3547F5;width:{{ impWidth }};transition:width .3s ease;"></div></div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ impDone }}" hint-placeholder-val="{{ false }}">
+    <div class="pop" style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:22px 20px;display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;align-items:baseline;gap:14px;"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:1;">{{ imp.added }}</span><span style="font-size:18px;font-weight:600;line-height:1.25;">dozen<br>toegevoegd</span></div>
+      <div style="height:1px;background:#E3E6EB;"></div>
+      <div style="display:flex;align-items:baseline;gap:14px;"><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:32px;font-weight:600;letter-spacing:-0.04em;line-height:1;color:#5B6573;">{{ imp.skipped }}</span><span style="font-size:16px;color:#4A5360;">overgeslagen, bestonden al</span></div>
+      <sc-if value="{{ impEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;color:#A4262C;line-height:1.4;">Geen nummers gevonden. Zet het nummer in de eerste kolom.</div></sc-if>
+    </div>
+  </sc-if>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;">
+  <sc-if value="{{ impIdle }}" hint-placeholder-val="{{ true }}">
+    <label class="pbtn" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;position:relative;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg> Bestand kiezen<input type="file" accept=".csv,.txt,text/csv,text/plain" onChange="{{ onCsv }}" aria-label="CSV-bestand kiezen" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;"></label>
+    <button type="button" class="ghost" onClick="{{ useSample }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;box-sizing:border-box;border-radius:14px;color:#3547F5;font-size:16px;font-weight:600;">Voorbeeldbestand gebruiken</button>
+  </sc-if>
+  <sc-if value="{{ impReading }}" hint-placeholder-val="{{ false }}"><button type="button" class="pbtn" disabled="{{ true }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">Bezig met inlezen…</button></sc-if>
+  <sc-if value="{{ impDone }}" hint-placeholder-val="{{ false }}">
+    <button type="button" class="pbtn" onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">Naar start</button>
+    <button type="button" class="ghost" onClick="{{ impAgain }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;box-sizing:border-box;border-radius:14px;color:#3547F5;font-size:16px;font-weight:600;">Nog een bestand</button>
+  </sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.unknown }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:24px 24px 24px;gap:20px;">
+  <div style="width:64px;height:64px;border-radius:20px;background:#FDE8E8;color:#A4262C;display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg></div>
+  <h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;">Deze sticker kennen we niet</h1>
+  <p style="font-size:17px;line-height:1.5;color:#4A5360;">Hij hoort niet bij deze app, of de code is verkeerd overgetypt. Zoek de doos op nummer of inhoud.</p>
+  <sc-if value="{{ hasBadCode }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;color:#5B6573;">Gelezen: {{ badCode }}</div></sc-if>
+  <form onSubmit="{{ submitBadSearch }}" style="position:relative;margin:0;">
+    <span style="position:absolute;left:18px;top:0;height:58px;display:flex;align-items:center;color:#5B6573;pointer-events:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>
+    <label for="q-bad" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Zoeken</label>
+    <input id="q-bad" type="search" value="{{ q }}" onChange="{{ setQ }}" placeholder="Zoek: orgel, Irma, 47" autocomplete="off" style="width:100%;height:58px;box-sizing:border-box;border-radius:16px;border:1px solid #E3E6EB;background:#FFFFFF;padding:0 16px;font-family:inherit;font-size:17px;color:#0F1216;padding-left:50px;">
+  </form>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;"><button type="button" class="pbtn" onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">Naar start</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ s.server }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;height:844px;width:390px;position:relative;">
+<div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 16px;flex:none;"><button type="button" class="ib" aria-label="Terug" onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E6EB;display:flex;align-items:center;justify-content:center;color:#0F1216;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:24px 24px 24px;gap:20px;">
+  <div style="width:64px;height:64px;border-radius:20px;background:#FFF1D0;color:#7A4B00;display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg></div>
+  <h1 style="margin:0;font-size:32px;line-height:1.08;letter-spacing:-0.035em;font-weight:700;">Geen verbinding met de server</h1>
+  <p style="font-size:17px;line-height:1.5;color:#4A5360;">Wat je al hebt opgeslagen blijft staan. Controleer je wifi of mobiele data en probeer het opnieuw.</p>
+</div>
+<div style="flex:none;padding:12px 16px 28px;background:#FFFFFF;border-top:1px solid #E3E6EB;display:flex;flex-direction:column;gap:8px;"><button type="button" class="pbtn" onClick="{{ retryServer }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg> Opnieuw proberen</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ lightbox.on }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:0;top:0;width:390px;height:844px;z-index:30;display:flex;align-items:center;justify-content:center;padding:24px;">
+    <button type="button" aria-label="Sluiten" onClick="{{ closeLightbox }}" style="position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(15,18,22,0.5);"></button>
+    <div class="pop" style="position:relative;width:100%;background:#FFFFFF;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:12px;">
+      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:18px;overflow:hidden;background:{{ lightbox.bg }};display:flex;align-items:center;justify-content:center;color:#5B6573;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/></svg>
+        <sc-if value="{{ lightbox.hasUrl }}" hint-placeholder-val="{{ false }}"><img src="{{ lightbox.url }}" alt="Foto van de doos" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;"></sc-if>
+      </div>
+      <button type="button" class="pbtn" onClick="{{ closeLightbox }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;width:100%;box-sizing:border-box;border-radius:16px;background:#3547F5;color:#FFFFFF;font-size:17px;font-weight:600;letter-spacing:-0.01em;">Sluiten</button>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+  <div class="rise" style="position:absolute;left:16px;right:16px;bottom:120px;z-index:40;display:flex;justify-content:center;pointer-events:none;">
+    <div style="background:#0F1216;color:#FFFFFF;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:500;display:flex;align-items:center;gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{ toast }}</div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+
+const ME = 'Edwin';
+const NOW = Date.now();
+const DAY = 86400000;
+const OWNERS = ['Edwin', 'Irma', 'Amy', 'Sven', 'Gezamenlijk'];
+const DESTS = ['Woonkamer', 'Keuken', 'Slaapkamer', 'Kamer Amy', 'Kamer Sven', 'Werkkamer', 'Garage', 'Bijkeuken'];
+const STAT = {
+  ingepakt: { label: 'Ingepakt', bg: '#FFF1D0', fg: '#7A4B00' },
+  opslag: { label: 'In opslag', bg: '#EAEDFF', fg: '#2433C7' },
+  uitgepakt: { label: 'Uitgepakt', bg: '#DDF4E7', fg: '#10633B' },
+  nieuw: { label: 'Nieuwe doos', bg: '#0F1216', fg: '#FFFFFF' }
+};
+const pad3 = n => String(n).padStart(3, '0');
+function T(d, h, m) { const x = new Date(NOW - d * DAY); x.setHours(h, m, 0, 0); return x.getTime(); }
+function fmt(ts) {
+  const d = new Date(ts), n = new Date();
+  const hm = d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === n.toDateString()) return 'Vandaag, ' + hm;
+  return d.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '') + ', ' + hm;
+}
+function isFilled(b) { return b.content.trim() !== ''; }
+function statusOf(b) {
+  if (!isFilled(b)) return 'nieuw';
+  if (b.unpacked) return 'uitgepakt';
+  if (b.place.indexOf('Opslag') === 0) return 'opslag';
+  return 'ingepakt';
+}
+function firstLine(t) { const l = (t || '').split(/\r?\n/)[0]; return l; }
+function emptyBox(id) { return { id: id, content: '', owner: '', dest: '', place: '', fragile: false, first: false, unpacked: false, events: [], removed: [], photos: [], updated: 0 }; }
+function filterBoxes(boxes, lf) {
+  let r = boxes.filter(isFilled);
+  if (lf.owner) r = r.filter(b => b.owner === lf.owner);
+  if (lf.kind === 'place') r = r.filter(b => b.place === lf.val);
+  if (lf.kind === 'dest') r = r.filter(b => b.dest === lf.val);
+  if (lf.kind === 'status') r = r.filter(b => statusOf(b) === lf.val);
+  return r;
+}
+function seedBoxes() {
+  const A1 = 'Opslag · achterwand, stapel 1', A2 = 'Opslag · achterwand, stapel 2';
+  const L1 = 'Opslag · linkerwand, stapel 1', L2 = 'Opslag · linkerwand, stapel 2', DK = 'Opslag · deurkant';
+  const HZ = 'Huis · zolder', HG = 'Huis · garage', HW = 'Huis · werkkamer', HK = 'Huis · woonkamer';
+  const R = [
+    [1, 'Servies: borden, kommen en ontbijtbordjes', 'Gezamenlijk', 'Keuken', A1, 'f'],
+    [2, 'Pannen en bakblikken, deksels apart in krant', 'Irma', 'Keuken', A1, ''],
+    [3, 'Boeken A–H: romans en kookboeken', 'Irma', 'Woonkamer', L1, ''],
+    [4, 'Boeken I–Z: romans en reisgidsen', 'Irma', 'Woonkamer', L1, ''],
+    [5, 'Reservesnaren, statieven en stemapparaat', 'Edwin', 'Werkkamer', L2, ''],
+    [6, 'Lego Technic: sets in zakjes', 'Sven', 'Kamer Sven', HZ, ''],
+    [7, 'Winterjassen en handschoenen', 'Gezamenlijk', 'Bijkeuken', HZ, ''],
+    [8, 'Kabels, voedingen en oude routers', 'Edwin', 'Werkkamer', HW, ''],
+    [9, 'Handdoeken en badlakens', 'Gezamenlijk', 'Slaapkamer', 'Nieuw huis · slaapkamer', ''],
+    [10, 'Fotolijsten en schilderijhaken', 'Irma', 'Woonkamer', DK, 'f'],
+    [11, 'Gitaarversterker en effectpedalen', 'Edwin', 'Werkkamer', A2, 'f'],
+    [12, 'Orgel: onderdelen, kruk en kabels', 'Edwin', 'Woonkamer', A2, ''],
+    [13, 'Schoolspullen: schriften en pennen', 'Amy', 'Kamer Amy', HZ, ''],
+    [14, 'Knuffels en fotoalbums', 'Amy', 'Kamer Amy', DK, ''],
+    [15, 'Bordspellen en schaakset', 'Gezamenlijk', 'Woonkamer', HZ, ''],
+    [16, 'Kerstversiering en lichtsnoeren', 'Gezamenlijk', 'Garage', L2, ''],
+    [17, 'Wijnglazen en karaffen', 'Irma', 'Keuken', A1, 'f'],
+    [18, 'Gereedschap: boren, schroeven, waterpas', 'Edwin', 'Garage', HG, ''],
+    [19, 'Plantenbakken en tuinhandschoenen', 'Irma', 'Garage', HG, ''],
+    [20, 'Beddengoed voor de eerste nacht', 'Gezamenlijk', 'Slaapkamer', HZ, 'e'],
+    [21, 'Voetbalspullen en scheenbeschermers', 'Sven', 'Kamer Sven', HG, ''],
+    [22, 'Dvd-collectie en spelcomputer', 'Sven', 'Kamer Sven', DK, ''],
+    [23, 'Strijkijzer, strijkplank en wasmanden', 'Irma', 'Bijkeuken', HZ, ''],
+    [24, 'Zomerkleding Irma', 'Irma', 'Slaapkamer', HZ, ''],
+    [25, 'Reservemonitor en toetsenbord', 'Edwin', 'Werkkamer', HW, 'f'],
+    [26, 'Studioboeken en cd-collectie', 'Edwin', 'Werkkamer', L1, ''],
+    [27, 'Taartvormen en mixer', 'Irma', 'Keuken', HZ, ''],
+    [28, 'EHBO-set, batterijen en ducttape', 'Gezamenlijk', 'Bijkeuken', HZ, 'e'],
+    [29, 'Kamerdecoratie en spiegel', 'Amy', 'Kamer Amy', DK, 'f'],
+    [30, 'Fietsonderdelen en reserveband', 'Edwin', 'Garage', HG, '']
+  ];
+  const out = [];
+  R.forEach((r, i) => {
+    const id = r[0], content = r[1], owner = r[2], dest = r[3], place = r[4], fl = r[5];
+    const packer = owner === 'Gezamenlijk' ? (i % 2 ? 'Irma' : 'Edwin') : owner;
+    const packTs = T(20 - (i % 14), 10 + (i % 8), 5 * (i % 12));
+    const inStore = place.indexOf('Opslag') === 0;
+    const origin = inStore ? (i % 2 ? HK : HZ) : (id === 9 ? HZ : place);
+    const events = [{ kind: 'pack', place: origin, by: packer, ts: packTs }];
+    let unpacked = false;
+    if (inStore) events.push({ kind: 'move', place: place, by: ME, ts: packTs + 3 * DAY + 2 * 3600000 });
+    if (id === 9) {
+      events.push({ kind: 'move', place: place, by: ME, ts: T(4, 16, 40) });
+      events.push({ kind: 'unpack', place: place, by: 'Irma', ts: T(3, 9, 15) });
+      unpacked = true;
+    }
+    const b = emptyBox(id);
+    b.content = content; b.owner = owner; b.dest = dest; b.place = place;
+    b.fragile = fl === 'f'; b.first = fl === 'e'; b.unpacked = unpacked;
+    b.events = events; b.updated = events[events.length - 1].ts;
+    if (id === 12) b.photos = [{ id: 'p12a', url: '', tone: 0, loading: false }, { id: 'p12b', url: '', tone: 2, loading: false }];
+    if (id === 1 || id === 17) b.photos = [{ id: 'p' + id + 'a', url: '', tone: 1, loading: false }];
+    if (id === 12) b.removed = [{ text: 'Twee kabels en de bladmuziek', ts: T(1, 11, 20) }];
+    out.push(b);
+  });
+  for (let id = 31; id <= 60; id++) out.push(emptyBox(id));
+  return out;
+}
+const TONES = ['#E6EAFB', '#E4F1EC', '#F6ECDD', '#EDE7F6'];
+
+
+function mkState() {
+  return {
+    screen: 'home', stack: [], boxes: seedBoxes(), boxId: null, loading: false, q: '',
+    listFilter: { kind: 'all', val: '', title: 'Alle dozen', owner: '' }, sort: 'nr', ownerFilter: '',
+    form: null, saving: false, savedId: null, listening: false, dictNote: '',
+    moveMode: 'series', destPicked: '', destTyped: '', scanned: [], flash: null, cam: 'granted',
+    moveDone: null, openSheet: false, openNote: '',
+    imp: { phase: 'idle', progress: 0, added: 0, skipped: 0, file: '' },
+    last: { owner: 'Irma', dest: 'Keuken', place: 'Huis · zolder', packer: 'Edwin' },
+    toast: '', lightbox: null, badCode: ''
+  };
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = mkState();
+    const proto = Object.getPrototypeOf(this);
+    Object.getOwnPropertyNames(proto).forEach(k => {
+      if (k !== 'constructor' && k !== 'renderVals' && typeof proto[k] === 'function') this[k] = proto[k].bind(this);
+    });
+  }
+
+  /* ---------- navigatie ---------- */
+  snap() {
+    const s = this.state;
+    return { screen: s.screen, boxId: s.boxId, listFilter: s.listFilter, moveMode: s.moveMode, q: s.q, form: s.form, ownerFilter: s.ownerFilter, sort: s.sort };
+  }
+  nav(screen, patch) {
+    this.setState(Object.assign({}, patch || {}, { screen: screen, stack: this.state.stack.concat([this.snap()]), openSheet: false, lightbox: null }));
+  }
+  back() {
+    const st = this.state.stack;
+    if (!st.length) { this.goHome(); return; }
+    const p = st[st.length - 1];
+    this.setState(Object.assign({}, p, { stack: st.slice(0, -1), openSheet: false, lightbox: null, loading: false, saving: false }));
+  }
+  goHome() { this.setState({ screen: 'home', stack: [], q: '', openSheet: false, lightbox: null, loading: false, saving: false }); }
+  showToast(text) {
+    this.setState({ toast: text });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  ownerNames() {
+    const set = OWNERS.slice();
+    this.state.boxes.forEach(b => { if (b.owner && set.indexOf(b.owner) < 0) set.push(b.owner); });
+    return set;
+  }
+  destNames() {
+    const set = DESTS.slice();
+    this.state.boxes.forEach(b => { if (b.dest && set.indexOf(b.dest) < 0) set.push(b.dest); });
+    return set;
+  }
+  openBox(id) {
+    const b = this.state.boxes.find(x => x.id === id);
+    if (!b) { this.nav('unknown', { badCode: '#' + pad3(id) }); return; }
+    if (!isFilled(b)) {
+      this.nav('form', { boxId: id, form: this.newForm(b), loading: false, listening: false, dictNote: '' });
+      return;
+    }
+    this.nav('box', { boxId: id, loading: true });
+    clearTimeout(this._lt);
+    this._lt = setTimeout(() => this.setState({ loading: false }), 500);
+  }
+  newForm(b) {
+    const l = this.state.last;
+    return { id: b.id, isNew: true, content: '', owner: l.owner, dest: l.dest, place: l.place, fragile: false, first: false, photos: [], packer: l.packer, ownerOther: false, destOther: false };
+  }
+  setF(patch) { this.setState({ form: Object.assign({}, this.state.form, patch) }); }
+  dest() { const s = this.state; return (s.destTyped.trim() || s.destPicked); }
+
+  /* ---------- home ---------- */
+  setQ(e) { this.setState({ q: e.target.value }); }
+  submitHomeSearch(e) { if (e && e.preventDefault) e.preventDefault(); this.nav('search', { q: this.state.q }); }
+  submitBadSearch(e) { if (e && e.preventDefault) e.preventDefault(); this.nav('search', { q: this.state.q }); }
+  startMove() { this.nav('moveDest', { moveMode: 'series', scanned: [], destPicked: '', destTyped: '', flash: null }); }
+  demoEmpty() { this.setState({ boxes: [] }); this.showToast('Leeg gestart'); }
+  demoReset() { this.setState({ boxes: seedBoxes() }); this.showToast('Voorbeelddata teruggezet'); }
+  retryServer() { this.goHome(); this.showToast('Verbinding hersteld'); }
+
+  /* ---------- doos ---------- */
+  goEdit() {
+    const b = this.state.boxes.find(x => x.id === this.state.boxId);
+    if (!b) return;
+    const f = { id: b.id, isNew: false, content: b.content, owner: b.owner, dest: b.dest, place: b.place, fragile: b.fragile, first: b.first, photos: b.photos.map(p => Object.assign({}, p)), packer: '', ownerOther: this.ownerNames().indexOf(b.owner) < 0, destOther: this.destNames().indexOf(b.dest) < 0 };
+    this.nav('form', { form: f, listening: false, dictNote: '' });
+  }
+  moveThis() { this.nav('moveDest', { moveMode: 'single', destPicked: '', destTyped: '' }); }
+  openOpenSheet() { this.setState({ openSheet: true, openNote: '' }); }
+  closeSheet() { this.setState({ openSheet: false }); }
+  setOpenNote(e) { this.setState({ openNote: e.target.value }); }
+  submitOpen() {
+    const s = this.state, note = s.openNote.trim();
+    if (!note) return;
+    const now = Date.now();
+    const boxes = s.boxes.map(b => b.id !== s.boxId ? b : Object.assign({}, b, {
+      updated: now,
+      removed: b.removed.concat([{ text: note, ts: now }]),
+      events: b.events.concat([{ kind: 'open', place: b.place, by: ME, ts: now, note: note }])
+    }));
+    this.setState({ boxes: boxes, openSheet: false, openNote: '' });
+    this.showToast('Genoteerd, de inhoud klopt weer');
+  }
+  doUnpack() {
+    const s = this.state, now = Date.now();
+    const boxes = s.boxes.map(b => b.id !== s.boxId ? b : Object.assign({}, b, {
+      unpacked: true, updated: now,
+      events: b.events.concat([{ kind: 'unpack', place: b.place, by: ME, ts: now }])
+    }));
+    this.setState({ boxes: boxes });
+    this.showToast('Doos staat op uitgepakt');
+  }
+  openPhoto(p) { this.setState({ lightbox: p }); }
+  closeLightbox() { this.setState({ lightbox: null }); }
+  addPhoto(target, e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    let url = '';
+    try { url = URL.createObjectURL(file); } catch (x) { url = ''; }
+    e.target.value = '';
+    const id = 'p' + Date.now();
+    const photo = { id: id, url: url, tone: Math.floor(Math.random() * 4), loading: true };
+    const s = this.state;
+    if (target === 'form') {
+      this.setF({ photos: s.form.photos.concat([photo]) });
+      setTimeout(() => {
+        if (!this.state.form) return;
+        this.setF({ photos: this.state.form.photos.map(p => p.id === id ? Object.assign({}, p, { loading: false }) : p) });
+      }, 1500);
+    } else {
+      this.setState({ boxes: s.boxes.map(b => b.id !== s.boxId ? b : Object.assign({}, b, { photos: b.photos.concat([photo]) })) });
+      setTimeout(() => {
+        this.setState({ boxes: this.state.boxes.map(b => b.id !== this.state.boxId ? b : Object.assign({}, b, { photos: b.photos.map(p => p.id === id ? Object.assign({}, p, { loading: false }) : p) })) });
+      }, 1500);
+    }
+  }
+  onPhotoBox(e) { this.addPhoto('box', e); }
+  onPhotoForm(e) { this.addPhoto('form', e); }
+
+  /* ---------- formulier ---------- */
+  onContent(e) { this.setF({ content: e.target.value }); }
+  onPlace(e) { this.setF({ place: e.target.value }); }
+  onPacker(e) { this.setF({ packer: e.target.value }); }
+  onOwnerOther(e) { this.setF({ owner: e.target.value }); }
+  onDestOther(e) { this.setF({ dest: e.target.value }); }
+  ownerOtherPick() { this.setF({ ownerOther: true, owner: this.state.form.ownerOther ? this.state.form.owner : '' }); }
+  destOtherPick() { this.setF({ destOther: true, dest: this.state.form.destOther ? this.state.form.dest : '' }); }
+  toggleFragile(e) { this.setF({ fragile: !!e.target.checked }); }
+  toggleFirst(e) { this.setF({ first: !!e.target.checked }); }
+  toggleDictate() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { this.setState({ dictNote: 'Dicteren werkt niet in deze browser. Typ de inhoud.' }); return; }
+    if (this.rec) { try { this.rec.stop(); } catch (x) { } return; }
+    const rec = new SR();
+    rec.lang = 'nl-NL'; rec.interimResults = true; rec.continuous = false;
+    const base = this.state.form.content ? this.state.form.content.trim() + ' ' : '';
+    rec.onresult = ev => {
+      let t = '';
+      for (let i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
+      this.setF({ content: base + t });
+    };
+    rec.onend = () => { this.rec = null; this.setState({ listening: false }); };
+    rec.onerror = () => { this.rec = null; this.setState({ listening: false, dictNote: 'Microfoon niet beschikbaar. Typ de inhoud.' }); };
+    this.rec = rec;
+    try { rec.start(); this.setState({ listening: true, dictNote: '' }); }
+    catch (x) { this.rec = null; this.setState({ dictNote: 'Microfoon niet beschikbaar. Typ de inhoud.' }); }
+  }
+  saveForm() {
+    const s = this.state, f = s.form;
+    if (s.saving || !f || !f.content.trim() || f.photos.some(p => p.loading)) return;
+    this.setState({ saving: true });
+    setTimeout(() => {
+      const now = Date.now();
+      const fresh = this.state.form || f;
+      const boxes = this.state.boxes.map(b => {
+        if (b.id !== fresh.id) return b;
+        const nb = Object.assign({}, b, { content: fresh.content.trim(), owner: (fresh.owner || 'Gezamenlijk').trim(), dest: (fresh.dest || '').trim(), fragile: fresh.fragile, first: fresh.first, photos: fresh.photos.map(p => Object.assign({}, p, { loading: false })), updated: now });
+        if (fresh.isNew) {
+          nb.place = (fresh.place || 'Onbekende plek').trim();
+          nb.events = [{ kind: 'pack', place: nb.place, by: (fresh.packer || ME).trim(), ts: now }];
+        }
+        return nb;
+      });
+      if (fresh.isNew) {
+        this.setState({ boxes: boxes, saving: false, screen: 'saved', savedId: fresh.id, stack: [], last: { owner: (fresh.owner || 'Gezamenlijk').trim(), dest: (fresh.dest || '').trim(), place: (fresh.place || '').trim(), packer: (fresh.packer || ME).trim() } });
+      } else {
+        this.setState({ boxes: boxes, saving: false });
+        this.back();
+        this.showToast('Wijzigingen opgeslagen');
+      }
+    }, 800);
+  }
+  saveNext() {
+    const s = this.state;
+    const next = s.boxes.find(b => !isFilled(b) && b.id !== s.savedId);
+    if (!next) { this.goHome(); return; }
+    this.setState({ screen: 'form', stack: [], boxId: next.id, form: this.newForm(next), listening: false, dictNote: '' });
+  }
+
+  /* ---------- verplaatsen ---------- */
+  setDestTyped(e) { this.setState({ destTyped: e.target.value }); }
+  moveDestGo() {
+    const s = this.state, dest = this.dest();
+    if (!dest) return;
+    if (s.moveMode === 'series') { this.nav('moveScan', { scanned: [], flash: null, cam: 'granted' }); return; }
+    const now = Date.now();
+    const boxes = s.boxes.map(b => b.id !== s.boxId ? b : Object.assign({}, b, { place: dest, updated: now, events: b.events.concat([{ kind: 'move', place: dest, by: ME, ts: now }]) }));
+    this.setState({ boxes: boxes });
+    this.back();
+    this.showToast('Verplaatst naar ' + dest);
+  }
+  beep(freq) {
+    try {
+      const A = window.AudioContext || window.webkitAudioContext;
+      if (A) {
+        this.ac = this.ac || new A();
+        const o = this.ac.createOscillator(), g = this.ac.createGain();
+        o.frequency.value = freq; g.gain.value = 0.07;
+        o.connect(g); g.connect(this.ac.destination);
+        o.start(); o.stop(this.ac.currentTime + 0.09);
+      }
+    } catch (x) { }
+    try { if (navigator.vibrate) navigator.vibrate(freq > 700 ? [30] : [25, 40, 25]); } catch (x) { }
+  }
+  flashNow(kind, big, small) {
+    this.setState({ flash: { kind: kind, big: big, small: small } });
+    clearTimeout(this._ft);
+    this._ft = setTimeout(() => this.setState({ flash: null }), 1500);
+  }
+  scan(id) {
+    const s = this.state;
+    if (s.cam !== 'granted') return;
+    const b = s.boxes.find(x => x.id === id);
+    if (!b) { this.beep(300); this.flashNow('unknown', '?', 'Onbekende code'); return; }
+    if (!isFilled(b)) { this.beep(440); this.flashNow('warn', '#' + pad3(id), 'Nog leeg, niet meegenomen'); return; }
+    if (s.scanned.indexOf(id) >= 0) { this.beep(440); this.flashNow('warn', '#' + pad3(id), 'Al gescand, geen probleem'); return; }
+    this.setState({ scanned: [id].concat(s.scanned) });
+    this.beep(880);
+    this.flashNow('ok', '#' + pad3(id), 'Erbij');
+  }
+  finishMove() {
+    const s = this.state, dest = this.dest();
+    if (!s.scanned.length) { this.goHome(); return; }
+    const now = Date.now(), ids = s.scanned;
+    const boxes = s.boxes.map(b => ids.indexOf(b.id) < 0 ? b : Object.assign({}, b, { place: dest, updated: now, events: b.events.concat([{ kind: 'move', place: dest, by: ME, ts: now }]) }));
+    this.setState({ boxes: boxes, screen: 'moveDone', stack: [], moveDone: { dest: dest, ids: ids.slice().reverse() }, flash: null });
+  }
+  newRound() { this.setState({ screen: 'moveDest', stack: [], moveMode: 'series', scanned: [], destPicked: '', destTyped: '', flash: null }); }
+  allowCam() { this.setState({ cam: 'granted' }); }
+  demoCamAsk() { this.setState({ cam: 'ask' }); }
+  demoCamDenied() { this.setState({ cam: 'denied' }); }
+
+  /* ---------- lijsten ---------- */
+  browseAll() { this.nav('list', { listFilter: { kind: 'all', val: '', title: 'Alle dozen', owner: '' } }); }
+  goOverview() { this.nav('overview', { ownerFilter: '' }); }
+  goImport() { this.nav('imp', { imp: { phase: 'idle', progress: 0, added: 0, skipped: 0, file: '' } }); }
+  setSortNr() { this.setState({ sort: 'nr' }); }
+  setSortRec() { this.setState({ sort: 'recent' }); }
+
+  /* ---------- import ---------- */
+  parseCsv(text) {
+    const ids = [];
+    text.split(/\r?\n/).forEach(l => {
+      const first = (l.split(/[;,\t]/)[0] || '');
+      const m = first.match(/\d+/);
+      if (m) { const n = parseInt(m[0], 10); if (n > 0 && n < 100000) ids.push(n); }
+    });
+    return ids.filter((v, i) => ids.indexOf(v) === i);
+  }
+  runImport(ids, name) {
+    this.setState({ imp: { phase: 'reading', progress: 8, added: 0, skipped: 0, file: name } });
+    [34, 66, 100].forEach((p, i) => setTimeout(() => {
+      if (this.state.imp.phase !== 'reading') return;
+      this.setState({ imp: Object.assign({}, this.state.imp, { progress: p }) });
+    }, 320 * (i + 1)));
+    setTimeout(() => {
+      const have = {};
+      this.state.boxes.forEach(b => { have[b.id] = true; });
+      let added = 0, skipped = 0;
+      const nb = [];
+      ids.forEach(id => { if (have[id]) skipped++; else { added++; nb.push(emptyBox(id)); } });
+      this.setState({ boxes: this.state.boxes.concat(nb).sort((a, b) => a.id - b.id), imp: { phase: 'done', progress: 100, added: added, skipped: skipped, file: name } });
+    }, 1350);
+  }
+  onCsv(e) {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => this.runImport(this.parseCsv(String(r.result)), f.name);
+    r.readAsText(f);
+    e.target.value = '';
+  }
+  useSample() {
+    const ids = [];
+    for (let i = 55; i <= 74; i++) ids.push(i);
+    this.runImport(ids, 'stickers-voorbeeld.csv');
+  }
+  impAgain() { this.setState({ imp: { phase: 'idle', progress: 0, added: 0, skipped: 0, file: '' } }); }
+
+  /* ---------- view model ---------- */
+  renderVals() {
+    const s = this.state, boxes = s.boxes;
+    const filled = boxes.filter(isFilled);
+    const cnt = { ingepakt: 0, opslag: 0, uitgepakt: 0 };
+    filled.forEach(b => { cnt[statusOf(b)]++; });
+    const byId = id => boxes.find(b => b.id === id);
+    const sc = s.screen;
+    const flags = { home: sc === 'home', box: sc === 'box', form: sc === 'form', saved: sc === 'saved', moveDest: sc === 'moveDest', moveScan: sc === 'moveScan', moveDone: sc === 'moveDone', search: sc === 'search', overview: sc === 'overview', list: sc === 'list', imp: sc === 'imp', unknown: sc === 'unknown', server: sc === 'server' };
+    const toneBg = t => TONES[(t || 0) % TONES.length];
+    const mapPhotos = arr => (arr || []).map(p => ({ id: p.id, bg: toneBg(p.tone), hasUrl: !!p.url, url: p.url, loading: !!p.loading, open: () => this.openPhoto(p) }));
+    const chipStyle = on => on ? 'background:#0F1216;color:#FFFFFF;border-color:#0F1216;' : 'background:#FFFFFF;color:#0F1216;border-color:#E3E6EB;';
+
+    /* home */
+    const stats = [
+      { key: 'ingepakt', label: 'Ingepakt' }, { key: 'opslag', label: 'In opslag' }, { key: 'uitgepakt', label: 'Uitgepakt' }
+    ].map(x => ({ n: cnt[x.key], label: x.label, open: () => this.nav('list', { listFilter: { kind: 'status', val: x.key, title: x.label, owner: '' } }) }));
+    const firstEmpty = boxes.find(b => !isFilled(b));
+    const demoChips = [
+      { label: '#' + pad3(firstEmpty ? firstEmpty.id : 47), sub: 'nieuwe doos', run: () => this.openBox(firstEmpty ? firstEmpty.id : 47) },
+      { label: '#012', sub: 'orgel', run: () => this.openBox(12) },
+      { label: '#009', sub: 'uitgepakt', run: () => this.openBox(9) },
+      { label: '#999', sub: 'onbekend', run: () => this.nav('unknown', { badCode: '#999' }) },
+      { label: 'Storing', sub: 'server', run: () => this.nav('server') }
+    ];
+
+    /* doos */
+    const cur = byId(s.boxId);
+    let bx = { nr: '', pillBg: '#fff', pillFg: '#000', status: '', hasTags: false, fragile: false, first: false, place: '', dest: '', owner: '', content: '', hasRemoved: false, removed: [], photos: [], journey: [], active: false, unpacked: false };
+    if (cur && isFilled(cur)) {
+      const st = STAT[statusOf(cur)];
+      const evs = cur.events.slice().reverse();
+      const kindTitle = e => e.kind === 'pack' ? 'Ingepakt in ' + e.place : e.kind === 'move' ? e.place : e.kind === 'open' ? 'Doos geopend' : 'Uitgepakt';
+      const kindSub = e => e.kind === 'move' ? 'Verplaatst door ' + e.by + ' · ' + fmt(e.ts) : e.kind === 'pack' ? e.by + ' · ' + fmt(e.ts) : e.by + ' · ' + fmt(e.ts);
+      bx = {
+        nr: pad3(cur.id), pillBg: st.bg, pillFg: st.fg, status: st.label,
+        hasTags: cur.fragile || cur.first, fragile: cur.fragile, first: cur.first,
+        place: cur.place, dest: cur.dest || 'Nog niet bepaald', owner: cur.owner, content: cur.content,
+        hasRemoved: cur.removed.length > 0,
+        removed: cur.removed.slice().reverse().map(r => ({ text: r.text, when: fmt(r.ts) })),
+        photos: mapPhotos(cur.photos),
+        journey: evs.map((e, i) => ({ dot: i === 0 ? '#3547F5' : '#C3C9D6', lineHide: i === evs.length - 1 ? 'display:none;' : '', title: kindTitle(e), sub: kindSub(e), hasNote: !!e.note, note: e.note ? 'Eruit: ' + e.note : '' })),
+        active: !cur.unpacked, unpacked: !!cur.unpacked
+      };
+    }
+
+    /* formulier */
+    const f = s.form;
+    let fv = { nr: '', pillBg: '#0F1216', pillFg: '#FFFFFF', pillText: '', content: '', isNew: true, place: '', packer: '', fragile: false, first: false, owner: '', dest: '' };
+    let ownerChips = [], destChips = [];
+    let saveLabel = 'Doos opslaan', saveDisabled = true, needContent = false, fphotos = [];
+    if (f) {
+      fv = { nr: pad3(f.id), pillBg: f.isNew ? '#0F1216' : '#EAEDFF', pillFg: f.isNew ? '#FFFFFF' : '#2433C7', pillText: f.isNew ? 'Nieuwe doos' : 'Bewerken', content: f.content, isNew: f.isNew, place: f.place, packer: f.packer, fragile: f.fragile, first: f.first, owner: f.owner, dest: f.dest };
+      ownerChips = this.ownerNames().map(n => ({ name: n, style: chipStyle(!f.ownerOther && f.owner === n), pick: () => this.setF({ owner: n, ownerOther: false }) }));
+      destChips = this.destNames().map(n => ({ name: n, style: chipStyle(!f.destOther && f.dest === n), pick: () => this.setF({ dest: n, destOther: false }) }));
+      const uploading = f.photos.some(p => p.loading);
+      needContent = !f.content.trim();
+      saveDisabled = s.saving || uploading || needContent;
+      saveLabel = s.saving ? 'Bezig met opslaan…' : uploading ? 'Foto wordt geüpload…' : f.isNew ? 'Doos opslaan' : 'Wijzigingen opslaan';
+      fphotos = mapPhotos(f.photos);
+    }
+
+    /* opgeslagen */
+    const svBox = byId(s.savedId);
+    const sv = { nr: pad3(s.savedId || 0), sub: svBox ? (svBox.owner + ' · naar ' + (svBox.dest || 'nog niet bepaald') + ' · nu in ' + svBox.place) : '' };
+
+    /* verplaatsen: bestemming */
+    const lastUse = {};
+    boxes.forEach(b => b.events.forEach(e => { if (!lastUse[e.place] || e.ts > lastUse[e.place]) lastUse[e.place] = e.ts; }));
+    const placeNames = Object.keys(lastUse).sort((a, b) => lastUse[b] - lastUse[a]);
+    const destEff = s.destTyped.trim() || s.destPicked;
+    const destRows = placeNames.map(n => {
+      const on = !s.destTyped.trim() && s.destPicked === n;
+      return { name: n, on: on, style: on ? 'border-color:#3547F5;background:#F3F5FF;' : '', ring: on ? 'background:#3547F5;border:2px solid #3547F5;' : 'background:#FFFFFF;border:2px solid #C3C9D6;', pick: () => this.setState({ destPicked: n, destTyped: '' }) };
+    });
+    const curForMove = byId(s.boxId);
+    const md = {
+      title: s.moveMode === 'single' ? 'Waar gaat #' + pad3(s.boxId || 0) + ' heen?' : 'Waar gaan de dozen heen?',
+      go: s.moveMode === 'single' ? 'Verplaats #' + pad3(s.boxId || 0) + ' hierheen' : 'Door naar scannen'
+    };
+
+    /* scanscherm */
+    const scanChips = [];
+    const cand = boxes.filter(b => isFilled(b) && s.scanned.indexOf(b.id) < 0 && b.place !== destEff).slice(0, 3);
+    cand.forEach(b => scanChips.push({ label: '#' + pad3(b.id), sub: b.content.split(/[:,]/)[0].slice(0, 16), run: () => this.scan(b.id) }));
+    if (s.scanned.length) scanChips.push({ label: '#' + pad3(s.scanned[0]), sub: 'dubbel', run: () => this.scan(s.scanned[0]) });
+    if (firstEmpty) scanChips.push({ label: '#' + pad3(firstEmpty.id), sub: 'leeg', run: () => this.scan(firstEmpty.id) });
+    scanChips.push({ label: '#999', sub: 'onbekend', run: () => this.scan(999) });
+    const fl = s.flash;
+    const flashVm = fl ? { on: true, big: fl.big, small: fl.small, bg: fl.kind === 'ok' ? '#3547F5' : fl.kind === 'warn' ? '#FFE7A8' : '#FDE4E4', fg: fl.kind === 'ok' ? '#FFFFFF' : fl.kind === 'warn' ? '#5C3A00' : '#8F1D22' } : { on: false, big: '', small: '', bg: '#fff', fg: '#000' };
+    const scv = { dest: destEff || '', count: s.scanned.length, has: s.scanned.length > 0, finish: s.scanned.length ? 'Klaar · ' + s.scanned.length + (s.scanned.length === 1 ? ' doos' : ' dozen') + ' verplaatsen' : 'Afsluiten' };
+    const scanList = s.scanned.map((id, i) => { const b = byId(id); return { bt: i ? '1px solid #E3E6EB' : '0', nr: pad3(id), line: b ? firstLine(b.content) : '' }; });
+
+    /* klaar */
+    const mdn = s.moveDone ? s.moveDone.ids.length : 0;
+    const mdone = { n: mdn, lead: mdn === 1 ? 'doos staat nu in' : 'dozen staan nu in', dest: s.moveDone ? s.moveDone.dest : '', list: (s.moveDone ? s.moveDone.ids : []).map(id => ({ nr: pad3(id) })) };
+
+    /* zoeken */
+    const qraw = s.q.trim(), ql = qraw.toLowerCase(), qnum = qraw.replace('#', '');
+    let results = [];
+    if (ql) {
+      results = filled.filter(b => {
+        if (b.content.toLowerCase().indexOf(ql) >= 0) return true;
+        if (b.owner.toLowerCase().indexOf(ql) >= 0) return true;
+        if (b.place.toLowerCase().indexOf(ql) >= 0) return true;
+        if (/^\d+$/.test(qnum)) { if (b.id === parseInt(qnum, 10) || pad3(b.id).indexOf(qnum) === 0) return true; }
+        return false;
+      }).map(b => ({ nr: pad3(b.id), place: b.place, dest: b.dest || 'nog niet bepaald', line: firstLine(b.content), open: () => this.openBox(b.id) }));
+    }
+    const srch = { blank: !ql, some: results.length > 0, none: !!ql && results.length === 0, count: results.length + (results.length === 1 ? ' doos gevonden' : ' dozen gevonden'), noneTitle: 'Niets gevonden voor "' + qraw + '"' };
+
+    /* overzicht */
+    const own = s.ownerFilter;
+    const base = own ? filled.filter(b => b.owner === own) : filled;
+    const groupBy = fn => { const m = {}; base.forEach(b => { const k = fn(b); m[k] = (m[k] || 0) + 1; }); return Object.keys(m).map(k => ({ k: k, n: m[k] })).sort((a, b) => b.n - a.n || a.k.localeCompare(b.k)); };
+    const mkRows = (arr, kind, labelFn) => { const max = Math.max(1, ...arr.map(x => x.n)); return arr.map((x, i) => { const label = labelFn ? labelFn(x.k) : x.k; return { label: label, n: x.n, w: Math.max(4, Math.round(x.n / max * 100)) + '%', bt: i ? '1px solid #E3E6EB' : '0', open: () => this.nav('list', { listFilter: { kind: kind, val: x.k, title: label, owner: own } }) }; }); };
+    const stCount = { ingepakt: 0, opslag: 0, uitgepakt: 0 };
+    base.forEach(b => { stCount[statusOf(b)]++; });
+    const ovStatus = mkRows(['ingepakt', 'opslag', 'uitgepakt'].map(k => ({ k: k, n: stCount[k] })), 'status', k => STAT[k].label);
+    const ovPlaces = mkRows(groupBy(b => b.place), 'place');
+    const ovDests = mkRows(groupBy(b => b.dest || 'Nog niet bepaald'), 'dest');
+    const ovOwners = [''].concat(this.ownerNames()).map(n => ({ name: n || 'Iedereen', style: chipStyle(own === n), pick: () => this.setState({ ownerFilter: n }) }));
+    const ov = { total: base.length + (base.length === 1 ? ' doos' : ' dozen') };
+
+    /* lijst */
+    const lf = s.listFilter;
+    let lrows = filterBoxes(boxes, lf);
+    lrows = s.sort === 'recent' ? lrows.slice().sort((a, b) => b.updated - a.updated) : lrows.slice().sort((a, b) => a.id - b.id);
+    const listRows = lrows.map((b, i) => ({ bt: i ? '1px solid #E3E6EB' : '0', nr: pad3(b.id), line: firstLine(b.content), place: b.place, fragile: b.fragile, first: b.first, open: () => this.openBox(b.id) }));
+    const lst = { title: lf.title + (lf.owner ? ' · ' + lf.owner : ''), count: lrows.length + (lrows.length === 1 ? ' doos' : ' dozen'), some: lrows.length > 0, none: lrows.length === 0 };
+    const segOn = 'background:#FFFFFF;color:#0F1216;box-shadow:0 1px 2px rgba(15,18,22,0.12);', segOff = 'background:transparent;color:#4A5360;';
+
+    /* import */
+    const im = s.imp;
+
+    /* lightbox */
+    const lb = s.lightbox;
+    const lightbox = lb ? { on: true, bg: toneBg(lb.tone), hasUrl: !!lb.url, url: lb.url } : { on: false, bg: '#fff', hasUrl: false, url: '' };
+
+    return {
+      s: flags,
+      back: this.back, goHome: this.goHome,
+      q: s.q, setQ: this.setQ, submitHomeSearch: this.submitHomeSearch, submitBadSearch: this.submitBadSearch,
+      hasBoxes: boxes.length > 0, noBoxes: boxes.length === 0,
+      stats: stats, demoChips: demoChips, goOverview: this.goOverview, goImport: this.goImport, startMove: this.startMove, demoEmpty: this.demoEmpty, demoReset: this.demoReset,
+      bx: bx, boxLoading: s.loading, boxReady: !s.loading,
+      goEdit: this.goEdit, openOpenSheet: this.openOpenSheet, doUnpack: this.doUnpack, moveThis: this.moveThis, onPhotoBox: this.onPhotoBox,
+      openSheet: s.openSheet, closeSheet: this.closeSheet, openNote: s.openNote, setOpenNote: this.setOpenNote, openDisabled: !s.openNote.trim(), submitOpen: this.submitOpen,
+      f: fv, ownerChips: ownerChips, destChips: destChips,
+      ownerOtherOn: !!(f && f.ownerOther), destOtherOn: !!(f && f.destOther),
+      ownerOtherStyle: chipStyle(!!(f && f.ownerOther)), destOtherStyle: chipStyle(!!(f && f.destOther)),
+      ownerOtherPick: this.ownerOtherPick, destOtherPick: this.destOtherPick, onOwnerOther: this.onOwnerOther, onDestOther: this.onDestOther,
+      onContent: this.onContent, onPlace: this.onPlace, onPacker: this.onPacker, toggleFragile: this.toggleFragile, toggleFirst: this.toggleFirst,
+      toggleDictate: this.toggleDictate,
+      micStyle: s.listening ? 'background:#3547F5;color:#FFFFFF;border:1px solid #3547F5;' : 'background:#FFFFFF;color:#0F1216;border:1px solid #E3E6EB;',
+      micLabel: s.listening ? 'Luisteren…' : 'Dicteren',
+      hasDictNote: !!s.dictNote, dictNote: s.dictNote,
+      fphotos: fphotos, onPhotoForm: this.onPhotoForm,
+      saveDisabled: saveDisabled, saveLabel: saveLabel, needContent: needContent && !!f, saveForm: this.saveForm,
+      sv: sv, saveNext: this.saveNext,
+      md: md, destRows: destRows, destTyped: s.destTyped, setDestTyped: this.setDestTyped, destDisabled: !destEff, moveDestGo: this.moveDestGo,
+      camOk: s.cam === 'granted', camAsk: s.cam === 'ask', camDenied: s.cam === 'denied',
+      allowCam: this.allowCam, demoCamAsk: this.demoCamAsk, demoCamDenied: this.demoCamDenied,
+      flash: flashVm, sc: scv, scanChips: scanChips, scanList: scanList, finishMove: this.finishMove,
+      mdone: mdone, newRound: this.newRound,
+      srch: srch, results: results, browseAll: this.browseAll,
+      ov: ov, ovOwners: ovOwners, ovStatus: ovStatus, ovPlaces: ovPlaces, ovDests: ovDests,
+      lst: lst, listRows: listRows, setSortNr: this.setSortNr, setSortRec: this.setSortRec,
+      sortNrStyle: s.sort === 'nr' ? segOn : segOff, sortRecStyle: s.sort === 'recent' ? segOn : segOff,
+      imp: im, impIdle: im.phase === 'idle', impReading: im.phase === 'reading', impDone: im.phase === 'done',
+      impWidth: im.progress + '%', impEmpty: im.phase === 'done' && im.added === 0 && im.skipped === 0,
+      onCsv: this.onCsv, useSample: this.useSample, impAgain: this.impAgain,
+      hasBadCode: !!s.badCode, badCode: s.badCode, retryServer: this.retryServer,
+      lightbox: lightbox, closeLightbox: this.closeLightbox,
+      toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+/.env
+/.env.bak
+/credentials.md
+/.local/
+/writable/cache/*
+/writable/logs/*
+/writable/session/*
+/writable/uploads/*
+!/writable/**/index.html
+/vendor/
+/node_modules/
+/deploy-queue.txt
+/deploy.php

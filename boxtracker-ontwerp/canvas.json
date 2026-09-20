@@ -1,0 +1,44 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-09-20T19:19:27Z"
+ },
+ "title": "Boxtracker",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "App (mobiel)",
+   "is_interactive": true
+  },
+  "Overzicht-laptop.dc.html": {
+   "x": 470,
+   "y": 0,
+   "w": 1280,
+   "h": 1120,
+   "title": "Overzicht (laptop)",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Overzicht-laptop.dc.html"
+ ],
+ "notes": {
+  "t1": {
+   "x": 0,
+   "y": -260,
+   "text": "Boxtracker",
+   "kind": "title1",
+   "maxW": 1750
+  }
+ },
+ "designSystems": []
+}

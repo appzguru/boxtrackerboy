@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Boxtracker overzicht laptop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8;}
+*{box-sizing:border-box;}
+h1,h2,h3,p{margin:0;}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left;}
+button:focus-visible,input:focus-visible,textarea:focus-visible,label:focus-within{outline:2px solid #3547F5;outline-offset:2px;}
+input,textarea{font-family:inherit;}
+input::placeholder,textarea::placeholder{color:#7B8494;}
+.pbtn{transition:background .12s,transform .08s;}
+.pbtn:hover{background:#2A3BE0!important;}
+.pbtn:active{transform:scale(.985);}
+.pbtn:disabled{background:#D9DDE6!important;color:#77808F!important;cursor:not-allowed;transform:none;}
+.sbtn:hover,.ib:hover{background:#F0F2F6!important;}
+.chip:hover,.row:hover,.tile:hover{filter:brightness(.96);}
+.ghost:hover{background:#EAEDFF;}
+.sbtn:active,.tile:active,.row:active,.chip:active{transform:scale(.985);}
+.sw{appearance:none;-webkit-appearance:none;width:52px;height:32px;border-radius:16px;background:#D5DAE1;position:relative;transition:background .15s;flex:none;margin:0;cursor:pointer;}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,18,22,.25);transition:transform .15s;}
+.sw:checked{background:#3547F5;}
+.sw:checked::after{transform:translateX(20px);}
+@keyframes scanline{0%{top:12%}50%{top:84%}100%{top:12%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes grow{from{width:4%}to{width:100%}}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+@keyframes rise{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.sk{animation:pulse 1.2s ease-in-out infinite;background:#E4E7EE;border-radius:12px;}
+.up{animation:grow 1.4s linear forwards;}
+.pop{animation:pop .16s ease-out;}
+.rise{animation:rise .22s ease-out;}
+.scanline{animation:scanline 2.6s ease-in-out infinite;}
+</style>
+</helmet>
+
+<div style="position:relative;width:1280px;height:1120px;overflow:hidden;background:#F5F6F8;color:#0F1216;font-family:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif;padding:40px 48px;display:flex;flex-direction:column;gap:28px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:44px;height:44px;border-radius:14px;background:#3547F5;color:#FFFFFF;display:flex;align-items:center;justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></svg></div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="font-size:15px;font-weight:600;color:#5B6573;letter-spacing:-0.01em;">Boxtracker</div>
+        <h1 style="margin:0;font-size:34px;font-weight:700;letter-spacing:-0.04em;line-height:1;">Overzicht</h1>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;margin-right:6px;">Eigenaar</span>
+      <sc-for list="{{ ownerChips }}" as="c" hint-placeholder-count="6"><button type="button" class="chip" onClick="{{ c.pick }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;{{ c.style }}">{{ c.name }}</button></sc-for>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0, 1fr) 380px;gap:28px;align-items:start;">
+    <div style="display:flex;flex-direction:column;gap:24px;min-width:0;">
+      <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px;">
+        <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="4">
+          <button type="button" class="tile" onClick="{{ t.pick }}" style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:20px 22px;display:flex;flex-direction:column;gap:10px;{{ t.style }}">
+            <span style="font-size:14px;font-weight:600;color:{{ t.labelColor }};">{{ t.label }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:52px;font-weight:600;letter-spacing:-0.05em;line-height:1;">{{ t.n }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;">
+        <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+          <div style="padding:18px 22px 6px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Per plek</div>
+          <sc-for list="{{ placeRows }}" as="r" hint-placeholder-count="7">
+            <button type="button" class="row" onClick="{{ r.pick }}" style="display:flex;flex-direction:column;gap:7px;width:100%;padding:11px 22px;{{ r.style }}">
+              <span style="display:flex;justify-content:space-between;gap:12px;width:100%;"><span style="font-size:15px;font-weight:600;">{{ r.label }}</span><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:16px;font-weight:600;">{{ r.n }}</span></span>
+              <span style="display:block;width:100%;height:5px;border-radius:3px;background:#EEF0F5;"><span style="display:block;height:5px;border-radius:3px;background:#3547F5;width:{{ r.w }};"></span></span>
+            </button>
+          </sc-for>
+          <div style="height:10px;"></div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+          <div style="padding:18px 22px 6px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Per bestemming</div>
+          <sc-for list="{{ destRows }}" as="r" hint-placeholder-count="7">
+            <button type="button" class="row" onClick="{{ r.pick }}" style="display:flex;flex-direction:column;gap:7px;width:100%;padding:11px 22px;{{ r.style }}">
+              <span style="display:flex;justify-content:space-between;gap:12px;width:100%;"><span style="font-size:15px;font-weight:600;">{{ r.label }}</span><span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:16px;font-weight:600;">{{ r.n }}</span></span>
+              <span style="display:block;width:100%;height:5px;border-radius:3px;background:#EEF0F5;"><span style="display:block;height:5px;border-radius:3px;background:#3547F5;width:{{ r.w }};"></span></span>
+            </button>
+          </sc-for>
+          <div style="height:10px;"></div>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.03em;">{{ filterTitle }}</div>
+            <span style="font-size:14px;font-weight:500;color:#5B6573;">{{ filterCount }}</span>
+            <sc-if value="{{ hasFilter }}" hint-placeholder-val="{{ false }}"><button type="button" class="chip" onClick="{{ clearFilter }}" style="min-height:44px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #E3E6EB;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px 0 14px;background:#EAEDFF;color:#2433C7;border-color:#EAEDFF;">Filter wissen <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M6 6l12 12M18 6L6 18"/></svg></button></sc-if>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="position:relative;">
+              <span style="position:absolute;left:12px;top:0;height:44px;display:flex;align-items:center;color:#5B6573;pointer-events:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>
+              <label for="d-q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Zoeken in de lijst</label>
+              <input id="d-q" type="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Zoek in de lijst" autocomplete="off" style="width:220px;height:44px;border-radius:12px;border:1px solid #E3E6EB;background:#F5F6F8;padding:0 12px 0 38px;font-size:15px;color:#0F1216;">
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2, auto);gap:4px;padding:4px;border-radius:12px;background:#E9ECF2;">
+              <button type="button" onClick="{{ setSortNr }}" style="height:36px;padding:0 14px;border-radius:9px;font-size:14px;font-weight:600;text-align:center;{{ sortNrStyle }}">Nummer</button>
+              <button type="button" onClick="{{ setSortRec }}" style="height:36px;padding:0 14px;border-radius:9px;font-size:14px;font-weight:600;text-align:center;{{ sortRecStyle }}">Laatst gewijzigd</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:64px minmax(0, 1fr) 110px 220px 120px 104px;gap:16px;align-items:center;padding:0 20px;height:38px;border-top:1px solid #E3E6EB;border-bottom:1px solid #E3E6EB;background:#FAFBFC;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">
+          <span>Nr</span><span>Inhoud</span><span>Eigenaar</span><span>Plek</span><span>Bestemming</span><span>Status</span>
+        </div>
+        <div style="max-height:400px;overflow-y:auto;">
+          <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+              <button type="button" class="row" onClick="{{ r.pick }}" style="display:grid;grid-template-columns:64px minmax(0, 1fr) 110px 220px 120px 104px;gap:16px;align-items:center;min-height:54px;padding:0 20px;width:100%;border-top:{{ r.bt }};{{ r.style }}">
+                <span style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:17px;font-weight:600;letter-spacing:-0.02em;">{{ r.nr }}</span>
+                <span style="font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.line }}</span>
+                <span style="font-size:14px;color:#4A5360;">{{ r.owner }}</span>
+                <span style="font-size:14px;color:#4A5360;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.place }}</span>
+                <span style="font-size:14px;color:#4A5360;">{{ r.dest }}</span>
+                <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:{{ r.pillBg }};color:{{ r.pillFg }};justify-self:start;">{{ r.status }}</span>
+              </button>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 22px;font-size:15px;color:#4A5360;">Geen dozen gevonden met dit filter.</div></sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E3E6EB;border-radius:20px;box-sizing:border-box;padding:26px 26px 12px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;">
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+          <div style="font-family:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums;font-size:72px;font-weight:600;letter-spacing:-0.05em;line-height:0.95;"><span style="color:#7C8696;font-size:40px;letter-spacing:-0.02em;">#</span>{{ sel.nr }}</div>
+          <span style="display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;background:{{ sel.pillBg }};color:{{ sel.pillFg }};margin-bottom:4px;">{{ sel.status }}</span>
+        </div>
+        <sc-if value="{{ sel.hasTags }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-if value="{{ sel.fragile }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E6EB;font-size:14px;font-weight:600;color:#0F1216;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0zM12 14v6M8.5 20h7"/></svg> Fragiel</span></sc-if>
+            <sc-if value="{{ sel.first }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E6EB;font-size:14px;font-weight:600;color:#0F1216;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M4 12v7h16v-7M12 14V3M8 7l4-4 4 4"/></svg> Eerst openen</span></sc-if>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:18px 18px;border-radius:16px;background:#F5F6F8;">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Staat nu</div>
+          <div style="font-size:24px;font-weight:700;letter-spacing:-0.03em;line-height:1.15;">{{ sel.place }}</div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:15px;"><span style="color:#5B6573;">Moet naar</span><span style="font-weight:600;">{{ sel.dest }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:15px;"><span style="color:#5B6573;">Eigenaar</span><span style="font-weight:600;">{{ sel.owner }}</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Inhoud</div>
+          <div style="font-size:16px;line-height:1.5;">{{ sel.content }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5B6573;">Reis van de doos</div>
+          <div>
+            <sc-for list="{{ sel.journey }}" as="j" hint-placeholder-count="3">
+              <div style="display:flex;gap:14px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:14px;flex:none;">
+                  <div style="width:14px;height:14px;border-radius:50%;margin-top:3px;background:{{ j.dot }};"></div>
+                  <div style="flex:1;width:2px;background:#E3E6EB;margin-top:4px;{{ j.lineHide }}"></div>
+                </div>
+                <div style="padding-bottom:16px;display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <div style="font-size:15px;font-weight:600;">{{ j.title }}</div>
+                  <div style="font-size:13px;color:#5B6573;line-height:1.35;">{{ j.sub }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noSel }}" hint-placeholder-val="{{ false }}"><div style="padding:40px 8px 44px;font-size:15px;line-height:1.5;color:#5B6573;text-align:center;">Kies een doos in de lijst om te zien waar hij staat.</div></sc-if>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1120}}'>
+
+const ME = 'Edwin';
+const NOW = Date.now();
+const DAY = 86400000;
+const OWNERS = ['Edwin', 'Irma', 'Amy', 'Sven', 'Gezamenlijk'];
+const DESTS = ['Woonkamer', 'Keuken', 'Slaapkamer', 'Kamer Amy', 'Kamer Sven', 'Werkkamer', 'Garage', 'Bijkeuken'];
+const STAT = {
+  ingepakt: { label: 'Ingepakt', bg: '#FFF1D0', fg: '#7A4B00' },
+  opslag: { label: 'In opslag', bg: '#EAEDFF', fg: '#2433C7' },
+  uitgepakt: { label: 'Uitgepakt', bg: '#DDF4E7', fg: '#10633B' },
+  nieuw: { label: 'Nieuwe doos', bg: '#0F1216', fg: '#FFFFFF' }
+};
+const pad3 = n => String(n).padStart(3, '0');
+function T(d, h, m) { const x = new Date(NOW - d * DAY); x.setHours(h, m, 0, 0); return x.getTime(); }
+function fmt(ts) {
+  const d = new Date(ts), n = new Date();
+  const hm = d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === n.toDateString()) return 'Vandaag, ' + hm;
+  return d.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '') + ', ' + hm;
+}
+function isFilled(b) { return b.content.trim() !== ''; }
+function statusOf(b) {
+  if (!isFilled(b)) return 'nieuw';
+  if (b.unpacked) return 'uitgepakt';
+  if (b.place.indexOf('Opslag') === 0) return 'opslag';
+  return 'ingepakt';
+}
+function firstLine(t) { const l = (t || '').split(/\r?\n/)[0]; return l; }
+function emptyBox(id) { return { id: id, content: '', owner: '', dest: '', place: '', fragile: false, first: false, unpacked: false, events: [], removed: [], photos: [], updated: 0 }; }
+function filterBoxes(boxes, lf) {
+  let r = boxes.filter(isFilled);
+  if (lf.owner) r = r.filter(b => b.owner === lf.owner);
+  if (lf.kind === 'place') r = r.filter(b => b.place === lf.val);
+  if (lf.kind === 'dest') r = r.filter(b => b.dest === lf.val);
+  if (lf.kind === 'status') r = r.filter(b => statusOf(b) === lf.val);
+  return r;
+}
+function seedBoxes() {
+  const A1 = 'Opslag · achterwand, stapel 1', A2 = 'Opslag · achterwand, stapel 2';
+  const L1 = 'Opslag · linkerwand, stapel 1', L2 = 'Opslag · linkerwand, stapel 2', DK = 'Opslag · deurkant';
+  const HZ = 'Huis · zolder', HG = 'Huis · garage', HW = 'Huis · werkkamer', HK = 'Huis · woonkamer';
+  const R = [
+    [1, 'Servies: borden, kommen en ontbijtbordjes', 'Gezamenlijk', 'Keuken', A1, 'f'],
+    [2, 'Pannen en bakblikken, deksels apart in krant', 'Irma', 'Keuken', A1, ''],
+    [3, 'Boeken A–H: romans en kookboeken', 'Irma', 'Woonkamer', L1, ''],
+    [4, 'Boeken I–Z: romans en reisgidsen', 'Irma', 'Woonkamer', L1, ''],
+    [5, 'Reservesnaren, statieven en stemapparaat', 'Edwin', 'Werkkamer', L2, ''],
+    [6, 'Lego Technic: sets in zakjes', 'Sven', 'Kamer Sven', HZ, ''],
+    [7, 'Winterjassen en handschoenen', 'Gezamenlijk', 'Bijkeuken', HZ, ''],
+    [8, 'Kabels, voedingen en oude routers', 'Edwin', 'Werkkamer', HW, ''],
+    [9, 'Handdoeken en badlakens', 'Gezamenlijk', 'Slaapkamer', 'Nieuw huis · slaapkamer', ''],
+    [10, 'Fotolijsten en schilderijhaken', 'Irma', 'Woonkamer', DK, 'f'],
+    [11, 'Gitaarversterker en effectpedalen', 'Edwin', 'Werkkamer', A2, 'f'],
+    [12, 'Orgel: onderdelen, kruk en kabels', 'Edwin', 'Woonkamer', A2, ''],
+    [13, 'Schoolspullen: schriften en pennen', 'Amy', 'Kamer Amy', HZ, ''],
+    [14, 'Knuffels en fotoalbums', 'Amy', 'Kamer Amy', DK, ''],
+    [15, 'Bordspellen en schaakset', 'Gezamenlijk', 'Woonkamer', HZ, ''],
+    [16, 'Kerstversiering en lichtsnoeren', 'Gezamenlijk', 'Garage', L2, ''],
+    [17, 'Wijnglazen en karaffen', 'Irma', 'Keuken', A1, 'f'],
+    [18, 'Gereedschap: boren, schroeven, waterpas', 'Edwin', 'Garage', HG, ''],
+    [19, 'Plantenbakken en tuinhandschoenen', 'Irma', 'Garage', HG, ''],
+    [20, 'Beddengoed voor de eerste nacht', 'Gezamenlijk', 'Slaapkamer', HZ, 'e'],
+    [21, 'Voetbalspullen en scheenbeschermers', 'Sven', 'Kamer Sven', HG, ''],
+    [22, 'Dvd-collectie en spelcomputer', 'Sven', 'Kamer Sven', DK, ''],
+    [23, 'Strijkijzer, strijkplank en wasmanden', 'Irma', 'Bijkeuken', HZ, ''],
+    [24, 'Zomerkleding Irma', 'Irma', 'Slaapkamer', HZ, ''],
+    [25, 'Reservemonitor en toetsenbord', 'Edwin', 'Werkkamer', HW, 'f'],
+    [26, 'Studioboeken en cd-collectie', 'Edwin', 'Werkkamer', L1, ''],
+    [27, 'Taartvormen en mixer', 'Irma', 'Keuken', HZ, ''],
+    [28, 'EHBO-set, batterijen en ducttape', 'Gezamenlijk', 'Bijkeuken', HZ, 'e'],
+    [29, 'Kamerdecoratie en spiegel', 'Amy', 'Kamer Amy', DK, 'f'],
+    [30, 'Fietsonderdelen en reserveband', 'Edwin', 'Garage', HG, '']
+  ];
+  const out = [];
+  R.forEach((r, i) => {
+    const id = r[0], content = r[1], owner = r[2], dest = r[3], place = r[4], fl = r[5];
+    const packer = owner === 'Gezamenlijk' ? (i % 2 ? 'Irma' : 'Edwin') : owner;
+    const packTs = T(20 - (i % 14), 10 + (i % 8), 5 * (i % 12));
+    const inStore = place.indexOf('Opslag') === 0;
+    const origin = inStore ? (i % 2 ? HK : HZ) : (id === 9 ? HZ : place);
+    const events = [{ kind: 'pack', place: origin, by: packer, ts: packTs }];
+    let unpacked = false;
+    if (inStore) events.push({ kind: 'move', place: place, by: ME, ts: packTs + 3 * DAY + 2 * 3600000 });
+    if (id === 9) {
+      events.push({ kind: 'move', place: place, by: ME, ts: T(4, 16, 40) });
+      events.push({ kind: 'unpack', place: place, by: 'Irma', ts: T(3, 9, 15) });
+      unpacked = true;
+    }
+    const b = emptyBox(id);
+    b.content = content; b.owner = owner; b.dest = dest; b.place = place;
+    b.fragile = fl === 'f'; b.first = fl === 'e'; b.unpacked = unpacked;
+    b.events = events; b.updated = events[events.length - 1].ts;
+    if (id === 12) b.photos = [{ id: 'p12a', url: '', tone: 0, loading: false }, { id: 'p12b', url: '', tone: 2, loading: false }];
+    if (id === 1 || id === 17) b.photos = [{ id: 'p' + id + 'a', url: '', tone: 1, loading: false }];
+    if (id === 12) b.removed = [{ text: 'Twee kabels en de bladmuziek', ts: T(1, 11, 20) }];
+    out.push(b);
+  });
+  for (let id = 31; id <= 60; id++) out.push(emptyBox(id));
+  return out;
+}
+const TONES = ['#E6EAFB', '#E4F1EC', '#F6ECDD', '#EDE7F6'];
+
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { boxes: seedBoxes(), owner: '', filter: { kind: 'all', val: '', label: 'Alle dozen' }, sort: 'nr', sel: 12, query: '' };
+    const proto = Object.getPrototypeOf(this);
+    Object.getOwnPropertyNames(proto).forEach(k => {
+      if (k !== 'constructor' && k !== 'renderVals' && typeof proto[k] === 'function') this[k] = proto[k].bind(this);
+    });
+  }
+  setQuery(e) { this.setState({ query: e.target.value }); }
+  clearFilter() { this.setState({ filter: { kind: 'all', val: '', label: 'Alle dozen' } }); }
+  setSortNr() { this.setState({ sort: 'nr' }); }
+  setSortRec() { this.setState({ sort: 'recent' }); }
+  renderVals() {
+    const s = this.state;
+    const filled = s.boxes.filter(isFilled);
+    const chipStyle = on => on ? 'background:#0F1216;color:#FFFFFF;border-color:#0F1216;' : 'background:#FFFFFF;color:#0F1216;border-color:#E3E6EB;';
+    const owners = [''].concat(OWNERS);
+    const base = s.owner ? filled.filter(b => b.owner === s.owner) : filled;
+    const cnt = { ingepakt: 0, opslag: 0, uitgepakt: 0 };
+    base.forEach(b => { cnt[statusOf(b)]++; });
+    const f = s.filter;
+    const setF = (kind, val, label) => () => this.setState({ filter: { kind: kind, val: val, label: label } });
+    const isOn = (kind, val) => f.kind === kind && f.val === val;
+    const tiles = [
+      { kind: 'all', val: '', label: 'Alle dozen', n: base.length },
+      { kind: 'status', val: 'ingepakt', label: 'Ingepakt', n: cnt.ingepakt },
+      { kind: 'status', val: 'opslag', label: 'In opslag', n: cnt.opslag },
+      { kind: 'status', val: 'uitgepakt', label: 'Uitgepakt', n: cnt.uitgepakt }
+    ].map(t => { const on = isOn(t.kind, t.val); return { label: t.label, n: t.n, style: on ? 'background:#0F1216;border-color:#0F1216;color:#FFFFFF;' : '', labelColor: on ? '#C9CEDA' : '#5B6573', pick: setF(t.kind, t.val, t.label) }; });
+    const groupBy = fn => { const m = {}; base.forEach(b => { const k = fn(b); m[k] = (m[k] || 0) + 1; }); return Object.keys(m).map(k => ({ k: k, n: m[k] })).sort((a, b) => b.n - a.n || a.k.localeCompare(b.k)); };
+    const mk = (arr, kind) => { const max = Math.max(1, ...arr.map(x => x.n)); return arr.map(x => ({ label: x.k, n: x.n, w: Math.max(4, Math.round(x.n / max * 100)) + '%', style: isOn(kind, x.k) ? 'background:#F3F5FF;' : '', pick: setF(kind, x.k, x.k) })); };
+    const placeRows = mk(groupBy(b => b.place), 'place');
+    const destRows = mk(groupBy(b => b.dest || 'Nog niet bepaald'), 'dest');
+    let list = base;
+    if (f.kind === 'place') list = list.filter(b => b.place === f.val);
+    if (f.kind === 'dest') list = list.filter(b => (b.dest || 'Nog niet bepaald') === f.val);
+    if (f.kind === 'status') list = list.filter(b => statusOf(b) === f.val);
+    const ql = s.query.trim().toLowerCase();
+    if (ql) list = list.filter(b => b.content.toLowerCase().indexOf(ql) >= 0 || b.owner.toLowerCase().indexOf(ql) >= 0 || b.place.toLowerCase().indexOf(ql) >= 0 || pad3(b.id).indexOf(ql.replace('#', '')) >= 0);
+    list = s.sort === 'recent' ? list.slice().sort((a, b) => b.updated - a.updated) : list.slice().sort((a, b) => a.id - b.id);
+    const rows = list.map((b, i) => { const st = STAT[statusOf(b)]; const on = s.sel === b.id; return { nr: pad3(b.id), line: firstLine(b.content), owner: b.owner, place: b.place, dest: b.dest, status: st.label, pillBg: st.bg, pillFg: st.fg, bt: i ? '1px solid #E3E6EB' : '0', style: on ? 'background:#F3F5FF;' : '', pick: () => this.setState({ sel: b.id }) }; });
+    const cur = s.boxes.find(b => b.id === s.sel);
+    let sel = { nr: '', status: '', pillBg: '#fff', pillFg: '#000', hasTags: false, fragile: false, first: false, place: '', dest: '', owner: '', content: '', journey: [] };
+    if (cur && isFilled(cur)) {
+      const st = STAT[statusOf(cur)];
+      const evs = cur.events.slice().reverse().slice(0, 5);
+      const title = e => e.kind === 'pack' ? 'Ingepakt in ' + e.place : e.kind === 'move' ? e.place : e.kind === 'open' ? 'Doos geopend' : 'Uitgepakt';
+      const sub = e => (e.kind === 'move' ? 'Verplaatst door ' : '') + e.by + ' · ' + fmt(e.ts);
+      sel = { nr: pad3(cur.id), status: st.label, pillBg: st.bg, pillFg: st.fg, hasTags: cur.fragile || cur.first, fragile: cur.fragile, first: cur.first, place: cur.place, dest: cur.dest || 'Nog niet bepaald', owner: cur.owner, content: cur.content, journey: evs.map((e, i) => ({ dot: i === 0 ? '#3547F5' : '#C3C9D6', lineHide: i === evs.length - 1 ? 'display:none;' : '', title: title(e), sub: sub(e) })) };
+    }
+    const hasSel = !!(cur && isFilled(cur));
+    const segOn = 'background:#FFFFFF;color:#0F1216;box-shadow:0 1px 2px rgba(15,18,22,0.12);', segOff = 'background:transparent;color:#4A5360;';
+    return {
+      ownerChips: owners.map(n => ({ name: n || 'Iedereen', style: chipStyle(s.owner === n), pick: () => this.setState({ owner: n }) })),
+      tiles: tiles, placeRows: placeRows, destRows: destRows,
+      filterTitle: f.label, filterCount: rows.length + (rows.length === 1 ? ' doos' : ' dozen'), hasFilter: f.kind !== 'all', clearFilter: this.clearFilter,
+      query: s.query, setQuery: this.setQuery, setSortNr: this.setSortNr, setSortRec: this.setSortRec,
+      sortNrStyle: s.sort === 'nr' ? segOn : segOff, sortRecStyle: s.sort === 'recent' ? segOn : segOff,
+      rows: rows, hasRows: rows.length > 0, noRows: rows.length === 0,
+      sel: sel, hasSel: hasSel, noSel: !hasSel
+    };
+  }
+}
+
+</script>
+</body>
+</html>
