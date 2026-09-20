@@ -49,7 +49,17 @@ window.Boxtracker = window.Boxtracker || {};
     }
 
     loadJsQR().then(function () {
-      return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      // Zonder resolutie-voorkeur kiest de browser vaak een lage standaardstream,
+      // die er dan uitgerekt en wazig uitziet op een groter videovlak. Vraag HD op,
+      // en continu scherpstellen waar de camera dat ondersteunt (vooral Android Chrome).
+      return navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          advanced: [{ focusMode: 'continuous' }],
+        },
+      });
     }).then(function (s) {
       stream = s;
       video.srcObject = stream;
