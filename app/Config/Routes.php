@@ -31,6 +31,11 @@ $routes->get('/zoek', 'Search::index');
 $routes->get('/overzicht', 'Overview::index');
 $routes->get('/overzicht/lijst', 'Overview::list');
 
+$routes->get('/labels', 'Labels::index');
+$routes->post('/labels', 'Labels::generate');
+$routes->get('/labels/print', 'Labels::print');
+$routes->get('/labels/csv', 'Labels::csv');
+
 $routes->get('/import', 'Csv::importForm');
 $routes->post('/import', 'Csv::import');
 $routes->get('/export', 'Csv::export');

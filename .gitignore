@@ -6,6 +6,7 @@
 /writable/logs/*
 /writable/session/*
 /writable/uploads/*
+/writable/debugbar/*
 !/writable/**/index.html
 /vendor/
 /node_modules/

@@ -24,7 +24,7 @@
       </div>
       <div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:10px;">
         <a href="<?= base_url('overzicht') ?>" class="btn btn-secondary"><?= icon('grid') ?> Overzicht</a>
-        <a href="<?= base_url('import') ?>" class="btn btn-secondary"><?= icon('labels') ?> Labels</a>
+        <a href="<?= base_url('labels') ?>" class="btn btn-secondary"><?= icon('labels') ?> Labels</a>
       </div>
     <?php else: ?>
       <div class="card" style="display:flex;flex-direction:column;gap:18px;">
