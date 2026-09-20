@@ -13,7 +13,8 @@
     <form class="field-search" action="<?= base_url('zoek') ?>" method="get">
       <span class="icon"><?= icon('search', 22) ?></span>
       <label class="sr-only" for="q-home">Zoeken</label>
-      <input class="field" type="search" id="q-home" name="q" placeholder="Zoek: orgel, Irma, 47" autocomplete="off">
+      <input class="field" type="search" id="q-home" name="q" placeholder="Zoek: orgel, Irma, 47" autocomplete="off" style="padding-right:58px;">
+      <button type="button" id="scan-btn" aria-label="Doos scannen" style="position:absolute;right:6px;top:6px;width:46px;height:46px;border-radius:12px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;"><?= icon('camera', 22) ?></button>
     </form>
 
     <?php if ($hasAny): ?>
@@ -42,4 +43,15 @@
     <?php endif ?>
   </div>
 </div>
+<div id="scan-overlay"></div>
+<?= $this->endSection() ?>
+<?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/scan.js') ?>"></script>
+<script>
+document.getElementById('scan-btn').addEventListener('click', function () {
+  Boxtracker.scanOnce(document.getElementById('scan-overlay'), function (url) {
+    window.location.href = url;
+  });
+});
+</script>
 <?= $this->endSection() ?>
