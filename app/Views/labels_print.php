@@ -33,7 +33,7 @@
 </head>
 <body>
 <div class="toolbar">
-  <h1>Boxtracker — <?= $aantal ?> stickers, <?= count($sheets) ?> <?= count($sheets) === 1 ? 'vel' : 'vellen' ?></h1>
+  <h1>Boxtracker — <?= $aantal ?> <?= $aantal === 1 ? 'doos' : 'dozen' ?> (<?= $aantal * 2 ?> stickers), <?= count($sheets) ?> <?= count($sheets) === 1 ? 'vel' : 'vellen' ?></h1>
   <button type="button" class="btn" onclick="window.print()">Printen</button>
   <a href="<?= base_url('labels/csv') ?>" class="btn ghost">Lijst downloaden (CSV)</a>
   <a href="<?= base_url('labels') ?>" class="btn ghost">Andere batch</a>
@@ -45,16 +45,20 @@
     <div class="sheet-inner" style="grid-template-columns:repeat(<?= $preset['cols'] ?>, <?= $preset['w'] ?>mm);grid-auto-rows:<?= $preset['h'] ?>mm;column-gap:<?= $preset['gx'] ?>mm;row-gap:<?= $preset['gy'] ?>mm;padding-top:<?= $preset['mt'] ?>mm;padding-left:<?= $preset['ml'] ?>mm;">
       <?php foreach ($sheet as $item): ?>
         <?php $qrSize = round($preset['h'] * 3.2); $qrMm = ($preset['h'] - 8) . 'mm'; ?>
-        <div class="label">
-          <div class="qr" style="width:<?= $qrMm ?>;height:<?= $qrMm ?>;flex:none;">
-            <canvas data-url="<?= esc($baseUrl . '/d/' . $item['nummer'] . '-' . $item['token']) ?>" data-size="<?= $qrSize ?>" style="width:100%;height:100%;"></canvas>
+        <?php // Twee keer dezelfde doos naast elkaar (grid vult van links naar rechts), voor
+              // een sticker op elke kant van de doos. ?>
+        <?php for ($side = 0; $side < 2; $side++): ?>
+          <div class="label">
+            <div class="qr" style="width:<?= $qrMm ?>;height:<?= $qrMm ?>;flex:none;">
+              <canvas data-url="<?= esc($baseUrl . '/d/' . $item['nummer'] . '-' . $item['token']) ?>" data-size="<?= $qrSize ?>" style="width:100%;height:100%;"></canvas>
+            </div>
+            <div class="meta">
+              <div class="num" style="font-size:<?= round($preset['h'] * 0.46) ?>mm;">#<?= box_nr($item['nummer']) ?></div>
+              <div class="writeline"></div>
+              <div class="writehint">ruimte</div>
+            </div>
           </div>
-          <div class="meta">
-            <div class="num" style="font-size:<?= round($preset['h'] * 0.46) ?>mm;">#<?= box_nr($item['nummer']) ?></div>
-            <div class="writeline"></div>
-            <div class="writehint">ruimte</div>
-          </div>
-        </div>
+        <?php endfor ?>
       <?php endforeach ?>
     </div>
   </div>

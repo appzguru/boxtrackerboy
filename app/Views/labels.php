@@ -10,20 +10,12 @@
     <div class="card" style="display:flex;flex-direction:column;gap:16px;">
       <div>
         <div style="font-size:19px;font-weight:700;">Nieuwe stickers genereren</div>
-        <div style="font-size:14px;color:var(--text-dim);margin-top:4px;">Begint bij <strong>#<?= box_nr($next) ?></strong>. Elk nummer wordt meteen als lege doos aangemaakt, klaar om te scannen.</div>
+        <div style="font-size:14px;color:var(--text-dim);margin-top:4px;">Begint bij <strong>#<?= box_nr($next) ?></strong>. Elk nummer wordt meteen als lege doos aangemaakt, klaar om te scannen. Elke doos krijgt 2 identieke stickers naast elkaar op het vel (6 dozen, 12 stickers per A4).</div>
       </div>
       <form method="post" action="<?= base_url('labels') ?>" style="display:flex;flex-direction:column;gap:14px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="label" for="aantal">Aantal stickers</label>
-          <input class="field" type="number" id="aantal" name="aantal" value="12" min="1" max="600" style="height:52px;">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="label" for="preset">Stickervel</label>
-          <select class="field" id="preset" name="preset" style="height:52px;">
-            <?php foreach ($presets as $key => $p): ?>
-              <option value="<?= esc($key) ?>" <?= $key === '12' ? 'selected' : '' ?>><?= esc($p['label']) ?></option>
-            <?php endforeach ?>
-          </select>
+          <label class="label" for="aantal">Aantal dozen</label>
+          <input class="field" type="number" id="aantal" name="aantal" value="6" min="1" max="300" style="height:52px;">
         </div>
         <button type="submit" class="btn btn-primary"><?= icon('labels') ?> Genereren en printen</button>
       </form>
