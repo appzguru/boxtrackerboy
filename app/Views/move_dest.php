@@ -5,6 +5,7 @@
     <button type="button" class="btn-icon" aria-label="Terug" onclick="history.back()"><?= icon('back') ?></button>
   </div>
   <form id="destform" class="content" method="post" action="<?= base_url('verplaats') ?>" style="gap:22px;">
+    <?= csrf_field() ?>
     <h1 style="font-size:32px;font-weight:700;letter-spacing:-0.035em;">Waar naartoe?</h1>
     <?php if ($recent): ?>
     <div style="display:flex;flex-direction:column;gap:8px;">

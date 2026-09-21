@@ -62,8 +62,18 @@ class Cookie extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Cookie will only be accessible via HTTP(S) (no JavaScript).
+     *
+     * false, want dit is de default die de CSRF-cookie erft (de enige cookie in
+     * deze app die geen eigen httponly meegeeft — de sessiecookie en de
+     * account-cookie zetten 'm allebei zelf, expliciet, op true en zijn dus
+     * onveranderd). De CSRF-cookie moet juist door JavaScript leesbaar zijn:
+     * de batch-scanlus en foto-upload doen los-van-de-pagina AJAX-POSTs en lezen
+     * daarvoor het token uit document.cookie (zie Boxtracker.csrfCookie() in
+     * app.js). Dat is geen verzwakking: bij het "double submit cookie"-patroon
+     * zit de bescherming 'm er juist in dat een ander origin die cookie niet kan
+     * lezen of zetten, niet in geheimhouding voor je eigen JS.
      */
-    public bool $httponly = true;
+    public bool $httponly = false;
 
     /**
      * --------------------------------------------------------------------------

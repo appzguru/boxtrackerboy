@@ -32,6 +32,7 @@
       <a href="<?= base_url('import') ?>" class="btn-ghost" style="text-align:center;">Nog een bestand</a>
     <?php else: ?>
       <form method="post" action="<?= base_url('import') ?>" enctype="multipart/form-data" id="impform">
+        <?= csrf_field() ?>
         <label class="btn btn-primary" style="position:relative;cursor:pointer;">
           <?= icon('upload') ?> Bestand kiezen
           <input type="file" name="csv" accept=".csv,.txt,text/csv,text/plain" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="document.getElementById('impform').submit();this.closest('label').textContent='Bezig met inlezen…';">

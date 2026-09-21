@@ -5,6 +5,7 @@
     <button type="button" class="btn-icon" aria-label="Terug" onclick="history.back()"><?= icon('back') ?></button>
   </div>
   <form id="boxform" class="content" method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token']) ?>" enctype="multipart/form-data" style="gap:26px;">
+    <?= csrf_field() ?>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
       <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#7C8696;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
       <span class="pill" style="background:<?= $isNew ? '#0F1216' : '#FFF1D0' ?>;color:<?= $isNew ? '#fff' : '#7A4B00' ?>;margin-bottom:6px;"><?= $isNew ? 'Nieuwe doos' : 'Bewerken' ?></span>

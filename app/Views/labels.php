@@ -13,6 +13,7 @@
         <div style="font-size:14px;color:var(--text-dim);margin-top:4px;">Begint bij <strong>#<?= box_nr($next) ?></strong>. Elk nummer wordt meteen als lege doos aangemaakt, klaar om te scannen. Elke doos krijgt 2 identieke stickers naast elkaar op het vel (6 dozen, 12 stickers per A4).</div>
       </div>
       <form method="post" action="<?= base_url('labels') ?>" style="display:flex;flex-direction:column;gap:14px;">
+        <?= csrf_field() ?>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <label class="label" for="aantal">Aantal dozen</label>
           <input class="field" type="number" id="aantal" name="aantal" value="6" min="1" max="300" style="height:52px;">

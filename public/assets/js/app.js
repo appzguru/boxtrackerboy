@@ -1,5 +1,17 @@
 /* Vaste topbar: verbergt bij scrollen naar beneden, komt terug bij scrollen naar boven.
  * Scanknop erin gebruikt dezelfde scanner als de rest van de app (scan.js). */
+window.Boxtracker = window.Boxtracker || {};
+
+/* CSRF-cookie uitlezen voor AJAX-POSTs (fetch/XHR) die geen paginaherlading krijgen,
+ * zoals de batch-scanlus en foto-upload. De cookie is bewust niet httponly (CI4's
+ * 'cookie'-beschermingsmethode) juist zodat JS 'm hier kan lezen. Elke aanroep leest
+ * live uit document.cookie in plaats van een waarde te cachen, want CI4 ververst de
+ * token na elke request (regenerate = true in Config/Security.php). */
+Boxtracker.csrfCookie = function () {
+  var m = document.cookie.match('(?:^|; )csrf_cookie=([^;]*)');
+  return m ? decodeURIComponent(m[1]) : '';
+};
+
 (function () {
   var bar = document.getElementById('app-topbar');
   if (bar) {

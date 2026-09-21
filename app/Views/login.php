@@ -29,6 +29,7 @@
     </div>
 
     <form id="pinform" method="post" action="<?= base_url('login') ?>" style="display:none;">
+      <?= csrf_field() ?>
       <input type="hidden" name="pincode" id="pincode">
       <input type="hidden" name="next" value="<?= esc($next) ?>">
     </form>

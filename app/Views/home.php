@@ -7,7 +7,7 @@
         <div style="width:36px;height:36px;border-radius:11px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;"><?= icon('box', 20) ?></div>
         <div style="font-size:17px;font-weight:600;letter-spacing:-0.02em;">Boxtracker</div>
       </div>
-      <form method="post" action="<?= base_url('logout') ?>" style="margin:0;"><button type="submit" style="font-size:13px;font-weight:600;color:var(--text-dim);">niet <?= esc($account_naam) ?>?</button></form>
+      <form method="post" action="<?= base_url('logout') ?>" style="margin:0;"><?= csrf_field() ?><button type="submit" style="font-size:13px;font-weight:600;color:var(--text-dim);">niet <?= esc($account_naam) ?>?</button></form>
     </div>
     <h1 style="font-size:38px;line-height:1.02;letter-spacing:-0.035em;font-weight:700;">Waar staat<br>alles?</h1>
     <form class="field-search" action="<?= base_url('zoek') ?>" method="get">

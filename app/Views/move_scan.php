@@ -46,6 +46,7 @@
   </div>
   <div class="bottombar">
     <form method="post" action="<?= base_url('verplaats/' . $batch . '/sluit') ?>">
+      <?= csrf_field() ?>
       <button type="submit" class="btn btn-primary" id="finish-btn" <?= $items ? '' : 'disabled' ?>>Klaar, <?= count($items) ?> dozen verplaatst</button>
     </form>
   </div>
@@ -80,6 +81,7 @@ function onDecode(text, code) {
 
   var fd = new FormData();
   fd.append('code', code.code);
+  fd.append('csrf_token', Boxtracker.csrfCookie());
   fetch(scanUrl, { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (res) {
     busy = false;
     if (!res.ok) { showFlash('?', 'Onbekende code', false); return; }

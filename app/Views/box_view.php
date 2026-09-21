@@ -77,6 +77,7 @@
       <a href="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '?edit=1') ?>" class="btn btn-secondary"><?= icon('edit') ?> Bewerken</a>
       <button type="button" class="btn btn-secondary" onclick="document.getElementById('open-sheet').style.display='block';document.getElementById('open-backdrop').style.display='block';"><?= icon('unpack') ?> Doos geopend</button>
       <form method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '/status') ?>" style="grid-column:span 2;">
+        <?= csrf_field() ?>
         <input type="hidden" name="status" value="uitgepakt">
         <button type="submit" class="btn btn-secondary" style="width:100%;"><?= icon('box') ?> Doos uitgepakt</button>
       </form>
@@ -103,6 +104,7 @@
     <div style="font-size:22px;font-weight:700;">Doos #<?= box_nr($box['nummer']) ?> verwijderen?</div>
     <div style="font-size:15px;color:var(--text-dim);">Dit verwijdert de doos, de reisgeschiedenis en de foto's definitief. Dit kan niet ongedaan worden gemaakt.</div>
     <form method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '/verwijderen') ?>">
+      <?= csrf_field() ?>
       <button type="submit" class="btn btn-primary" style="background:var(--red-fg);">Ja, verwijderen</button>
       <div style="height:8px;"></div>
       <button type="button" class="btn-ghost" style="width:100%;text-align:center;" onclick="document.getElementById('delete-sheet').style.display='none';document.getElementById('delete-backdrop').style.display='none';">Annuleren</button>
@@ -114,6 +116,7 @@
   <div class="sheet rise" id="open-sheet" style="display:none;">
     <div style="font-size:22px;font-weight:700;">Wat is eruit gehaald?</div>
     <form method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '/status') ?>">
+      <?= csrf_field() ?>
       <input type="hidden" name="status" value="geopend">
       <label class="sr-only" for="notitie">Wat is eruit gehaald</label>
       <textarea class="field" id="notitie" name="notitie" rows="3" placeholder="Bijv. twee kabels en de bladmuziek" style="background:var(--bg);"></textarea>
@@ -128,6 +131,7 @@
   <div class="sheet rise" id="move-sheet" style="display:none;">
     <div style="font-size:22px;font-weight:700;">Doos verplaatsen naar</div>
     <form method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '/move') ?>">
+      <?= csrf_field() ?>
       <label class="sr-only" for="naar_locatie">Nieuwe plek</label>
       <input class="field" type="text" id="naar_locatie" name="naar_locatie" placeholder="Bijv. Opslag · rij 3" autofocus>
       <div style="height:14px;"></div>

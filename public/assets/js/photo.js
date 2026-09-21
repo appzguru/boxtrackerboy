@@ -37,6 +37,7 @@ Boxtracker.uploadPhoto = function (file, uploadUrl, grid) {
   Boxtracker.compressImage(file, 1600, 0.8).then(function (blob) {
     var fd = new FormData();
     fd.append('foto', blob, 'foto.jpg');
+    fd.append('csrf_token', Boxtracker.csrfCookie());
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', uploadUrl);
