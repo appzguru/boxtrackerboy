@@ -268,4 +268,26 @@ class Box extends BaseController
 
         return redirect()->to('/d/' . $nummer . '-' . $token);
     }
+
+    /** Verwijdert een doos definitief. Alleen toegestaan als hij al uitgepakt is. */
+    public function delete(int $nummer, string $token)
+    {
+        $box = $this->loadBox($nummer, $token);
+        if ($box instanceof ResponseInterface) {
+            return $box;
+        }
+
+        if ($box['status'] !== 'uitgepakt') {
+            return redirect()->to('/d/' . $nummer . '-' . $token);
+        }
+
+        $dir = WRITEPATH . 'uploads/boxes/' . $box['id'];
+        if (is_dir($dir)) {
+            delete_files($dir, true);
+        }
+
+        $this->boxes->delete((int) $box['id']);
+
+        return redirect()->to('/')->with('message', 'Doos #' . box_nr($nummer) . ' is verwijderd.');
+    }
 }

@@ -15,6 +15,7 @@ $routes->post('/logout', 'Login::logout');
 $routes->post('/d/(:num)-(:any)/photo', 'Box::photo/$1/$2');
 $routes->post('/d/(:num)-(:any)/status', 'Box::status/$1/$2');
 $routes->post('/d/(:num)-(:any)/move', 'Box::move/$1/$2');
+$routes->post('/d/(:num)-(:any)/verwijderen', 'Box::delete/$1/$2');
 $routes->get('/d/(:num)-(:any)', 'Box::show/$1/$2');
 $routes->post('/d/(:num)-(:any)', 'Box::store/$1/$2');
 

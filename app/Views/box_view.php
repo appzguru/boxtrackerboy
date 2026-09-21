@@ -82,7 +82,10 @@
       </form>
     </div>
     <?php else: ?>
-      <a href="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '?edit=1') ?>" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px;"><?= icon('edit', 18) ?> Bewerken</a>
+      <div style="display:flex;gap:8px;">
+        <a href="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '?edit=1') ?>" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px;"><?= icon('edit', 18) ?> Bewerken</a>
+        <button type="button" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px;color:var(--red-fg);" onclick="document.getElementById('delete-sheet').style.display='block';document.getElementById('delete-backdrop').style.display='block';"><?= icon('trash', 18) ?> Verwijderen</button>
+      </div>
     <?php endif ?>
   </div>
 
@@ -93,6 +96,19 @@
       <a href="<?= base_url('/') ?>" class="btn btn-secondary" style="height:58px;">Terug naar start</a>
     <?php endif ?>
   </div>
+
+  <?php if ($box['status'] === 'uitgepakt'): ?>
+  <button type="button" class="sheet-backdrop" id="delete-backdrop" style="display:none;" onclick="document.getElementById('delete-sheet').style.display='none';this.style.display='none';"></button>
+  <div class="sheet rise" id="delete-sheet" style="display:none;">
+    <div style="font-size:22px;font-weight:700;">Doos #<?= box_nr($box['nummer']) ?> verwijderen?</div>
+    <div style="font-size:15px;color:var(--text-dim);">Dit verwijdert de doos, de reisgeschiedenis en de foto's definitief. Dit kan niet ongedaan worden gemaakt.</div>
+    <form method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '/verwijderen') ?>">
+      <button type="submit" class="btn btn-primary" style="background:var(--red-fg);">Ja, verwijderen</button>
+      <div style="height:8px;"></div>
+      <button type="button" class="btn-ghost" style="width:100%;text-align:center;" onclick="document.getElementById('delete-sheet').style.display='none';document.getElementById('delete-backdrop').style.display='none';">Annuleren</button>
+    </form>
+  </div>
+  <?php endif ?>
 
   <button type="button" class="sheet-backdrop" id="open-backdrop" style="display:none;" onclick="document.getElementById('open-sheet').style.display='none';this.style.display='none';"></button>
   <div class="sheet rise" id="open-sheet" style="display:none;">

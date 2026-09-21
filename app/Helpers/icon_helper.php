@@ -26,6 +26,7 @@ if (! function_exists('icon')) {
             'list'      => '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
             'close'     => '<path d="M6 6l12 12M18 6L6 18"/>',
             'box'       => '<path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/>',
+            'trash'     => '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
         ];
         $body = $paths[$name] ?? '';
 
