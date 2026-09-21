@@ -57,13 +57,15 @@ window.Boxtracker = window.Boxtracker || {};
 
     loadJsQR().then(function () {
       // Zonder resolutie-voorkeur kiest de browser vaak een lage standaardstream,
-      // die er dan uitgerekt en wazig uitziet op een groter videovlak. Vraag HD op,
-      // en continu scherpstellen waar de camera dat ondersteunt (vooral Android Chrome).
+      // die er dan uitgerekt en wazig uitziet op een groter videovlak. 720p is scherp
+      // genoeg voor een sticker-QR en is lichter voor de camerapijplijn dan 1080p —
+      // dat laatste leek de scherpstelling juist trager te maken bij het wisselen
+      // van doos. Continu scherpstellen waar de camera dat ondersteunt.
       return navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
           advanced: [{ focusMode: 'continuous' }],
         },
       });
@@ -73,6 +75,19 @@ window.Boxtracker = window.Boxtracker || {};
       video.play();
       onState('ok');
       raf = requestAnimationFrame(tick);
+
+      // Sommige Android-camera's houden 'continuous' focus niet goed vast en blijven
+      // scherpgesteld op de vorige doos. Opnieuw dezelfde constraint toepassen "port"
+      // op zulke toestellen vaak een nieuwe scherpstelronde af. Onschadelijk (en een
+      // no-op) op toestellen die dit niet ondersteunen.
+      var track = s.getVideoTracks()[0];
+      var caps = track && track.getCapabilities ? track.getCapabilities() : null;
+      if (track && caps && caps.focusMode && caps.focusMode.indexOf('continuous') !== -1) {
+        var refocus = setInterval(function () {
+          if (stopped) { clearInterval(refocus); return; }
+          track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(function () {});
+        }, 2000);
+      }
     }).catch(function (err) {
       onState(err && err.name === 'NotAllowedError' ? 'denied' : 'error');
     });
