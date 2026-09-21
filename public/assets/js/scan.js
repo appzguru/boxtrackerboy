@@ -31,15 +31,22 @@ window.Boxtracker = window.Boxtracker || {};
   Boxtracker.startScanner = function (video, canvas, onDecode, onState) {
     var stream = null, raf = null, stopped = false;
     var ctx = canvas.getContext('2d', { willReadFrequently: true });
+    // De video zelf blijft HD voor een scherp beeld, maar jsQR op elk frame op volle
+    // resolutie laten draaien is te zwaar voor telefoons en maakt de scanlus traag
+    // (vandaar de trage "pick-up" van de volgende doos). Decoderen op een kleiner
+    // canvas is ruimschoots genoeg voor een sticker-QR en is een stuk sneller.
+    var MAX_DECODE_DIM = 720;
 
     function tick() {
       if (stopped) return;
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        var vw = video.videoWidth, vh = video.videoHeight;
+        var scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
+        canvas.width = Math.round(vw * scale);
+        canvas.height = Math.round(vh * scale);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        var result = window.jsQR(img.data, img.width, img.height);
+        var result = window.jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
         if (result && result.data) {
           var code = extractCode(result.data);
           if (code) onDecode(result.data, code);
