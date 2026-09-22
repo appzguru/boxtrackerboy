@@ -8,7 +8,8 @@
 <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 <link rel="manifest" href="<?= base_url('manifest.json') ?>">
 <meta name="theme-color" content="#3547F5">
-<link rel="apple-touch-icon" href="<?= base_url('assets/icons/icon-192.png') ?>">
+<link rel="icon" href="<?= base_url('assets/icons/favicon.ico') ?>">
+<link rel="apple-touch-icon" href="<?= base_url('assets/icons/apple-touch-icon.png') ?>">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Boxtracker">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
