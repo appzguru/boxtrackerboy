@@ -12,6 +12,19 @@ Boxtracker.csrfCookie = function () {
   return m ? decodeURIComponent(m[1]) : '';
 };
 
+/* Een pagina kan meerdere formulieren hebben terwijl er ook AJAX-POSTs op diezelfde
+ * pagina lopen (foto-upload, batch-scannen). Elke geslaagde POST ververst het
+ * CSRF-token server-side (regenerate = true in Config/Security.php), dus het bij
+ * paginalaad ingebakken veld van een nog-niet-verstuurd formulier kan intussen
+ * verouderd zijn geraakt. Vlak voor elke formulierverzending het veld verversen
+ * met de actuele cookie-waarde voorkomt dat zo'n verzending stil faalt (redirect
+ * terug, geen zichtbare fout, niets weggeschreven). Capture-phase, want dit moet
+ * vóór de browser het formulier daadwerkelijk verstuurt. */
+document.addEventListener('submit', function (e) {
+  var input = e.target.querySelector && e.target.querySelector('input[name="csrf_token"]');
+  if (input) input.value = Boxtracker.csrfCookie();
+}, true);
+
 (function () {
   var bar = document.getElementById('app-topbar');
   if (bar) {
