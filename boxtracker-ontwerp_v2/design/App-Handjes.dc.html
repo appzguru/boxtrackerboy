@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Handjes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Geist',system-ui,sans-serif;background:#F3E9D8;color:#1A140E;-webkit-font-smoothing:antialiased}
+a{color:#6E4424}a:hover{color:#1A140E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background-color: #F3E9D8; background-image: repeating-linear-gradient(90deg, rgba(120,80,40,0.035) 0 2px, transparent 2px 11px); font-family: 'Geist', system-ui, sans-serif; color: #1A140E">
+<header style="height: 64px; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; background-color: #CA9E67; background-image: repeating-linear-gradient(90deg, rgba(26,20,14,0.07) 0 2px, transparent 2px 10px); border-bottom: 2px solid #1A140E; flex-shrink: 0">
+<a href="App-Menu.dc.html" aria-label="Menu" style="width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #1A140E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></a>
+<span style="font-size: 16px; font-weight: 600">Verhuizing Lindelaan</span>
+<button type="button" aria-label="Scannen" style="width: 48px; height: 48px; border: 0; border-radius: 14px; background: #FFFDF8; color: #1A140E; border: 2px solid #1A140E; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"></path><rect x="9" y="9" width="6" height="6" rx="1"></rect></svg></button>
+</header>
+
+<div style="flex-grow: 1; padding: 24px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="margin: 0 4px; display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.03em">Handjes</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; color: #6B5C4A">Hulp zonder account. Ze scannen jouw QR-code en kunnen meteen aan de slag.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button type="button" onClick="{{kiesSjouwen}}" aria-pressed="{{sjouwen}}" style="min-height: 124px; border: 0; border-radius: 18px; background: #FFFDF8; padding: 16px; font-family: inherit; color: #1A140E; text-align: left; display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 0 0 2px {{sjouwRing}}">
+<span style="font-size: 17px; font-weight: 600">Sjouwen</span>
+<span style="font-size: 13px; line-height: 1.4; color: #6B5C4A">Ziet nummer, bestemming, fragiel en eerst openen. Geen inhoud.</span>
+</button>
+<button type="button" onClick="{{kiesInpakken}}" aria-pressed="{{inpakken}}" style="min-height: 124px; border: 0; border-radius: 18px; background: #FFFDF8; padding: 16px; font-family: inherit; color: #1A140E; text-align: left; display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 0 0 2px {{inpakRing}}">
+<span style="font-size: 17px; font-weight: 600">Inpakken</span>
+<span style="font-size: 13px; line-height: 1.4; color: #6B5C4A">Kan ook dozen vullen: inhoud, foto's en bestemming.</span>
+</button>
+</div>
+
+<div style="background: #FFFDF8; border-radius: 18px; border: 2px solid #1A140E; padding: 10px 10px 10px 18px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 500">Hoe lang</span><span style="font-size: 13px; color: #6B5C4A">Daarna vervalt de toegang</span></div>
+<div style="display: flex; align-items: center; gap: 4px">
+<button type="button" onClick="{{minder}}" aria-label="Een dag minder" style="width: 48px; height: 48px; border: 0; border-radius: 14px; background: #F3E9D8; color: #1A140E; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+<span style="min-width: 72px; text-align: center; font-size: 16px; font-weight: 600"><span style="font-family: 'Geist Mono', monospace">{{dagen}}</span> {{dagLabel}}</span>
+<button type="button" onClick="{{meer}}" aria-label="Een dag meer" style="width: 48px; height: 48px; border: 0; border-radius: 14px; background: #F3E9D8; color: #1A140E; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+</div>
+
+<span style="margin: 10px 4px 0; font-size: 13px; font-weight: 600; color: #6B5C4A; letter-spacing: 0.02em">ACTIEVE GASTEN</span>
+<div style="background: #FFFDF8; border-radius: 18px; border: 2px solid #1A140E; padding: 4px 0; display: flex; flex-direction: column">
+<div style="min-height: 60px; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 12px">
+<div style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 500">Piet</span><span style="font-size: 13px; color: #6B5C4A">Sjouwen · nog 2 dagen</span></div>
+<button type="button" style="height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: #B42318; font-family: inherit; font-size: 14px; font-weight: 500">Stoppen</button>
+</div>
+<div style="height: 1px; background: #EFE3CF; margin-left: 16px"></div>
+<div style="min-height: 60px; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 12px">
+<div style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 500">Ayla</span><span style="font-size: 13px; color: #6B5C4A">Inpakken · nog 5 uur</span></div>
+<button type="button" style="height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: #B42318; font-family: inherit; font-size: 14px; font-weight: 500">Stoppen</button>
+</div>
+</div>
+</div>
+
+<div style="padding: 16px 16px 28px">
+<a href="App-Handjes-QR.dc.html" style="width: 100%; height: 56px; border-radius: 16px; background: #936037; color: #FFFDF8; border: 2px solid #1A140E; box-shadow: 0 3px 0 #1A140E; text-decoration: none; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><path d="M14 14h2v2M20 14v6h-6"></path></svg>QR-code tonen</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { rol: 'sjouwen', dagen: 2 };
+  }
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    return {
+      sjouwen: s.rol === 'sjouwen',
+      inpakken: s.rol === 'inpakken',
+      sjouwRing: s.rol === 'sjouwen' ? '#936037' : '#D2BC98',
+      inpakRing: s.rol === 'inpakken' ? '#936037' : '#D2BC98',
+      kiesSjouwen: function () { self.setState({ rol: 'sjouwen' }); },
+      kiesInpakken: function () { self.setState({ rol: 'inpakken' }); },
+      dagen: s.dagen,
+      dagLabel: s.dagen === 1 ? 'dag' : 'dagen',
+      minder: function () { self.setState({ dagen: Math.max(1, s.dagen - 1) }); },
+      meer: function () { self.setState({ dagen: Math.min(7, s.dagen + 1) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

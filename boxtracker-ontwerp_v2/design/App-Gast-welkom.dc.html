@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Gast-welkom</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Geist',system-ui,sans-serif;background:#F3E9D8;color:#1A140E;-webkit-font-smoothing:antialiased}
+a{color:#6E4424}a:hover{color:#1A140E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background-color: #F3E9D8; background-image: repeating-linear-gradient(90deg, rgba(120,80,40,0.035) 0 2px, transparent 2px 11px); font-family: 'Geist', system-ui, sans-serif; color: #1A140E">
+<div style="padding: 28px 20px 0; display: flex; align-items: center; gap: 8px">
+<img src="/_blob/0d50963b69e6124487c30bac27c5e0ed" alt="" style="width: 36px; height: 36px; border-radius: 9px; display: block">
+<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em">Boxtracker</span>
+</div>
+
+<div style="flex-grow: 1; padding: 48px 20px 0; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; color: #6B5C4A">Je helpt bij Verhuizing Lindelaan</span>
+<h1 style="margin: 0; font-size: 36px; line-height: 1.08; font-weight: 600; letter-spacing: -0.035em">Hoe heet je?</h1>
+</div>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 500">Je naam<input type="text" placeholder="Zodat Sanne weet wie wat verplaatst" style="height: 56px; border-radius: 16px; border: 2px solid #936037; background: #FFFDF8; padding: 0 16px; font-family: inherit; font-size: 18px; color: #1A140E"></label>
+<div style="background: #FFFDF8; border-radius: 18px; border: 2px solid #1A140E; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 16px; font-weight: 600">Je sjouwt</span><span style="font-size: 14px; color: #6B5C4A">2 dagen toegang</span></div>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #54483A">Scan een doos en je ziet het nummer, waar hij heen moet en of hij fragiel is of eerst open moet. Wat erin zit zie je niet.</p>
+</div>
+</div>
+
+<div style="padding: 16px 20px 32px">
+<a href="App-Doos-sjouwer.dc.html" style="height: 56px; border-radius: 16px; background: #936037; color: #FFFDF8; border: 2px solid #1A140E; box-shadow: 0 3px 0 #1A140E; text-decoration: none; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">Aan de slag</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
