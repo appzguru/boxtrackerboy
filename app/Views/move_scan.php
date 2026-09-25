@@ -6,15 +6,15 @@
     <div class="header-title">Dozen scannen</div>
   </div>
   <div class="content" style="padding:0 16px 18px;gap:14px;">
-    <div id="cam-wrap" style="position:relative;flex:none;height:248px;border-radius:24px;background:#E4E8EF;overflow:hidden;">
+    <div id="cam-wrap" style="position:relative;flex:none;height:248px;border-radius:24px;background:#E6D2B0;overflow:hidden;">
       <video id="cam-video" playsinline muted style="width:100%;height:100%;object-fit:cover;"></video>
       <canvas id="cam-canvas" style="display:none;"></canvas>
-      <div style="position:absolute;left:26px;top:26px;width:30px;height:30px;border-top:3px solid #0F1216;border-left:3px solid #0F1216;border-top-left-radius:10px;"></div>
-      <div style="position:absolute;right:26px;top:26px;width:30px;height:30px;border-top:3px solid #0F1216;border-right:3px solid #0F1216;border-top-right-radius:10px;"></div>
-      <div style="position:absolute;left:26px;bottom:26px;width:30px;height:30px;border-bottom:3px solid #0F1216;border-left:3px solid #0F1216;border-bottom-left-radius:10px;"></div>
-      <div style="position:absolute;right:26px;bottom:26px;width:30px;height:30px;border-bottom:3px solid #0F1216;border-right:3px solid #0F1216;border-bottom-right-radius:10px;"></div>
+      <div style="position:absolute;left:26px;top:26px;width:30px;height:30px;border-top:3px solid #1A140E;border-left:3px solid #1A140E;border-top-left-radius:10px;"></div>
+      <div style="position:absolute;right:26px;top:26px;width:30px;height:30px;border-top:3px solid #1A140E;border-right:3px solid #1A140E;border-top-right-radius:10px;"></div>
+      <div style="position:absolute;left:26px;bottom:26px;width:30px;height:30px;border-bottom:3px solid #1A140E;border-left:3px solid #1A140E;border-bottom-left-radius:10px;"></div>
+      <div style="position:absolute;right:26px;bottom:26px;width:30px;height:30px;border-bottom:3px solid #1A140E;border-right:3px solid #1A140E;border-bottom-right-radius:10px;"></div>
       <div class="scanline" id="scanline" style="position:absolute;left:44px;right:44px;height:3px;border-radius:2px;background:var(--blue);"></div>
-      <div style="position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:14px;font-weight:500;color:#4A5360;">Richt op de QR-code op de sticker</div>
+      <div style="position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:14px;font-weight:500;color:#54483A;">Richt op de QR-code op de sticker</div>
       <div id="flash" class="pop" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;">
         <div id="flash-big" class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;"></div>
         <div id="flash-small" style="font-size:19px;font-weight:600;"></div>
@@ -65,8 +65,8 @@ var flash = document.getElementById('flash'), flashBig = document.getElementById
 function showFlash(big, small, ok) {
   flashBig.textContent = big;
   flashSmall.textContent = small;
-  flash.style.background = ok ? '#DDF4E7' : '#FDE8E8';
-  flash.style.color = ok ? '#10633B' : '#A4262C';
+  flash.style.background = ok ? '#DFF3E8' : '#FDECEA';
+  flash.style.color = ok ? '#1A7F4B' : '#B42318';
   flash.style.display = 'flex';
   if (navigator.vibrate) navigator.vibrate(ok ? 60 : [40, 60, 40]);
   setTimeout(function () { flash.style.display = 'none'; }, 700);

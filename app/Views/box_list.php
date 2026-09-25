@@ -9,7 +9,7 @@
       <h1 style="font-size:28px;font-weight:700;letter-spacing:-0.035em;"><?= esc($titel) ?></h1>
       <div style="font-size:15px;font-weight:500;color:var(--text-dim);"><?= count($rows) ?> <?= count($rows) === 1 ? 'doos' : 'dozen' ?></div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:#E9ECF2;">
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:#EFE3CF;">
       <a href="?kind=<?= esc($kind) ?>&val=<?= urlencode((string) $val) ?>&sort=nr" style="height:44px;border-radius:11px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;<?= $sort === 'nr' ? 'background:#fff;box-shadow:0 1px 2px rgba(15,18,22,.12);' : 'color:var(--text-mid);' ?>">Nummer</a>
       <a href="?kind=<?= esc($kind) ?>&val=<?= urlencode((string) $val) ?>&sort=recent" style="height:44px;border-radius:11px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;<?= $sort === 'recent' ? 'background:#fff;box-shadow:0 1px 2px rgba(15,18,22,.12);' : 'color:var(--text-mid);' ?>">Laatst gewijzigd</a>
     </div>
@@ -22,8 +22,8 @@
               <span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= esc(access()->can('helper') ? (first_line($r['omschrijving']) ?: '(nog geen inhoud)') : 'Moet naar ' . ($r['einddoel'] ?: '—')) ?></span>
               <span style="font-size:13px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= esc($r['huidige_locatie'] ?: '—') ?></span>
             </span>
-            <?php if ($r['fragiel']): ?><span style="color:#7A4B00;flex:none;" title="Fragiel"><?= icon('fragile') ?></span><?php endif ?>
-            <?php if ($r['eerst_openen']): ?><span style="color:#2433C7;flex:none;" title="Eerst openen"><?= icon('first') ?></span><?php endif ?>
+            <?php if ($r['fragiel']): ?><span style="color:#A4271B;flex:none;" title="Fragiel"><?= icon('fragile') ?></span><?php endif ?>
+            <?php if ($r['eerst_openen']): ?><span style="color:#6E4424;flex:none;" title="Eerst openen"><?= icon('first') ?></span><?php endif ?>
           </a>
         <?php endforeach ?>
       </div>

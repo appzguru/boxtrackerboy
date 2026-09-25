@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8">
 <title><?= esc($title) ?></title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <style>
+  @font-face{font-family:'Geist';font-style:normal;font-weight:400 700;font-display:swap;src:url('<?= base_url('assets/fonts/geist.woff2') ?>') format('woff2');}
+  @font-face{font-family:'Geist Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url('<?= base_url('assets/fonts/geist-mono.woff2') ?>') format('woff2');}
   *{box-sizing:border-box;}
-  body{margin:0;background:#E8E6E1;color:#16181C;font-family:'Geist',system-ui,sans-serif;}
+  body{margin:0;background:#F3E9D8;color:#1A140E;font-family:'Geist',system-ui,sans-serif;}
   .toolbar{max-width:210mm;margin:0 auto;padding:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
   .toolbar h1{font-size:20px;margin:0;flex:1 1 100%;}
-  .toolbar .note{font-size:13px;color:#4A4F57;flex:1 1 100%;}
-  .btn{font:inherit;font-weight:600;padding:10px 18px;border:1px solid #16181C;background:#16181C;color:#fff;cursor:pointer;border-radius:10px;}
-  .btn.ghost{background:#fff;color:#16181C;}
+  .toolbar .note{font-size:13px;color:#54483A;flex:1 1 100%;}
+  .btn{font:inherit;font-weight:600;padding:10px 18px;border:2px solid #1A140E;background:#936037;color:#FFFDF8;cursor:pointer;border-radius:10px;box-shadow:0 3px 0 #1A140E;}
+  .btn.ghost{background:#FFFDF8;color:#1A140E;box-shadow:none;}
   a.btn{display:inline-block;text-decoration:none;}
   .sheet{background:#fff;margin:0 auto 18px;width:210mm;height:297mm;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.15);}
   .sheet-inner{display:grid;}
@@ -20,8 +21,8 @@
   .label canvas{display:block;}
   .meta{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1mm;}
   .num{font-family:'Geist Mono',monospace;font-weight:700;line-height:.9;letter-spacing:-0.02em;}
-  .writeline{border-bottom:0.4mm solid #16181C;height:5mm;}
-  .writehint{font-size:2.4mm;color:#6B7078;margin-top:-1mm;}
+  .writeline{border-bottom:0.4mm solid #1A140E;height:5mm;}
+  .writehint{font-size:2.4mm;color:#6B5C4A;margin-top:-1mm;}
   @media print{
     @page{size:A4;margin:0;}
     body{background:#fff;}

@@ -27,7 +27,7 @@ Boxtracker.compressImage = function (file, maxSize, quality) {
 /** Voegt meteen een tegel met voortgangsbalk toe aan `grid`, en vervangt die door de echte foto na upload. */
 Boxtracker.uploadPhoto = function (file, uploadUrl, grid) {
   var tile = document.createElement('div');
-  tile.style.cssText = 'position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:#E4F1EC;';
+  tile.style.cssText = 'position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:#DFF3E8;';
   tile.innerHTML = '<div style="position:absolute;inset:0;background:rgba(255,255,255,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">' +
     '<div style="font-size:12px;font-weight:600;">Uploaden</div>' +
     '<div class="progress-track" style="width:60%;"><div class="progress-bar" style="width:4%;"></div></div></div>';
@@ -51,14 +51,14 @@ Boxtracker.uploadPhoto = function (file, uploadUrl, grid) {
           tile.style.background = 'transparent';
           tile.innerHTML = '<img src="' + res.url + '" alt="Foto van de doos" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">';
         } else {
-          tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A4262C;text-align:center;padding:8px;">' + (res.error || 'Mislukt') + '</div>';
+          tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#B42318;text-align:center;padding:8px;">' + (res.error || 'Mislukt') + '</div>';
         }
       } catch (err) {
-        tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A4262C;">Mislukt</div>';
+        tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#B42318;">Mislukt</div>';
       }
     };
     xhr.onerror = function () {
-      tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A4262C;">Mislukt</div>';
+      tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#B42318;">Mislukt</div>';
     };
     xhr.send(fd);
   });

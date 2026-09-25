@@ -17,7 +17,7 @@
       <?php foreach ($results as $r): ?>
         <a href="<?= base_url('d/' . $r['nummer'] . '-' . $r['token']) ?>" class="card row" style="display:flex;flex-direction:column;gap:10px;padding:16px 18px;">
           <span style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-            <span class="mono" style="font-size:15px;font-weight:600;background:#F0F2F6;border-radius:8px;padding:4px 10px;">#<?= box_nr($r['nummer']) ?></span>
+            <span class="mono" style="font-size:15px;font-weight:600;background:#EFE3CF;border-radius:8px;padding:4px 10px;">#<?= box_nr($r['nummer']) ?></span>
             <span style="font-size:14px;font-weight:500;color:var(--text-dim);">Moet naar <?= esc($r['einddoel'] ?: '—') ?></span>
           </span>
           <span style="font-size:25px;font-weight:700;letter-spacing:-0.03em;"><?= esc($r['huidige_locatie'] ?: '—') ?></span>

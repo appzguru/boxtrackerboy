@@ -102,7 +102,7 @@ window.Boxtracker = window.Boxtracker || {};
   /** Fullscreen scan-overlay voor één scan; roept onResult(url) aan en ruimt zichzelf op. */
   Boxtracker.scanOnce = function (container, onResult) {
     container.innerHTML =
-      '<div style="position:fixed;inset:0;background:#0F1216;z-index:50;display:flex;flex-direction:column;">' +
+      '<div style="position:fixed;inset:0;background:#1A140E;z-index:50;display:flex;flex-direction:column;">' +
       '<div style="position:relative;flex:1;overflow:hidden;">' +
       '<video playsinline muted style="width:100%;height:100%;object-fit:cover;"></video>' +
       '<canvas style="display:none;"></canvas>' +

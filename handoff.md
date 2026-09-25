@@ -343,9 +343,25 @@ afhankelijkheid voor samenwerken. SPF/DKIM voor boxtracker.nl instellen.
 
 ## 12. Bouwvolgorde
 
-**Stand 2026-09-25:** 0–6 gebouwd en lokaal getest (curl-rooktest + `tests/database/ScopingTest.php`).
-Van 7 zijn account/verhuizing verwijderen en de limieten klaar; landingspagina en privacyverklaring
-nog niet. 8 wacht op DNS/hosting voor boxtracker.nl.
+**Stand 2026-09-25:** 0–8 gebouwd, getest en live. `app.boxtracker.nl` en `boxtracker.nl`
+(landingspagina + privacyverklaring, §7 fase 8) staan beide op de server (web0171/zxcs = Vimexx,
+zie CLAUDE.md). §14 (papieren lijsten) is erbij gekomen na livegang.
+
+**Stijl (2026-09-25):** de hele app is omgezet naar de kartonlook uit
+`boxtracker-ontwerp_v2/HANDOFF.md` §1-2 — dezelfde visuele taal als de landingspagina. Dit ging
+via `public/assets/css/app.css`: de bestaande tokennamen (`--blue`, `--bg`, `--border`, …) hebben
+nieuwe kraft-waarden gekregen, plus nieuwe componentregels (outline + drop-shadow op knoppen/
+kaarten, corrugated-textuur). Omdat alle 39 views al consistent via deze tokens/klassen werkten,
+hoefde geen enkele view zelf aangepast te worden — behalve een handvol losse hardcoded hex-kleuren
+(`status_pill()` in `format_helper.php`, en enkele `style="color:#…"` in box_form/box_list/
+box_sjouwer/box_view/move_dest/move_scan/search/labels_print), die zijn losstaand meegenomen.
+Fonts zelf gehost (`public/assets/fonts/`, gekopieerd uit `landing/assets/fonts/`), net als de
+PWA-iconen (nieuwe logo, `public/assets/icons/`) en `manifest.json`.
+
+**Nog niet gedaan:** de 13 specifiek ontworpen schermen (App-Registreren, App-Handjes-QR, enz.)
+zijn nu wel in de juiste kleuren/fonts/componenten, maar nog niet pixel-voor-pixel langs hun eigen
+mockup gelegd (plakband, stempel-component, exacte layout-details per scherm). Dat is een losse
+detailslag als daar behoefte aan is — de tokens/componenten-pass hierboven raakt alle schermen al.
 
 0. **Voorbereiden** — openstaande v1-wijzigingen committen, tag `familie-v1`, branch `familie`
    (daar deployt minisaas voortaan vanaf). v2 op `main`.

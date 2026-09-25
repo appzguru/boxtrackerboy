@@ -7,7 +7,7 @@
   </div>
   <div class="content">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
-      <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#7C8696;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
+      <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#9A8A74;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
       <span class="pill" style="background:<?= $pill['bg'] ?>;color:<?= $pill['fg'] ?>;margin-bottom:6px;"><?= esc($pill['label']) ?></span>
     </div>
 
