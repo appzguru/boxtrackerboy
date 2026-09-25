@@ -42,6 +42,10 @@ git archive --format=tar HEAD -- . \
         --exclude=/.env --exclude=/writable/ --exclude=/vendor/ --exclude=/cgi-bin/ \
         \"\$TMP\"/ ~/$APP_DIR/
     cd ~/$APP_DIR
+    # rsync neemt de rechten van de mktemp-map (700) over; de webserver moet erin kunnen.
+    chmod 755 .
+    chmod -R go-w app public system
+    chmod 600 .env 2>/dev/null || true
     mkdir -p writable/cache writable/logs writable/session writable/uploads writable/mail writable/debugbar
     [ -f .env ] || echo 'WAARSCHUWING: geen .env op de server!'
     composer install --no-dev --optimize-autoloader --no-interaction --quiet
