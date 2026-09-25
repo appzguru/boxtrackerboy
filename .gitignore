@@ -1,6 +1,7 @@
 /.env
 /.env.bak
 /credentials.md
+/env_prd
 /.local/
 /writable/cache/*
 /writable/logs/*
