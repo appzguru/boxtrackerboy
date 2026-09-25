@@ -36,7 +36,7 @@ git archive --format=tar HEAD -- . \
   | ssh "$HOST" "set -e
     TMP=\$(mktemp -d)
     trap 'rm -rf \"\$TMP\"' EXIT
-    tar -xf - -C \"\$TMP\"
+    tar -mxf - -C \"\$TMP\"
     mkdir -p ~/$APP_DIR
     rsync -a --delete \
         --exclude=/.env --exclude=/writable/ --exclude=/vendor/ --exclude=/cgi-bin/ \
