@@ -273,6 +273,7 @@ Eén vergeten `where verhuizing_id = ?` = data van een ander zichtbaar. Daarom:
 | GET/POST | `/verplaats…` | sjouwer+ | batch verplaatsen |
 | GET | `/zoek` | sjouwer+ | sjouwer: alleen nummer |
 | GET | `/overzicht…` | sjouwer+ | |
+| GET | `/lijsten…` | sjouwer+ | papieren lijsten, zie §14 |
 | GET/POST | `/labels…` | helper+ | |
 | GET/POST | `/import` | admin | |
 | GET | `/export` | admin | |
@@ -372,3 +373,26 @@ nog niet. 8 wacht op DNS/hosting voor boxtracker.nl.
 - inhoud als losse regels per voorwerp; het blijft één vrij tekstveld
 - native apps, notificaties, offline werken
 - migratie van de v1-data (minisaas blijft apart draaien)
+
+---
+
+## 14. Papieren lijsten
+
+Niet iedereen scant. Drie printbare lijsten (route `/lijsten…`, sjouwer+ — alleen nummer,
+bestemming en plek, geen inhoud, dus ook veilig voor sjouwers). Gebaseerd op `BoxModel::forLists()`
+(nummer, einddoel, huidige_locatie van elke niet-lege doos in de actieve verhuizing).
+
+- **Bij de voordeur** (`/lijsten/deur`): alle dozen, nummer → bestemming, op volgnummer. Wie een
+  doos oppakt zoekt het nummer op en weet de kamer, zonder scannen.
+- **Per kamer** (`/lijsten/kamers`): gegroepeerd per bestemming, met de doosnummers die daar
+  verwacht worden. Elke kamer op een eigen afdrukpagina (`page-break-after`), om los te knippen en
+  in die kamer op te hangen.
+- **Controle** (`/lijsten/controle`): per bestemming een vergelijking `einddoel` ↔ `huidige_locatie`
+  — welke dozen zijn al aangekomen (`huidige_locatie = einddoel`) en welke nog niet. Bedoeld voor
+  het moment dat dozen echt in de nieuwe kamers gezet worden (na de verhuizing dus, niet tijdens
+  het inpakken — daarvóór wijken plek en bestemming altijd af, dat is normaal en geen "afwijking").
+  Geen "staat hier maar hoort er niet"-check (v1): dat zou tijdens de opslagfase voortdurend
+  vals-positief geven voor tussentijdse locaties als "Zolder" of "Opslag · rij 3".
+- Printen via de gewone browser-printfunctie (`window.print()`), met `@media print`-regels in
+  `app.css` die de app-chrome verbergen en per lijst-kaart een eigen pagina forceren.
+- Bereikbaar via het overzichtscherm ("Papieren lijsten printen") en via `/lijsten` zelf.

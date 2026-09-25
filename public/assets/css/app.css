@@ -130,3 +130,13 @@ textarea.field { min-height: 124px; padding: 14px 16px; line-height: 1.45; resiz
 .menu-row + .menu-row { border-top: 1px solid var(--border); }
 .menu-row .sub { font-size: 13px; font-weight: 500; color: var(--text-dim); }
 .vh-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-mid); max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- papieren lijsten (handoff.md §14): printbaar vanuit de gewone app-chrome ---- */
+.print-list-card { break-inside: avoid; page-break-inside: avoid; }
+@media print {
+  .app-topbar, #scan-overlay, .header, .bottombar, .no-print { display: none !important; }
+  body, .screen { background: #fff !important; }
+  .content { padding: 0 !important; }
+  .print-list-card { box-shadow: none !important; border: 1px solid #000 !important; page-break-after: always; break-after: page; }
+  .print-list-card:last-child { page-break-after: auto; break-after: auto; }
+}

@@ -60,6 +60,10 @@ $routes->group('', ['filter' => 'access:sjouwer'], static function ($routes) {
     $routes->get('/zoek', 'Search::index');
     $routes->get('/overzicht', 'Overview::index');
     $routes->get('/overzicht/lijst', 'Overview::list');
+    $routes->get('/lijsten', 'Lijsten::index');
+    $routes->get('/lijsten/deur', 'Lijsten::deur');
+    $routes->get('/lijsten/kamers', 'Lijsten::kamers');
+    $routes->get('/lijsten/controle', 'Lijsten::controle');
 });
 
 // Helpers (inpakkers) en admins

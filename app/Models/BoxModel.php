@@ -93,6 +93,15 @@ class BoxModel extends ScopedModel
         return $this->where('status !=', 'leeg')->orderBy('updated_at', 'DESC')->findAll(200);
     }
 
+    /** Nummer, bestemming en huidige plek van elke doos die meetelt — basis voor de papieren lijsten. */
+    public function forLists(): array
+    {
+        return $this->select('nummer, einddoel, huidige_locatie')
+            ->where('status !=', 'leeg')
+            ->orderBy('nummer', 'ASC')
+            ->findAll();
+    }
+
     public function counts(): array
     {
         $rows = $this->select('status, COUNT(*) as n')->groupBy('status')->findAll();

@@ -24,6 +24,12 @@ $maxDoel   = $perDoel ? max($perDoel) : 1;
     </div>
     <?php endif ?>
 
+    <a href="<?= base_url('lijsten') ?>" class="card row" style="display:flex;align-items:center;gap:12px;padding:16px 18px;">
+      <?= icon('print', 20) ?>
+      <span style="flex:1;font-size:15px;font-weight:600;">Papieren lijsten printen</span>
+      <?= icon('back', 16) ?>
+    </a>
+
     <div class="grid-wide" style="display:flex;flex-direction:column;gap:24px;">
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="label">Per status</div>
