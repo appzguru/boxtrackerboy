@@ -34,4 +34,20 @@ class LocationModel extends Model
 
         return array_column($builder->orderBy('naam', 'ASC')->limit($limit)->findAll(), 'naam');
     }
+
+    /** Verbergt een naam als suggestie (bv. een typo), zonder de verplaatshistorie aan te passen. */
+    public function hide(string $naam): void
+    {
+        $naam = trim($naam);
+        if ($naam === '') {
+            return;
+        }
+        $this->where('naam', $naam)->set(['actief' => 0])->update();
+    }
+
+    /** Namen die verborgen zijn (actief = 0), voor het uitfilteren van suggesties elders. */
+    public function hiddenNames(): array
+    {
+        return array_column($this->where('actief', 0)->findAll(), 'naam');
+    }
 }

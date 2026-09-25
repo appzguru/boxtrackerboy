@@ -12,16 +12,16 @@ class Home extends BaseController
         $totaalAlles = $boxes->countAll();
         $counts = $boxes->counts();
 
-        $ingepakt = $counts['ingepakt'] ?? 0;
-        $opslag   = ($counts['opgeslagen'] ?? 0) + ($counts['geopend'] ?? 0);
+        $openDoos  = ($counts['ingepakt'] ?? 0) + ($counts['geopend'] ?? 0);
+        $opslag    = $counts['opgeslagen'] ?? 0;
         $uitgepakt = $counts['uitgepakt'] ?? 0;
-        $hasBoxes = ($ingepakt + $opslag + $uitgepakt) > 0;
+        $hasBoxes  = ($openDoos + $opslag + $uitgepakt) > 0;
 
         return $this->view('home', [
             'title'      => 'Boxtracker',
             'hasAny'     => $totaalAlles > 0,
             'hasBoxes'   => $hasBoxes,
-            'ingepakt'   => $ingepakt,
+            'openDoos'   => $openDoos,
             'opslag'     => $opslag,
             'uitgepakt'  => $uitgepakt,
         ]);

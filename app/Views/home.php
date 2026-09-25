@@ -18,7 +18,7 @@
 
     <?php if ($hasAny): ?>
       <div style="display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;">
-        <a href="<?= base_url('overzicht/lijst?kind=status&val=ingepakt') ?>" class="tile"><span class="mono" style="font-size:38px;font-weight:600;letter-spacing:-0.05em;"><?= $ingepakt ?></span><span style="font-size:14px;font-weight:500;color:var(--text-dim);">Ingepakt</span></a>
+        <a href="<?= base_url('overzicht/lijst?kind=status&val=ingepakt,geopend') ?>" class="tile"><span class="mono" style="font-size:38px;font-weight:600;letter-spacing:-0.05em;"><?= $openDoos ?></span><span style="font-size:14px;font-weight:500;color:var(--text-dim);">Open doos</span></a>
         <a href="<?= base_url('overzicht/lijst?kind=status&val=opgeslagen') ?>" class="tile"><span class="mono" style="font-size:38px;font-weight:600;letter-spacing:-0.05em;"><?= $opslag ?></span><span style="font-size:14px;font-weight:500;color:var(--text-dim);">In opslag</span></a>
         <a href="<?= base_url('overzicht/lijst?kind=status&val=uitgepakt') ?>" class="tile"><span class="mono" style="font-size:38px;font-weight:600;letter-spacing:-0.05em;"><?= $uitgepakt ?></span><span style="font-size:14px;font-weight:500;color:var(--text-dim);">Uitgepakt</span></a>
       </div>

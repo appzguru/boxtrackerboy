@@ -60,8 +60,14 @@ class Overview extends BaseController
 
         $titel = 'Alle dozen';
         if ($kind === 'status' && $val) {
-            $builder->where('status', $val);
-            $titel = status_pill($val)['label'];
+            $vals = array_filter(explode(',', $val));
+            if (count($vals) > 1) {
+                $builder->whereIn('status', $vals);
+                $titel = 'Open doos';
+            } else {
+                $builder->where('status', $val);
+                $titel = status_pill($val)['label'];
+            }
         } elseif ($kind === 'plek' && $val) {
             $builder->where('huidige_locatie', $val === 'Nog niet bepaald' ? null : $val);
             $titel = $val;

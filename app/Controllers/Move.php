@@ -10,10 +10,22 @@ class Move extends BaseController
 {
     public function start()
     {
+        $locations = new LocationModel();
+
         return $this->view('move_dest', [
             'title' => 'Dozen verplaatsen — Boxtracker',
-            'recent' => (new MovementModel())->recentDestinations(),
+            'recent' => (new MovementModel())->recentDestinations(8, $locations->hiddenNames()),
         ]);
+    }
+
+    public function hideDestination()
+    {
+        $naam = trim((string) $this->request->getPost('naam'));
+        if ($naam !== '') {
+            (new LocationModel())->hide($naam);
+        }
+
+        return $this->response->setJSON(['ok' => true]);
     }
 
     public function go()

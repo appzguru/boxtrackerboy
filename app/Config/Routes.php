@@ -23,6 +23,7 @@ $routes->get('/foto/(:num)', 'Photo::show/$1');
 
 $routes->get('/verplaats', 'Move::start');
 $routes->post('/verplaats', 'Move::go');
+$routes->post('/verplaats/plek/verwijderen', 'Move::hideDestination');
 $routes->get('/verplaats/(:any)/scan', 'Move::scan/$1');
 $routes->post('/verplaats/(:any)/scan', 'Move::doScan/$1');
 $routes->post('/verplaats/(:any)/sluit', 'Move::finish/$1');

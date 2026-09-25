@@ -18,14 +18,16 @@ class MovementModel extends Model
     }
 
     /** Meest recent gebruikte locaties (naar_locatie), uniek, nieuwste eerst. */
-    public function recentDestinations(int $limit = 8): array
+    public function recentDestinations(int $limit = 8, array $exclude = []): array
     {
-        $rows = $this->select('naar_locatie, MAX(op) as laatst')
+        $builder = $this->select('naar_locatie, MAX(op) as laatst')
             ->groupBy('naar_locatie')
-            ->orderBy('laatst', 'DESC')
-            ->limit($limit)
-            ->findAll();
+            ->orderBy('laatst', 'DESC');
 
-        return array_column($rows, 'naar_locatie');
+        if ($exclude) {
+            $builder->whereNotIn('naar_locatie', $exclude);
+        }
+
+        return array_column($builder->limit($limit)->findAll(), 'naar_locatie');
     }
 }
