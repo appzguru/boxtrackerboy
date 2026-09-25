@@ -9,9 +9,9 @@ SSH en deployen.
 | | v1 — familie | v2 — openbaar |
 |---|---|---|
 | Code | branch `familie` (tag `familie-v1`) | `master` |
-| Live | boxtracker.minisaas.nl (web0098) | app.boxtracker.nl + boxtracker.nl (web0171) — **nog niet live** |
+| Live | boxtracker.minisaas.nl (web0098) | app.boxtracker.nl + boxtracker.nl (web0171) — gedeployd, wacht op DNS/SSL |
 | Login | 4 pincode-accounts | accounts, verhuizingen, rollen admin/helper/sjouwer |
-| Deploy | `php deploy.php` (alleen vanaf branch `familie`) | nog in te richten (fase 8) |
+| Deploy | `php deploy.php` (alleen vanaf branch `familie`) | `bash deploy-v2.sh` (alleen vanaf `master`) |
 
 v1 blijft draaien voor de eigen verhuizing en krijgt alleen bugfixes, op branch `familie`.
 Een fix die ook voor v2 geldt: apart op `master` doorvoeren (het schema verschilt).
@@ -52,7 +52,7 @@ MariaDB 10.6.
 
 - **v2**: `ssh boxtrackernl` — alias in `~/.ssh/config`, host `web0171.zxcs.nl` poort 7685,
   user `u7872p488700`. Zelfde hoofdaccount als `rondjebant`. Domeinmap:
-  `~/domains/boxtracker.nl` (bevat nu alleen de standaard `public_html/index.html`).
+  `~/domains/boxtracker.nl`; de app staat in `public_html/app`.
   Database `u7872p488700_boxtracker_j3ls` (gegevens in `env_prd`, niet in git).
 - **v1**: `ssh boxtracker` — host `web0098.zxcs.nl`, user `u7872p5382`, projectmap
   `~/domains/minisaas.nl/public_html/boxtracker`.
@@ -77,12 +77,26 @@ HEAD. Het FTP-account `boxtrackerboy@minisaas.nl` is gechroot op `~/domains/mini
 dus remote path `public_html/boxtracker`. Document Root van boxtracker.minisaas.nl moet naar
 `public_html/boxtracker/public` wijzen.
 
-### v2 (app.boxtracker.nl) — nog in te richten
+### v2 (app.boxtracker.nl)
 
-Open (handoff.md §12 fase 8): subdomein `app.boxtracker.nl` met Document Root op de CI4
-`public/`-map, SSL voor beide domeinen, `.htaccess` op boxtracker.nl die `/d/*` doorstuurt
-naar de app, SMTP (`noreply@boxtracker.nl`) + SPF/DKIM, en een eigen deploy-doel. In de
-live `.env` o.a. `boxtracker.stickerBaseURL = 'https://boxtracker.nl'` en de `email.*`-instellingen.
+```bash
+bash deploy-v2.sh      # alleen vanaf master; deployt de gecommitte HEAD via SSH
+```
+
+Zet HEAD via `git archive` op de server en synct met `rsync --delete` naar
+`~/domains/boxtracker.nl/public_html/app` (Document Root van app.boxtracker.nl:
+`public_html/app/public`). `.env`, `writable/` en `vendor/` blijven op de server staan;
+`composer install --no-dev` draait daar. De gedeployde revisie staat in `writable/REVISION`.
+Schemawijzigingen gaan niet mee — apart live draaien.
+
+- Live `.env` staat alleen op de server (rechten 600): productie-DB, `app.baseURL`
+  https://app.boxtracker.nl/, `boxtracker.stickerBaseURL` https://boxtracker.nl,
+  `cookie.secure`, en `email.*` — **SMTPHost/SMTPPass nog leeg**, dus mails komen tot die tijd
+  in `writable/mail/` terecht in plaats van verstuurd te worden.
+- `~/domains/boxtracker.nl/public_html/.htaccess` (niet in git): blokkeert `/app` (404) en
+  stuurt sticker-URL's `boxtracker.nl/d/*` door naar `https://app.boxtracker.nl/d/*` (302).
+- Nog open: SSL voor beide domeinen, landingspagina + privacyverklaring op boxtracker.nl,
+  mailbox `noreply@boxtracker.nl` + SPF/DKIM.
 
 ## Repository
 
