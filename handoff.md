@@ -310,7 +310,18 @@ de verhuizing-naam + wisselaar in de kop en respecteren de rol.
   bevestigen door de naam te typen). Account verwijderen: kan alleen als je nergens de enige admin
   bent van een verhuizing met andere leden (anders eerst overdragen of verhuizing verwijderen).
 - Privacyverklaring op boxtracker.nl (foto's van persoonlijke spullen = persoonsgegevens-achtig).
-- Later (niet v2.0): verhuizing zonder activiteit na 18 maanden → mail aan admins → na 30 dagen weg.
+- **Inactiviteit — vereist voor v2, nog niet gebouwd**: de privacyverklaring belooft dat een account
+  automatisch verdwijnt na 6 maanden niet inloggen (`users` × `sessions.last_used_at`, die al bestaat).
+  Nodig: een geplande taak (cron) die dit uitvoert via dezelfde route als handmatig account verwijderen
+  (`Account::delete`, incl. het cascaderen van verhuizingen waar de gebruiker de enige bij is).
+  **Open vraag, nog niet besloten:** wat gebeurt er met een inactieve gebruiker die de enige admin is
+  van een verhuizing met andere leden? Handmatig verwijderen wordt daar nu geblokkeerd (er moet eerst
+  een andere admin komen) — dat kan een geautomatiseerde taak niet vragen. Opties: (a) die gebruiker
+  overslaan totdat het is opgelost (verwijdert dan nooit vanzelf), (b) automatisch de langst-actieve
+  medeadmin/helper promoveren en dan pas verwijderen, (c) een waarschuwingsmail sturen vóór de
+  deadline. De privacytekst noemt bewust geen waarschuwingsmail — als die er komt, moet de tekst mee.
+- Back-up-bewaartermijn (§11): dagelijkse dump, laatste 14 bewaard — dit getal staat al zo in de
+  privacyverklaring, dus bij wijziging daar ook aanpassen.
 
 ---
 
