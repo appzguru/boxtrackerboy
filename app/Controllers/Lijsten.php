@@ -42,10 +42,17 @@ class Lijsten extends BaseController
         ]);
     }
 
-    /** Per bestemming: welke dozen zijn al aangekomen (huidige_locatie = einddoel) en welke nog niet. */
+    /**
+     * Per bestemming: welke dozen zijn al aangekomen (huidige_locatie = einddoel) en welke nog
+     * niet, plus het totaal over alle kamers heen — voor op een tablet die de hele dag blijft
+     * staan (de view ververst zichzelf, zie lijst_controle.php).
+     */
     public function controle()
     {
         $kamers = [];
+        $totaalKlopt = 0;
+        $totaalVerwacht = 0;
+
         foreach ((new BoxModel())->forLists() as $r) {
             $doel = trim((string) $r['einddoel']);
             if ($doel === '') {
@@ -54,12 +61,16 @@ class Lijsten extends BaseController
             $plek = trim((string) $r['huidige_locatie']);
             $kamers[$doel]['naam'] ??= $doel;
             $kamers[$doel][$plek === $doel ? 'klopt' : 'ontbreekt'][] = $r['nummer'];
+            $totaalKlopt    += $plek === $doel ? 1 : 0;
+            $totaalVerwacht += 1;
         }
         ksort($kamers, SORT_NATURAL | SORT_FLAG_CASE);
 
         return $this->view('lijst_controle', [
-            'title'  => 'Controle — Boxtracker',
-            'kamers' => $kamers,
+            'title'          => 'Controle — Boxtracker',
+            'kamers'         => $kamers,
+            'totaalKlopt'    => $totaalKlopt,
+            'totaalVerwacht' => $totaalVerwacht,
         ]);
     }
 }

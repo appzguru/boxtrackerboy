@@ -8,9 +8,17 @@
   </div>
   <div class="content" style="gap:16px;">
     <h1 style="font-size:28px;font-weight:700;letter-spacing:-0.035em;">Controle</h1>
-    <p class="no-print" style="font-size:14px;line-height:1.5;color:var(--text-mid);margin-top:-8px;">Per kamer: welke dozen zijn er al, en welke moeten nog komen. Ververs deze pagina tijdens het uitladen.</p>
+    <p class="no-print" style="font-size:14px;line-height:1.5;color:var(--text-mid);margin-top:-8px;">Per kamer: welke dozen zijn er al, en welke moeten nog komen. Laat deze pagina open staan (bijv. op een tablet) — hij ververst zichzelf.</p>
 
-    <?php if ($kamers): ?>
+    <?php if ($kamers): $pct = $totaalVerwacht ? round($totaalKlopt / $totaalVerwacht * 100) : 0; ?>
+      <div class="card print-list-card" style="padding:20px 22px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+          <span style="font-size:15px;font-weight:600;color:var(--text-mid);">Totaal</span>
+          <span class="mono" style="font-size:26px;font-weight:600;letter-spacing:-0.02em;"><?= $totaalKlopt ?>/<?= $totaalVerwacht ?> <span style="font-size:15px;font-weight:500;color:var(--text-dim);">(<?= $pct ?>%)</span></span>
+        </div>
+        <span class="bar-track"><span class="bar-fill" style="width:<?= max(4, $pct) ?>%;background:<?= $pct >= 100 ? 'var(--green-fg)' : 'var(--blue)' ?>;"></span></span>
+      </div>
+
       <?php foreach ($kamers as $kamer): $klopt = $kamer['klopt'] ?? []; $ontbreekt = $kamer['ontbreekt'] ?? []; $totaal = count($klopt) + count($ontbreekt); ?>
         <div class="card print-list-card" style="padding:22px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
@@ -36,4 +44,16 @@
     <?php endif ?>
   </div>
 </div>
+<?= $this->endSection() ?>
+<?= $this->section('scripts') ?>
+<script>
+// Voor de tablet-op-de-muur: haalt zichzelf elke 30s opnieuw op, maar niet
+// terwijl iemand aan het printen is of het scherm weg is (bespaart batterij/data).
+(function () {
+  if (window.matchMedia && window.matchMedia('print').matches) return;
+  setInterval(function () {
+    if (document.visibilityState === 'visible') location.reload();
+  }, 30000);
+})();
+</script>
 <?= $this->endSection() ?>
