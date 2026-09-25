@@ -19,7 +19,7 @@
           <a href="<?= base_url('d/' . $r['nummer'] . '-' . $r['token']) ?>" class="row" style="display:flex;align-items:center;gap:14px;min-height:66px;padding:0 16px;<?= $i ? 'border-top:1px solid var(--border);' : '' ?>">
             <span class="mono" style="font-size:21px;font-weight:600;letter-spacing:-0.03em;width:48px;flex:none;"><?= box_nr($r['nummer']) ?></span>
             <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
-              <span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= esc(first_line($r['omschrijving']) ?: '(nog geen inhoud)') ?></span>
+              <span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= esc(access()->can('helper') ? (first_line($r['omschrijving']) ?: '(nog geen inhoud)') : 'Moet naar ' . ($r['einddoel'] ?: '—')) ?></span>
               <span style="font-size:13px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= esc($r['huidige_locatie'] ?: '—') ?></span>
             </span>
             <?php if ($r['fragiel']): ?><span style="color:#7A4B00;flex:none;" title="Fragiel"><?= icon('fragile') ?></span><?php endif ?>

@@ -2,19 +2,22 @@
 
 namespace App\Controllers;
 
+use App\Models\BoxModel;
 use App\Models\PhotoModel;
 use CodeIgniter\Files\File;
 
 class Photo extends BaseController
 {
+    /** Foto uitserveren — gescoped op de actieve verhuizing (handoff.md §6). */
     public function show(int $id)
     {
         $photo = (new PhotoModel())->find($id);
-        if (! $photo) {
+        $box   = $photo ? (new BoxModel())->find((int) $photo['box_id']) : null;
+        if (! $box) {
             return $this->response->setStatusCode(404);
         }
 
-        $path = WRITEPATH . 'uploads/boxes/' . $photo['box_id'] . '/' . $photo['bestandsnaam'];
+        $path = PhotoModel::dirFor($box) . '/' . basename($photo['bestandsnaam']);
         if (! is_file($path)) {
             return $this->response->setStatusCode(404);
         }

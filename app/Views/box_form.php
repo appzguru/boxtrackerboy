@@ -71,7 +71,7 @@
           <input type="file" accept="image/*" capture="environment" id="photo-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
         </label>
       </div>
-      <div style="font-size:14px;color:var(--text-dim);">Ingepakt door <strong><?= esc(current_account_naam()) ?></strong></div>
+      <div style="font-size:14px;color:var(--text-dim);">Ingepakt door <strong><?= esc(access()->naam()) ?></strong></div>
     </div>
     <?php endif ?>
   </form>

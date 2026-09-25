@@ -169,7 +169,7 @@ class Database extends Config
         'password'    => '',
         'database'    => ':memory:',
         'DBDriver'    => 'SQLite3',
-        'DBPrefix'    => 'db_',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
+        'DBPrefix'    => '',     // Geen prefix: sql/schema.sql en de ruwe subqueries gaan uit van de echte tabelnamen.
         'pConnect'    => false,
         'DBDebug'     => true,
         'charset'     => 'utf8',

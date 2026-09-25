@@ -116,3 +116,17 @@ textarea.field { min-height: 124px; padding: 14px 16px; line-height: 1.45; resiz
 .progress-bar { height: 8px; border-radius: 4px; background: var(--blue); transition: width .3s ease; }
 .bar-track { display: block; width: 100%; height: 6px; border-radius: 3px; background: #EEF0F5; }
 .bar-fill { display: block; height: 6px; border-radius: 3px; background: var(--blue); }
+
+/* v2: formulieren voor accounts, leden en handjes */
+.form-stack { display: flex; flex-direction: column; gap: 14px; }
+.form-field { display: flex; flex-direction: column; gap: 8px; }
+.msg { border-radius: var(--radius-md); padding: 14px 16px; font-size: 15px; line-height: 1.45; }
+.msg-error { background: var(--red-bg); color: var(--red-fg); }
+.msg-ok { background: #DDF4E7; color: #10633B; }
+.msg-info { background: var(--blue-tint); color: var(--blue-tint-fg); }
+.page-title { font-size: 32px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
+.page-sub { font-size: 16px; line-height: 1.5; color: var(--text-mid); }
+.menu-row { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 16px; font-size: 16px; font-weight: 600; }
+.menu-row + .menu-row { border-top: 1px solid var(--border); }
+.menu-row .sub { font-size: 13px; font-weight: 500; color: var(--text-dim); }
+.vh-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-mid); max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

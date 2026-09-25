@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
-
-class MovementModel extends Model
+class MovementModel extends ScopedModel
 {
     protected $table         = 'movements';
     protected $primaryKey    = 'id';

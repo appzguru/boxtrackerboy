@@ -13,3 +13,5 @@
 /node_modules/
 /deploy-queue.txt
 /deploy.php
+/writable/mail/*
+/build/

@@ -36,12 +36,13 @@ class Csv extends BaseController
             }
             $nummer = (int) trim($cols[0] ?? '');
             $code   = trim($cols[1] ?? '');
-            if ($nummer <= 0 || $code === '') {
+            if ($nummer <= 0 || ! preg_match('/^[a-zA-Z0-9]{4,8}$/', $code)) {
                 continue;
             }
 
-            $existing = $boxes->findByNummer($nummer);
-            if ($existing) {
+            // Nummer bestaat al in deze verhuizing, of het token is ergens al in gebruik
+            // (tokens zijn globaal uniek): overslaan, nooit overschrijven.
+            if ($boxes->findByNummer($nummer) || BoxModel::locateToken($code)) {
                 $skipped++;
                 continue;
             }

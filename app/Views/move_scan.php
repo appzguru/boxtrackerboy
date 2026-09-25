@@ -84,7 +84,7 @@ function onDecode(text, code) {
   fd.append('csrf_token', Boxtracker.csrfCookie());
   fetch(scanUrl, { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (res) {
     busy = false;
-    if (!res.ok) { showFlash('?', 'Onbekende code', false); return; }
+    if (!res.ok) { showFlash('?', res.reason === 'andere_verhuizing' ? 'Hoort bij een andere verhuizing' : 'Onbekende code', false); return; }
     if (res.dubbel) { showFlash('#' + res.nummer, 'Al gescand', false); return; }
     count = res.count;
     document.getElementById('scan-count').textContent = count;

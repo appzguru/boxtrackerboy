@@ -3,8 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\BoxModel;
-use App\Models\MovementModel;
 use App\Models\LocationModel;
+use App\Models\MovementModel;
 
 class Move extends BaseController
 {
@@ -37,19 +37,31 @@ class Move extends BaseController
 
         $batch = bin2hex(random_bytes(16));
         session()->set('move_batch', [
-            'id'         => $batch,
-            'bestemming' => $bestemming,
-            'items'      => [],
+            'id'            => $batch,
+            'verhuizing_id' => access()->verhuizingId(),
+            'bestemming'    => $bestemming,
+            'items'         => [],
         ]);
 
         return redirect()->to('/verplaats/' . $batch . '/scan');
     }
 
+    /** De batch uit de sessie — alleen als hij bij de actieve verhuizing hoort. */
     private function activeBatch(string $batch): ?array
     {
         $b = session()->get('move_batch');
 
-        return ($b && $b['id'] === $batch) ? $b : null;
+        return ($b && $b['id'] === $batch && ($b['verhuizing_id'] ?? null) === access()->verhuizingId()) ? $b : null;
+    }
+
+    /** Regel onder het nummer in de scanlijst: inhoud voor helpers, bestemming voor sjouwers. */
+    private function lineFor(array $box): string
+    {
+        if (access()->can('helper')) {
+            return first_line($box['omschrijving']) ?: '(nog geen inhoud ingevuld)';
+        }
+
+        return $box['einddoel'] ? 'Moet naar ' . $box['einddoel'] : '';
     }
 
     public function scan(string $batch)
@@ -81,22 +93,30 @@ class Move extends BaseController
         $nummer = (int) $m[1];
         $token  = $m[2];
 
-        $box = (new BoxModel())->findByNummer($nummer);
-        if (! $box || ! hash_equals($box['token'], $token)) {
+        $loc = BoxModel::locateToken($token);
+        if (! $loc || (int) $loc['nummer'] !== $nummer) {
+            return $this->response->setJSON(['ok' => false, 'reason' => 'onbekend']);
+        }
+        if ((int) $loc['verhuizing_id'] !== $b['verhuizing_id']) {
+            return $this->response->setJSON(['ok' => false, 'reason' => 'andere_verhuizing']);
+        }
+
+        $box = (new BoxModel())->find((int) $loc['id']);
+        if (! $box) {
             return $this->response->setJSON(['ok' => false, 'reason' => 'onbekend']);
         }
 
         if (isset($b['items'][$nummer])) {
             return $this->response->setJSON([
                 'ok' => true, 'dubbel' => true, 'count' => count($b['items']),
-                'nummer' => box_nr($nummer), 'line' => first_line($box['omschrijving']),
+                'nummer' => box_nr($nummer), 'line' => $b['items'][$nummer]['line'],
             ]);
         }
 
         $b['items'][$nummer] = [
             'box_id' => (int) $box['id'],
             'nummer' => $nummer,
-            'line'   => first_line($box['omschrijving']) ?: '(nog geen inhoud ingevuld)',
+            'line'   => $this->lineFor($box),
         ];
         session()->set('move_batch', $b);
 
@@ -117,9 +137,11 @@ class Move extends BaseController
 
         $boxes     = new BoxModel();
         $movements = new MovementModel();
-        $naam      = current_account_naam();
+        $naam      = access()->naam();
         $now       = date('Y-m-d H:i:s');
 
+        $db = db_connect();
+        $db->transStart();
         foreach ($b['items'] as $item) {
             $current = $boxes->find($item['box_id']);
             if (! $current) {
@@ -141,6 +163,7 @@ class Move extends BaseController
             }
             $boxes->update($item['box_id'], $update);
         }
+        $db->transComplete();
 
         (new LocationModel())->remember($b['bestemming']);
         session()->remove('move_batch');

@@ -19,6 +19,16 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
+    /** Wie doet dit request, in welke verhuizing, met welke rol. Zie App\Libraries\Access. */
+    public static function access(bool $getShared = true): \App\Libraries\Access
+    {
+        if ($getShared) {
+            return static::getSharedInstance('access');
+        }
+
+        return new \App\Libraries\Access();
+    }
+
     /*
      * public static function example($getShared = true)
      * {

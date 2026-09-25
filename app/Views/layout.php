@@ -15,16 +15,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
-<?php if (current_account()): ?>
+<?php if (access()->verhuizingId()): ?>
 <div class="app-topbar" id="app-topbar">
   <a href="<?= base_url('/') ?>" class="app-topbar-btn" aria-label="Naar start"><?= icon('box', 20) ?></a>
-  <div style="flex:1;"></div>
+  <a href="<?= base_url('menu') ?>" class="vh-switch" style="flex:1;min-width:0;justify-content:center;" aria-label="Menu"><?= esc(access()->verhuizing()['naam']) ?></a>
+  <a href="<?= base_url('menu') ?>" class="app-topbar-btn" aria-label="Menu"><?= icon('menu', 20) ?></a>
   <button type="button" id="app-scan-btn" class="app-topbar-btn app-topbar-btn-primary" aria-label="Doos scannen"><?= icon('camera', 20) ?></button>
 </div>
 <div id="scan-overlay"></div>
 <?php endif ?>
 <?= $this->renderSection('content') ?>
-<?php if (current_account()): ?>
+<?php if (access()->verhuizingId()): ?>
 <script src="<?= base_url('assets/js/scan.js') ?>"></script>
 <script src="<?= base_url('assets/js/app.js') ?>"></script>
 <?php endif ?>

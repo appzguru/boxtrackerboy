@@ -131,6 +131,11 @@ de v1-tabellen `accounts` / `account_sessions` en de pincode-seed vervallen.
 | email_verified_at | datetime null | |
 | created_at | datetime | |
 
+### user_tokens
+Eenmalige tokens voor e-mail bevestigen (7 dagen) en wachtwoord reset (1 uur). Alleen de
+sha256-hash staat in de database: `user_id`, `soort` enum(`verify`,`reset`), `token_hash`,
+`expires_at`, `used_at`.
+
 ### sessions
 | kolom | type | opmerking |
 |---|---|---|
@@ -208,7 +213,8 @@ de v1-tabellen `accounts` / `account_sessions` en de pincode-seed vervallen.
 - `naam` unique → **unique (verhuizing_id, naam)**
 
 ### movements, photos
-Ongewijzigd; horen via `box_id` bij een verhuizing. `door` blijft een naam-snapshot.
+`+ verhuizing_id` (cascade). Ze horen via `box_id` al bij een verhuizing, maar krijgen de kolom
+ook zelf zodat elke query er direct op scopet (§6). `door` blijft een naam-snapshot.
 `huidige_locatie` en `movements` altijd in dezelfde transactie bijwerken (zoals v1).
 
 ---
@@ -245,6 +251,7 @@ Eén vergeten `where verhuizing_id = ?` = data van een ander zichtbaar. Daarom:
 | GET | `/verifieer/{token}` | – | e-mail bevestigen |
 | GET | `/uitnodiging/{token}` | – | uitnodiging bekijken/accepteren |
 | GET/POST | `/h/{code}` | – | handjes-QR: naam invullen, gast-sessie |
+| GET | `/menu` | sjouwer+ | menu (leden, handjes, wisselen, account, uitloggen) |
 | GET | `/verhuizingen` | account | keuzescherm |
 | POST | `/verhuizingen` | account | nieuwe verhuizing starten |
 | POST | `/verhuizingen/{id}/kies` | account | actieve verhuizing wisselen |
@@ -257,7 +264,7 @@ Eén vergeten `where verhuizing_id = ?` = data van een ander zichtbaar. Daarom:
 | POST | `/handjes` | admin | QR maken (rol, dagen) → toont QR |
 | POST | `/handjes/{id}/intrekken` | admin | |
 | GET/POST | `/verhuizing` | admin | naam wijzigen, verwijderen, export |
-| GET | `/d/{nummer}-{token}` | sjouwer+ | doospagina (inhoud alleen helper+) |
+| GET | `/d/{nummer}-{token}` | sjouwer+ | doospagina (inhoud alleen helper+). Route-filter `access:any`: de verhuizing volgt uit het token, de rol wordt in de controller gecontroleerd |
 | POST | `/d/{nummer}-{token}` | helper+ | inhoud opslaan |
 | POST | `/d/…/photo` · `/d/…/status` | helper+ | |
 | POST | `/d/…/move` | sjouwer+ | losse verplaatsing |
@@ -323,6 +330,10 @@ afhankelijkheid voor samenwerken. SPF/DKIM voor boxtracker.nl instellen.
 ---
 
 ## 12. Bouwvolgorde
+
+**Stand 2026-09-25:** 0–6 gebouwd en lokaal getest (curl-rooktest + `tests/database/ScopingTest.php`).
+Van 7 zijn account/verhuizing verwijderen en de limieten klaar; landingspagina en privacyverklaring
+nog niet. 8 wacht op DNS/hosting voor boxtracker.nl.
 
 0. **Voorbereiden** — openstaande v1-wijzigingen committen, tag `familie-v1`, branch `familie`
    (daar deployt minisaas voortaan vanaf). v2 op `main`.

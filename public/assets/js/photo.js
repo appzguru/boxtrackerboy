@@ -1,4 +1,4 @@
-/* Verkleint een foto client-side (max 1600px lange zijde, JPEG 0.8) en uploadt
+/* Verkleint een foto client-side (max 1280px lange zijde, JPEG 0.7) en uploadt
  * 'm met een voortgangsbalk. Zie handoff.md §7. */
 window.Boxtracker = window.Boxtracker || {};
 
@@ -34,7 +34,7 @@ Boxtracker.uploadPhoto = function (file, uploadUrl, grid) {
   grid.insertBefore(tile, grid.firstChild);
   var bar = tile.querySelector('.progress-bar');
 
-  Boxtracker.compressImage(file, 1600, 0.8).then(function (blob) {
+  Boxtracker.compressImage(file, 1280, 0.7).then(function (blob) {
     var fd = new FormData();
     fd.append('foto', blob, 'foto.jpg');
     fd.append('csrf_token', Boxtracker.csrfCookie());
@@ -51,7 +51,7 @@ Boxtracker.uploadPhoto = function (file, uploadUrl, grid) {
           tile.style.background = 'transparent';
           tile.innerHTML = '<img src="' + res.url + '" alt="Foto van de doos" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">';
         } else {
-          tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A4262C;text-align:center;padding:8px;">Mislukt</div>';
+          tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A4262C;text-align:center;padding:8px;">' + (res.error || 'Mislukt') + '</div>';
         }
       } catch (err) {
         tile.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A4262C;">Mislukt</div>';
