@@ -103,5 +103,6 @@ Schemawijzigingen gaan niet mee — apart live draaien.
 
 ## Repository
 
-GitHub: `git@github.com:appzguru/boxtrackerboy.git` (zie credentials.md). **Nog niet
-gepusht** — bewuste keuze, niet iets wat automatisch gebeurt.
+GitHub: `git@github.com:appzguru/boxtrackerboy.git` (zie credentials.md). `master`, `familie`
+en tag `familie-v1` staan erop; de SSH-sleutel van deze machine hangt aan het account appzguru.
+De geschiedenis bevat de v1-pincodes (`sql/schema.sql` op `familie`) — geaccepteerd, v1 verdwijnt.
