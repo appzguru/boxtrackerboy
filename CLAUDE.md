@@ -9,7 +9,7 @@ SSH en deployen.
 | | v1 — familie | v2 — openbaar |
 |---|---|---|
 | Code | branch `familie` (tag `familie-v1`) | `master` |
-| Live | boxtracker.minisaas.nl (web0098) | app.boxtracker.nl + boxtracker.nl (web0171) — gedeployd, wacht op DNS/SSL |
+| Live | boxtracker.minisaas.nl (web0098) | app.boxtracker.nl + boxtracker.nl (web0171) — live met SSL |
 | Login | 4 pincode-accounts | accounts, verhuizingen, rollen admin/helper/sjouwer |
 | Deploy | `php deploy.php` (alleen vanaf branch `familie`) | `bash deploy-v2.sh` (alleen vanaf `master`) |
 
@@ -91,12 +91,15 @@ Schemawijzigingen gaan niet mee — apart live draaien.
 
 - Live `.env` staat alleen op de server (rechten 600): productie-DB, `app.baseURL`
   https://app.boxtracker.nl/, `boxtracker.stickerBaseURL` https://boxtracker.nl,
-  `cookie.secure`, en `email.*` — **SMTPHost/SMTPPass nog leeg**, dus mails komen tot die tijd
-  in `writable/mail/` terecht in plaats van verstuurd te worden.
+  `cookie.secure`, en `email.*` — SMTP via `mail.boxtracker.nl:587` (tls) met de mailbox
+  `noreply@boxtracker.nl` (wachtwoord in credentials.md). Mails gaan als HTML met tekst-fallback
+  ([app/Views/emails/action.php](app/Views/emails/action.php)).
+- SSL: één Let's Encrypt-certificaat (autorenew) voor boxtracker.nl, www., mail. en app.
+  SPF, DKIM (selector `x`) en DMARC (`p=none`) staan in DNS, ingesteld door zxcs.
 - `~/domains/boxtracker.nl/public_html/.htaccess` (niet in git): blokkeert `/app` (404) en
   stuurt sticker-URL's `boxtracker.nl/d/*` door naar `https://app.boxtracker.nl/d/*` (302).
-- Nog open: SSL voor beide domeinen, landingspagina + privacyverklaring op boxtracker.nl,
-  mailbox `noreply@boxtracker.nl` + SPF/DKIM.
+  Stuurt `http://boxtracker.nl` nog **niet** door naar https.
+- Landingspagina + privacyverklaring (`landing/`) staan live via `bash deploy-landing.sh`.
 
 ## Repository
 
