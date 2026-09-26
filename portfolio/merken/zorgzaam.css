@@ -1,0 +1,59 @@
+/* Zorgzaam Verhuizen — voor senioren: groot, rustig, alles onder elkaar, veel tikruimte. */
+:root {
+  --blue: #3F6B57; --blue-dark: #325646; --blue-tint: #E6EFE9; --blue-tint-fg: #2E5042;
+  --bg: #FAF7F2; --card: #FFFFFF; --border: #D8D2C6; --field-line: #8E8778;
+  --text: #222222; --text-dim: #5A5650; --text-mid: #3E3B37;
+  --amber-bg: #F4E9D6; --amber-fg: #6B4A12;
+  --radius-lg: 18px; --radius-md: 14px; --radius-sm: 14px;
+  --outline: 2px solid #D8D2C6; --drop: none;
+  --corrugated: none; --corrugated-strong: none;
+  --font: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-head: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible', system-ui, sans-serif;
+}
+.app-topbar { background: #fff; border-bottom: 2px solid var(--border); height: 72px; }
+.screen { padding-top: 72px; }
+.app-topbar .app-topbar-btn { width: 50px; height: 50px; border: 2px solid var(--border); background: #fff; color: var(--text); }
+.app-topbar .app-topbar-btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.vh-switch { font-size: 17px; color: var(--text); font-weight: 700; }
+.tb-home .merk-mark { color: var(--blue); width: 26px; height: 26px; }
+
+.home-brand .merk-mark { background: var(--blue-tint); color: var(--blue); border-radius: 50%; width: 50px; height: 50px; padding: 10px; }
+.merk-naam { font-size: 21px; font-weight: 700; color: var(--blue); letter-spacing: 0; }
+.home-user { font-size: 17px; }
+.home-title { font-size: 34px; font-weight: 700; letter-spacing: 0; line-height: 1.2; }
+.field { height: 64px; font-size: 19px; border-width: 2px; }
+.field-search .icon { height: 64px; }
+
+.stats { grid-template-columns: 1fr; gap: 12px; }
+.stat { flex-direction: row; align-items: center; gap: 16px; padding: 16px 20px; border: 2px solid var(--border); }
+.stat::after { content: "›"; margin-left: auto; font-size: 30px; line-height: 1; color: var(--text-dim); }
+.stat-num { font-size: 34px; font-weight: 700; letter-spacing: 0; min-width: 44px; color: var(--blue); }
+.stat-label { font-size: 19px; color: var(--text); font-weight: 700; }
+.home-actions { grid-template-columns: 1fr; gap: 12px; }
+
+.btn { font-size: 19px; height: 64px; }
+.btn-secondary { min-height: 60px; box-shadow: inset 0 0 0 2px var(--border); font-size: 18px; }
+.btn-primary { border: 0; border-radius: 14px; }
+.btn-icon { width: 52px; height: 52px; box-shadow: inset 0 0 0 2px var(--border); }
+.bottombar { background: #fff; border-top: 2px solid var(--border); }
+
+.card { border: 2px solid var(--border); }
+.label { font-size: 16px; letter-spacing: 0; text-transform: none; font-weight: 700; color: var(--text-dim); }
+.box-num { font-size: 58px; font-weight: 700; letter-spacing: 0; }
+.box-num .hash { color: var(--text-dim); }
+.box-status { height: 40px; font-size: 17px; }
+.tag { height: 44px; font-size: 18px; border-width: 2px; }
+.tag-fragiel { background: #FDECEA; border-color: #E7B4AE; color: #8E1F14; }
+.box-plek { font-size: 28px; }
+.box-inhoud { font-size: 20px; }
+.box-row-val { font-size: 19px; }
+.reis-plek { font-size: 18px; }
+.reis-meta { font-size: 15px; }
+.ploeg-wie { font-size: 16px; color: var(--blue); font-weight: 700; }
+
+.sticker { border-radius: 12px; }
+.sticker-num { font-family: 'Atkinson Hyperlegible', sans-serif; font-size: 54px; }
+.sticker-hint { font-size: 12px; }
+.sticker-merk { color: #3F6B57; font-size: 12px; font-weight: 700; }
+.sticker-uitleg { font-size: 16px; }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Deploy de statische landingspagina (landing/) naar boxtracker.nl (web0171,
 # SSH-alias `boxtrackernl`). Los van de app: raakt nooit public_html/app,
-# cgi-bin of .htaccess (die staan alleen op de server, niet in git).
+# public_html/portfolio (subdomein, eigen deploy), cgi-bin of .htaccess.
 #
 #   bash deploy-landing.sh
 #
@@ -33,10 +33,10 @@ git archive --format=tar HEAD -- landing \
     tar -mxf - -C \"\$TMP\"
     mkdir -p ~/$REMOTE_DIR
     rsync -a --delete \
-        --exclude=/app/ --exclude=/cgi-bin/ --exclude=/.htaccess \
+        --exclude=/app/ --exclude=/portfolio/ --exclude=/cgi-bin/ --exclude=/.htaccess \
         \"\$TMP\"/landing/ ~/$REMOTE_DIR/
     cd ~/$REMOTE_DIR
     chmod 755 .
-    find . -maxdepth 1 ! -name app ! -name cgi-bin ! -name .htaccess ! -name . -exec chmod -R go-w {} +
+    find . -maxdepth 1 ! -name app ! -name portfolio ! -name cgi-bin ! -name .htaccess ! -name . -exec chmod -R go-w {} +
     echo '$rev' > .landing-revision
     echo 'Klaar: landing $rev staat live.'"

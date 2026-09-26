@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../app/css/app.css">
+<link rel="stylesheet" href="../app/css/base.css">
+<link rel="stylesheet" id="merk-fonts">
+<link rel="stylesheet" id="merk-css">
+<script>document.addEventListener('click', function (e) { e.preventDefault(); }, true);</script>
+</head>
+<body>
+<div class="app-topbar">
+  <a href="#" class="app-topbar-btn tb-home" aria-label="Naar start"><span class="merk-mark tb-mark"></span></a>
+  <a href="#" class="vh-switch tb-title" style="flex:1;min-width:0;justify-content:center;" data-t="vh_naam">Familie Jansen</a>
+  <a href="#" class="app-topbar-btn tb-menu" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></a>
+  <button type="button" class="app-topbar-btn app-topbar-btn-primary tb-scan" aria-label="Doos scannen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+</div>
+<div class="screen scr-home">
+  <div class="content home-content">
+    <div class="home-brand">
+      <div class="merk-lockup"><span class="merk-mark"></span><span class="merk-naam">Boxtracker</span></div>
+      <a href="#" class="home-user">Sanne</a>
+    </div>
+    <h1 class="home-title" data-t="home_titel">Waar staat<br>alles?</h1>
+    <form class="field-search">
+      <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>
+      <input class="field" type="search" placeholder="Zoek: orgel, Irma, 47" data-tp="zoek_placeholder">
+    </form>
+    <div class="stats">
+      <a href="#" class="tile stat stat-open"><span class="mono stat-num">16</span><span class="stat-label" data-t="stat_open">Open doos</span></a>
+      <a href="#" class="tile stat stat-opslag"><span class="mono stat-num">5</span><span class="stat-label" data-t="stat_opslag">In opslag</span></a>
+      <a href="#" class="tile stat stat-uit"><span class="mono stat-num">3</span><span class="stat-label" data-t="stat_uit">Uitgepakt</span></a>
+    </div>
+    <div class="home-actions">
+      <a href="#" class="btn btn-secondary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg> <span data-t="btn_overzicht">Overzicht</span></a>
+      <a href="#" class="btn btn-secondary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg> <span data-t="btn_labels">Labels</span></a>
+    </div>
+  </div>
+  <div class="bottombar">
+    <a href="#" class="btn btn-primary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg> <span data-t="btn_verplaatsen">Dozen verplaatsen</span></a>
+  </div>
+</div>
+</body>
+</html>

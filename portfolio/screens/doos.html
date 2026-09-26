@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../app/css/app.css">
+<link rel="stylesheet" href="../app/css/base.css">
+<link rel="stylesheet" id="merk-fonts">
+<link rel="stylesheet" id="merk-css">
+<script>document.addEventListener('click', function (e) { e.preventDefault(); }, true);</script>
+</head>
+<body>
+<div class="app-topbar">
+  <a href="#" class="app-topbar-btn tb-home" aria-label="Naar start"><span class="merk-mark tb-mark"></span></a>
+  <a href="#" class="vh-switch tb-title" style="flex:1;min-width:0;justify-content:center;" data-t="vh_naam">Familie Jansen</a>
+  <a href="#" class="app-topbar-btn tb-menu" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></a>
+  <button type="button" class="app-topbar-btn app-topbar-btn-primary tb-scan" aria-label="Doos scannen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+</div>
+<div class="screen scr-doos">
+  <div class="header">
+    <button type="button" class="btn-icon" aria-label="Terug"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  </div>
+  <div class="content">
+    <div class="box-head">
+      <div class="mono box-num"><span class="hash">#</span>002</div>
+      <span class="pill box-status" data-t="status_ingepakt">Ingepakt</span>
+    </div>
+    <div class="box-tags">
+      <span class="tag tag-fragiel"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0zM12 14v6M8.5 20h7"/></svg> <span data-t="tag_fragiel">Fragiel</span></span>
+      <span class="tag tag-eerst"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7h16v-7M12 14V3M8 7l4-4 4 4"/></svg> <span data-t="tag_eerst">Eerst openen</span></span>
+    </div>
+    <div class="card box-card box-card-plek">
+      <div class="label" data-t="lbl_staatnu">Staat nu</div>
+      <div class="box-plek" data-t="plek_nu">Verhuiswagen</div>
+      <div class="divider"></div>
+      <div class="box-row"><span class="label" data-t="lbl_moetnaar">Moet naar</span><span class="box-row-val" data-t="plek_naar">Keuken</span></div>
+      <div class="box-row"><span class="label" data-t="lbl_eigenaar">Eigenaar</span><span class="box-row-val zacht">Sanne</span></div>
+    </div>
+    <div class="card box-card box-card-inhoud">
+      <div class="label" data-t="lbl_inhoud">Inhoud</div>
+      <div class="box-inhoud" data-t="inhoud">Borden, diepe borden en schalen van het servies van oma</div>
+    </div>
+    <div class="box-reis">
+      <div class="label" data-t="lbl_reis">Reis van de doos</div>
+      <div class="card reis-card">
+        <div class="reis-stap"><div class="reis-lijn"><div class="reis-dot"></div><div class="reis-streep"></div></div><div class="reis-tekst"><div class="reis-plek" data-t="plek_nu">Verhuiswagen</div><div class="reis-meta" data-t="reis_1">Ploeg Kees · vandaag 08:42</div></div></div>
+        <div class="reis-stap"><div class="reis-lijn"><div class="reis-dot oud"></div></div><div class="reis-tekst"><div class="reis-plek" data-t="plek_van">Oude woning</div><div class="reis-meta" data-t="reis_2">Ingepakt door Sanne · gisteren 20:30</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottombar">
+    <a href="#" class="btn btn-primary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg> <span data-t="btn_doosverplaatsen">Doos verplaatsen</span></a>
+  </div>
+</div>
+</body>
+</html>

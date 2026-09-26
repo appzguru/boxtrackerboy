@@ -1,0 +1,49 @@
+/* Zolderruimte — vriendelijke opslag: petrol, mosterd, zachte schaduwen, geen harde lijnen. */
+:root {
+  --blue: #0E7C7B; --blue-dark: #0A6463; --blue-tint: #DDF1EF; --blue-tint-fg: #0A5E5D;
+  --bg: #EFF7F6; --card: #FFFFFF; --border: #CFE3E1; --field-line: #9CC5C2;
+  --text: #12302F; --text-dim: #56706E; --text-mid: #34504E;
+  --amber-bg: #FCEBC4; --amber-fg: #7A5300;
+  --radius-lg: 22px; --radius-md: 18px; --radius-sm: 16px;
+  --outline: 0 solid transparent; --drop: none;
+  --corrugated: none; --corrugated-strong: none;
+  --font: 'Poppins', system-ui, sans-serif;
+  --font-head: 'Poppins', system-ui, sans-serif;
+  --font-mono: 'Poppins', system-ui, sans-serif;
+  --mosterd: #F2B134;
+}
+.app-topbar { background: #fff; border-bottom: 0; box-shadow: 0 6px 20px -12px rgba(14,124,123,.4); }
+.app-topbar .app-topbar-btn { border: 0; background: var(--blue-tint); color: var(--blue); border-radius: 14px; }
+.app-topbar .app-topbar-btn-primary { background: var(--mosterd); color: #12302F; }
+.vh-switch { color: var(--text); font-weight: 600; font-size: 15px; }
+.tb-home .merk-mark { color: var(--blue); width: 24px; height: 24px; }
+
+.home-content { padding-top: 0; }
+.home-brand { background: var(--blue); margin: 0 -20px; padding: 22px 20px 124px; border-radius: 0 0 34px 34px; }
+.home-brand .merk-mark { background: #fff; color: var(--blue); border-radius: 12px; }
+.merk-naam { font-weight: 700; color: #fff; }
+.home-user { color: #CDEBE8; }
+.home-title { margin-top: -132px; color: #fff; font-weight: 700; font-size: 32px; letter-spacing: -.02em; line-height: 1.1; }
+.field { border: 0; box-shadow: 0 10px 26px -12px rgba(14,124,123,.55); border-radius: 18px; }
+
+.stat { border: 0; box-shadow: 0 8px 22px -14px rgba(18,48,47,.4); }
+.stat-open { background: var(--mosterd); }
+.stat-open .stat-label { color: #5A3E00; }
+.stat-num { font-weight: 700; letter-spacing: -.03em; font-size: 36px; }
+.stat-label { font-size: 13px; }
+
+.btn-primary { border: 0; box-shadow: 0 12px 26px -12px rgba(14,124,123,.75); border-radius: 18px; }
+.btn-secondary { box-shadow: 0 8px 20px -14px rgba(18,48,47,.45); background: #fff; }
+.btn-icon { box-shadow: 0 6px 16px -10px rgba(18,48,47,.4); background: #fff; }
+.bottombar { background: rgba(255,255,255,.94); border-top: 0; box-shadow: 0 -8px 24px -16px rgba(18,48,47,.45); }
+
+.card { border: 0; box-shadow: 0 10px 28px -16px rgba(18,48,47,.4); }
+.label { text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; color: var(--blue); }
+.box-num { font-weight: 700; letter-spacing: -.035em; }
+.box-num .hash { color: var(--mosterd); }
+.tag { border: 0; background: #fff; box-shadow: 0 5px 14px -9px rgba(18,48,47,.45); }
+.tag-fragiel { color: #B42318; }
+
+.sticker { border-radius: 16px; transform: rotate(1.5deg); }
+.sticker-num { font-family: 'Poppins', sans-serif; font-weight: 700; color: #0E7C7B; letter-spacing: -.03em; }
+.sticker-merk { color: #0E7C7B; }

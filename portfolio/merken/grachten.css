@@ -1,0 +1,54 @@
+/* De Grachtenverhuizer — Amsterdams: marine, rood, gevelblok, scherpe hoeken. */
+:root {
+  --blue: #C8102E; --blue-dark: #A50D26; --blue-tint: #E9ECF3; --blue-tint-fg: #14213D;
+  --bg: #F3EFE6; --card: #FFFFFF; --border: #CFC8B8; --field-line: #14213D;
+  --text: #14213D; --text-dim: #5B6478; --text-mid: #394259;
+  --amber-bg: #14213D; --amber-fg: #FFFFFF;
+  --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px;
+  --outline: 2px solid #14213D; --drop: 4px 4px 0 #14213D;
+  --corrugated: none; --corrugated-strong: none;
+  --font: 'DM Sans', system-ui, sans-serif;
+  --font-head: 'DM Serif Display', Georgia, serif;
+  --font-mono: 'DM Serif Display', Georgia, serif;
+  --navy: #14213D;
+}
+.app-topbar { background: var(--navy); border-bottom: 6px solid var(--blue); }
+.app-topbar .app-topbar-btn { background: transparent; border: 0; color: #fff; }
+.app-topbar .app-topbar-btn-primary { background: var(--blue); border-radius: 50%; }
+.vh-switch { color: #fff; font-family: var(--font-head); font-size: 20px; font-weight: 400; }
+.tb-home .merk-mark { color: #fff; width: 26px; height: 26px; }
+.screen { padding-top: 70px; }
+
+.home-content { padding: 0 0 24px; gap: 22px; }
+.home-content > .field-search, .home-content > .stats, .home-content > .home-actions { margin-left: 20px; margin-right: 20px; }
+.home-brand { background: var(--navy); color: #fff; padding: 26px 20px 10px; }
+.home-brand .merk-mark { background: #F3EFE6; color: var(--navy); border-radius: 0; width: 42px; height: 42px; padding: 4px; }
+.merk-naam { font-family: var(--font-head); font-size: 22px; font-weight: 400; color: #fff; letter-spacing: 0; }
+.home-user { color: #AEB6C8; }
+.home-title { background: var(--navy); color: #fff; margin-top: -22px; padding: 6px 20px 58px; font-weight: 400; font-size: 44px; letter-spacing: -.005em; line-height: 1.02; }
+.home-content > .field-search { margin-top: -52px; }
+.field { border: 2px solid var(--navy); box-shadow: 5px 5px 0 var(--blue); }
+
+.stats { gap: 8px; }
+.stat { background: var(--navy); color: #fff; border: 0; }
+.stat-num { font-family: var(--font-head); font-weight: 400; font-size: 42px; letter-spacing: 0; }
+.stat-label { color: #C9D0DE; }
+.stat-open { background: var(--blue); }
+.stat-open .stat-label { color: #FFD9DF; }
+
+.btn-primary { border: 2px solid var(--navy); }
+.btn-secondary { box-shadow: inset 0 0 0 2px var(--navy); }
+.btn-icon { box-shadow: inset 0 0 0 2px var(--navy); }
+.bottombar { background: var(--bg); border-top: 2px solid var(--navy); }
+
+.card { border: 0; border-left: 6px solid var(--blue); box-shadow: 0 0 0 1px var(--border); }
+.label { letter-spacing: .14em; color: var(--blue); }
+.box-num { font-family: var(--font-head); font-weight: 400; font-size: 72px; letter-spacing: 0; }
+.box-num .hash { color: var(--blue); font-size: 46px; }
+.box-plek, .box-bestemming-groot { font-family: var(--font-head); font-weight: 400; letter-spacing: 0; }
+.tag { border: 2px solid var(--navy); }
+.reis-dot { border-radius: 0; transform: rotate(45deg); width: 11px; height: 11px; }
+
+.sticker { border-radius: 0; border: 3px solid #14213D; box-shadow: 7px 7px 0 #C8102E; transform: rotate(-1deg); }
+.sticker-num { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 50px; }
+.sticker-merk { color: #14213D; }

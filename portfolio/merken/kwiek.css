@@ -1,0 +1,60 @@
+/* Kwiek Verhuist — jong en speels: koraal, geel, lila, dikke randen, scheve kaarten. */
+:root {
+  --blue: #FF5A4E; --blue-dark: #EC4A3F; --blue-tint: #FFE1DC; --blue-tint-fg: #B8322A;
+  --bg: #FFF4E6; --card: #FFFFFF; --border: #2A1A4A; --field-line: #2A1A4A;
+  --text: #2A1A4A; --text-dim: #6B5A87; --text-mid: #4A3B66;
+  --amber-bg: #FFD23F; --amber-fg: #2A1A4A;
+  --radius-lg: 26px; --radius-md: 22px; --radius-sm: 18px;
+  --outline: 3px solid #2A1A4A; --drop: 0 5px 0 #2A1A4A;
+  --corrugated: radial-gradient(circle at 2px 2px, rgba(42,26,74,.10) 1.6px, transparent 0);
+  --corrugated-strong: none;
+  --font: 'Nunito', system-ui, sans-serif;
+  --font-head: 'Baloo 2', system-ui, sans-serif;
+  --font-mono: 'Baloo 2', system-ui, sans-serif;
+  --geel: #FFD23F; --lila: #B79CFF;
+}
+body { background-size: 18px 18px; }
+.app-topbar { background: var(--blue); border-bottom: 3px solid #2A1A4A; }
+.app-topbar .app-topbar-btn { border: 3px solid #2A1A4A; border-radius: 50%; box-shadow: 0 3px 0 #2A1A4A; background: #fff; color: #2A1A4A; }
+.app-topbar .app-topbar-btn-primary { background: var(--geel); }
+.vh-switch { color: #fff; font-family: var(--font-head); font-size: 20px; font-weight: 800; }
+.tb-home .merk-mark { color: var(--blue); width: 24px; height: 24px; }
+.screen { padding-top: 67px; }
+
+.home-brand .merk-mark { background: none; padding: 0; color: var(--blue); width: 46px; height: 46px; transform: rotate(-8deg); }
+.merk-naam { font-family: var(--font-head); font-size: 26px; font-weight: 800; color: var(--blue); letter-spacing: -.01em; }
+.home-user { background: var(--lila); color: #2A1A4A; border: 2px solid #2A1A4A; border-radius: 999px; padding: 4px 12px; font-weight: 800; }
+.home-title { font-size: 46px; font-weight: 800; line-height: .95; letter-spacing: -.02em; }
+
+.stats { grid-template-columns: 1fr 1fr; gap: 14px; padding: 4px 2px 6px; }
+.stat { box-shadow: 0 5px 0 #2A1A4A; }
+.stat-open { grid-column: span 2; background: var(--blue); transform: rotate(-1.5deg); flex-direction: row; align-items: center; gap: 14px; }
+.stat-open .stat-label, .stat-open .stat-num { color: #fff; }
+.stat-opslag { background: var(--geel); transform: rotate(1.8deg); }
+.stat-uit { background: var(--lila); transform: rotate(-1.2deg); }
+.stat-num { font-size: 48px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+.stat-label { color: #2A1A4A; font-weight: 800; font-size: 16px; }
+
+.btn { border-radius: 999px; }
+.btn-primary { font-family: var(--font-head); font-size: 21px; font-weight: 800; }
+.btn-secondary { box-shadow: 0 4px 0 #2A1A4A; border: 3px solid #2A1A4A; font-weight: 800; }
+.btn-icon { box-shadow: 0 3px 0 #2A1A4A; border: 3px solid #2A1A4A; border-radius: 50%; }
+.bottombar { background: var(--bg); border-top: 3px solid #2A1A4A; }
+
+.card { box-shadow: 0 5px 0 #2A1A4A; }
+.label { font-family: var(--font-head); letter-spacing: 0; text-transform: none; font-size: 17px; font-weight: 800; color: var(--blue); }
+.box-head { align-items: center; }
+.box-num { font-family: var(--font-head); font-weight: 800; font-size: 64px; background: var(--geel); border: 3px solid #2A1A4A; border-radius: 22px; padding: 8px 18px 0; transform: rotate(-3deg); box-shadow: 0 5px 0 #2A1A4A; letter-spacing: -.02em; }
+.box-num .hash { color: #2A1A4A; }
+.box-status { background: #fff; border: 3px solid #2A1A4A; color: #2A1A4A; font-weight: 800; }
+.tag { border: 3px solid #2A1A4A; border-radius: 999px; font-weight: 800; }
+.tag-fragiel { background: var(--blue-tint); }
+.tag-eerst { background: var(--lila); }
+.box-plek, .box-bestemming-groot { font-family: var(--font-head); font-weight: 800; }
+.reis-dot { border: 2px solid #2A1A4A; width: 16px; height: 16px; }
+
+.sticker { border-radius: 22px; border: 3px solid #2A1A4A; transform: rotate(3deg); }
+.sticker-num { font-family: 'Baloo 2', sans-serif; font-weight: 800; color: #FF5A4E; font-size: 52px; }
+.sticker-lijn { border-bottom: 3px dotted #2A1A4A; }
+.sticker-merk { color: #2A1A4A; font-weight: 800; }
+.sticker-merk .merk-mark { color: #FF5A4E; }
