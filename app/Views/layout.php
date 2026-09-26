@@ -3,17 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title><?= esc($title ?? 'Boxtracker') ?></title>
+<?php $dev = config('Boxtracker')->isDev(); ?>
+<title><?= $dev ? 'DEV · ' : '' ?><?= esc($title ?? 'Boxtracker') ?></title>
 <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
-<link rel="manifest" href="<?= base_url('manifest.json') ?>">
-<meta name="theme-color" content="#CA9E67">
+<link rel="manifest" href="<?= base_url($dev ? 'manifest-dev.json' : 'manifest.json') ?>">
+<meta name="theme-color" content="<?= $dev ? '#3E6F87' : '#CA9E67' ?>">
 <link rel="icon" href="<?= base_url('assets/icons/favicon.ico') ?>">
 <link rel="apple-touch-icon" href="<?= base_url('assets/icons/apple-touch-icon.png') ?>">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Boxtracker">
+<meta name="apple-mobile-web-app-title" content="<?= $dev ? 'Boxtracker DEV' : 'Boxtracker' ?>">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
-<body>
+<body<?= $dev ? ' class="env-dev"' : '' ?>>
+<?php if ($dev): ?><div class="env-strip">DEV · testomgeving — niet je echte verhuizing</div><?php endif ?>
 <?php if (access()->verhuizingId()): ?>
 <div class="app-topbar" id="app-topbar">
   <a href="<?= base_url('/') ?>" class="app-topbar-btn" aria-label="Naar start"><?= icon('box', 20) ?></a>

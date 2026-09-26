@@ -22,6 +22,14 @@ class Boxtracker extends BaseConfig
      */
     public string $stickerFallbackURL = '';
 
+    /** 'dev' = testomgeving: waarschuwingsbalk, andere kleuren, "DEV" in titel en op stickers. Leeg = prd. */
+    public string $omgeving = '';
+
+    public function isDev(): bool
+    {
+        return $this->omgeving === 'dev';
+    }
+
     /** Limieten tegen misbruik (handoff.md §9). */
     public int $maxLabelsPerKeer          = 60;
     public int $maxDozenPerVerhuizing     = 1000;

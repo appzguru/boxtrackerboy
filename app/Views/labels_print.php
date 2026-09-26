@@ -2,7 +2,8 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<title><?= esc($title) ?></title>
+<?php $dev = config('Boxtracker')->isDev(); ?>
+<title><?= $dev ? 'DEV · ' : '' ?><?= esc($title) ?></title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <style>
   @font-face{font-family:'Geist';font-style:normal;font-weight:400 700;font-display:swap;src:url('<?= base_url('assets/fonts/geist.woff2') ?>') format('woff2');}
@@ -25,16 +26,18 @@
   .writehint{font-size:2.4mm;color:#6B5C4A;margin-top:-1mm;}
   .brand{display:flex;align-items:center;gap:1mm;font-size:2.6mm;font-weight:600;color:#936037;margin-top:1mm;}
   .brand svg{width:3.2mm;height:3.2mm;}
+  .devnote{padding:6px 12px;text-align:center;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:repeating-linear-gradient(-45deg,#F2C230 0 12px,#FFDD66 12px 24px);border-bottom:2px solid #1A140E;}
   @media print{
     @page{size:A4;margin:0;}
     body{background:#fff;}
-    .toolbar{display:none;}
+    .toolbar,.devnote{display:none;}
     .sheet{box-shadow:none;margin:0;width:210mm;height:297mm;page-break-after:always;break-after:page;}
     .sheet:last-child{page-break-after:auto;break-after:auto;}
   }
 </style>
 </head>
 <body>
+<?php if ($dev): ?><div class="devnote">DEV · testomgeving — deze stickers werken alleen hier, niet op je echte verhuizing</div><?php endif ?>
 <div class="toolbar">
   <h1>Boxtracker — <?= $aantal ?> <?= $aantal === 1 ? 'doos' : 'dozen' ?> (<?= $aantal * 2 ?> stickers), <?= count($sheets) ?> <?= count($sheets) === 1 ? 'vel' : 'vellen' ?></h1>
   <button type="button" class="btn" onclick="window.print()">Printen</button>
@@ -59,7 +62,7 @@
               <div class="num" style="font-size:<?= round($preset['h'] * 0.46) ?>mm;">#<?= box_nr($item['nummer']) ?></div>
               <div class="writeline"></div>
               <div class="writehint">ruimte</div>
-              <div class="brand"><?= icon('box', 20) ?> boxtracker.nl</div>
+              <div class="brand"><?= icon('box', 20) ?> <?= $dev ? 'TESTSTICKER' : 'boxtracker.nl' ?></div>
             </div>
           </div>
         <?php endfor ?>
