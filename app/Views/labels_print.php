@@ -23,6 +23,8 @@
   .num{font-family:'Geist Mono',monospace;font-weight:700;line-height:.9;letter-spacing:-0.02em;}
   .writeline{border-bottom:0.4mm solid #1A140E;height:5mm;}
   .writehint{font-size:2.4mm;color:#6B5C4A;margin-top:-1mm;}
+  .brand{display:flex;align-items:center;gap:1mm;font-size:2.6mm;font-weight:600;color:#936037;margin-top:1mm;}
+  .brand svg{width:3.2mm;height:3.2mm;}
   @media print{
     @page{size:A4;margin:0;}
     body{background:#fff;}
@@ -57,6 +59,7 @@
               <div class="num" style="font-size:<?= round($preset['h'] * 0.46) ?>mm;">#<?= box_nr($item['nummer']) ?></div>
               <div class="writeline"></div>
               <div class="writehint">ruimte</div>
+              <div class="brand"><?= icon('box', 20) ?> boxtracker.nl</div>
             </div>
           </div>
         <?php endfor ?>
