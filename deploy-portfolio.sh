@@ -6,6 +6,8 @@
 #
 # Gecommitte HEAD van portfolio/ via git archive, rsync --delete naar de documentmap;
 # cgi-bin/ blijft staan. Raakt de landingspagina en de app niet.
+# Let op: de map ligt binnen public_html, dus de .htaccess van de landingspagina geldt
+# ook hier — die blokkeert /app/ en stuurt /d/* door. Gebruik die mapnamen niet.
 set -euo pipefail
 
 HOST=boxtrackernl
