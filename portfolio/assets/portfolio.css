@@ -6,7 +6,7 @@
   --bruin: #936037; --lijn: #D2BC98;
   --sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
-  --s: .66; --pw: 390px; --ph: 844px;
+  --s: .64; --pw: 390px; --ph: 844px;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -55,7 +55,9 @@ h1, h2, h3, p { margin: 0; }
 .swatches span { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink); }
 .merk-letters { font-family: var(--mono); font-size: 13px; color: var(--ink-3); }
 
-.telefoons { display: flex; gap: 28px; padding: 28px max(20px, calc((100vw - 1180px) / 2 + 20px)) 40px; overflow-x: auto; scroll-snap-type: x mandatory; }
+/* 4 × (390·.64 + 16) + 3 × 24 = 1134px: past binnen 1140px, dus op brede schermen geen schuifbalk.
+   Procent i.p.v. vw, zodat de verticale schuifbalk van de pagina niet meetelt. */
+.telefoons { display: flex; gap: 24px; padding: 28px max(20px, calc((100% - 1180px) / 2 + 20px)) 40px; overflow-x: auto; scroll-snap-type: x mandatory; }
 .telefoons figure { margin: 0; flex: none; scroll-snap-align: center; display: flex; flex-direction: column; gap: 14px; width: calc(var(--pw) * var(--s) + 16px); }
 .phone { width: calc(var(--pw) * var(--s) + 16px); height: calc(var(--ph) * var(--s) + 16px); padding: 8px; border-radius: 36px; background: var(--ink); box-shadow: 0 24px 50px -24px rgba(40,25,10,.55); overflow: hidden; }
 .phone iframe { width: var(--pw); height: var(--ph); border: 0; border-radius: calc(28px / var(--s)); transform: scale(var(--s)); transform-origin: 0 0; background: #fff; display: block; }
