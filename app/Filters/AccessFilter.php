@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Models\BoxModel;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -21,6 +22,12 @@ class AccessFilter implements FilterInterface
     {
         helper(['access', 'url', 'icon', 'csrf', 'format']);
         $need   = $arguments[0] ?? 'sjouwer';
+
+        // Vóór de inlogcheck: een onbekende sticker hoort bij een andere omgeving.
+        if ($need === 'any' && ($fallback = $this->stickerFallback($request)) !== null) {
+            return redirect()->to($fallback);
+        }
+
         $access = access();
 
         if (! $access->isAuthenticated() || ($need === 'user' && ! $access->user())) {
@@ -48,6 +55,22 @@ class AccessFilter implements FilterInterface
         }
 
         return null;
+    }
+
+    private function stickerFallback(RequestInterface $request): ?string
+    {
+        $base = rtrim(config('Boxtracker')->stickerFallbackURL, '/');
+        if ($base === '' || strtolower($request->getMethod()) !== 'get'
+            || ! preg_match('#^/?d/(\d+)-([^/]+)$#', $request->getUri()->getPath(), $m)) {
+            return null;
+        }
+
+        $loc = BoxModel::locateToken($m[2]);
+        if ($loc && (int) $loc['nummer'] === (int) $m[1]) {
+            return null;
+        }
+
+        return $base . '/d/' . $m[1] . '-' . rawurlencode($m[2]);
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

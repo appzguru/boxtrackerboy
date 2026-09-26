@@ -16,6 +16,12 @@ class Boxtracker extends BaseConfig
      */
     public string $stickerBaseURL = '';
 
+    /**
+     * Alleen voor de testomgeving (minisaas): een gescande sticker die hier niet bestaat
+     * gaat door naar deze URL + /d/…, zodat oude v1-stickers bij prd uitkomen. Leeg = uit.
+     */
+    public string $stickerFallbackURL = '';
+
     /** Limieten tegen misbruik (handoff.md §9). */
     public int $maxLabelsPerKeer          = 60;
     public int $maxDozenPerVerhuizing     = 1000;
