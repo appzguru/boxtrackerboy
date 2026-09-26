@@ -4,17 +4,25 @@ Zie [handoff.md](handoff.md) voor het volledige bouwdocument v2 (rollen, datamod
 schermen). Dit bestand is alleen de operationele infrastructuur: lokaal draaien, database,
 SSH en deployen.
 
-## Twee versies
+## Omgevingen
 
-| | v1 — familie | v2 — openbaar |
+| | dev — testomgeving | prd |
 |---|---|---|
-| Code | branch `familie` (tag `familie-v1`) | `master` |
-| Live | boxtracker.minisaas.nl (web0098) | app.boxtracker.nl + boxtracker.nl (web0171) — live met SSL |
-| Login | 4 pincode-accounts | accounts, verhuizingen, rollen admin/helper/sjouwer |
-| Deploy | `php deploy.php` (alleen vanaf branch `familie`) | `bash deploy-v2.sh` (alleen vanaf `master`) |
+| URL | boxtracker.minisaas.nl (web0098) | app.boxtracker.nl + boxtracker.nl (web0171) |
+| Code | v2, elke branch | v2, alleen `master` |
+| Data | leeg, alleen testdata | de echte verhuizingen (o.a. Kopakker_1) |
+| Deploy | `bash deploy-dev.sh` | `bash deploy-v2.sh` |
+| Herkenbaar | gele DEV-balk, blauwgrijs, "DEV ·" in titel, TESTSTICKER | kraftbruin |
 
-v1 blijft draaien voor de eigen verhuizing en krijgt alleen bugfixes, op branch `familie`.
-Een fix die ook voor v2 geldt: apart op `master` doorvoeren (het schema verschilt).
+Het verschil zit in de server-`.env`: `boxtracker.omgeving = dev` (waarschuwingsbalk e.d.) en
+`boxtracker.stickerFallbackURL = https://app.boxtracker.nl` — een gescande sticker die op dev
+niet bestaat (de oude v1-stickers wijzen naar minisaas) gaat door naar prd. Op dev geen SMTP:
+mail komt in `writable/mail/`. Test altijd eerst op dev, dan pas prd.
+
+**v1 is uitgefaseerd** (2026-09-26): de data staat op prd (verhuizing Kopakker_1), minisaas
+draait nu v2-dev. Branch `familie` / tag `familie-v1` blijven als archief. Back-up van de
+v1-database: `u7872p5382_boxtracker_0393a.sql` (dump 2026-09-26 10:31).
+**Gebruik `deploy.php` niet meer** — dat zet v1-code over FTP op de v2-dev-database.
 
 ## Lokaal draaien
 
@@ -50,34 +58,27 @@ MariaDB 10.6.
 
 ## SSH
 
-- **v2**: `ssh boxtrackernl` — alias in `~/.ssh/config`, host `web0171.zxcs.nl` poort 7685,
+- **prd**: `ssh boxtrackernl` — alias in `~/.ssh/config`, host `web0171.zxcs.nl` poort 7685,
   user `u7872p488700`. Zelfde hoofdaccount als `rondjebant`. Domeinmap:
   `~/domains/boxtracker.nl`; de app staat in `public_html/app`.
   Database `u7872p488700_boxtracker_j3ls` (gegevens in `env_prd`, niet in git).
-- **v1**: `ssh boxtracker` — host `web0098.zxcs.nl`, user `u7872p5382`, projectmap
-  `~/domains/minisaas.nl/public_html/boxtracker`.
+- **dev**: `ssh boxtracker` — host `web0098.zxcs.nl`, user `u7872p5382`, app in
+  `~/domains/minisaas.nl/public_html/boxtracker` (Document Root: `…/boxtracker/public`).
+  Database `u7872p5382_boxtracker_0393a` (gegevens in `credentials.md`), v2-schema, leeg.
 
 ## Deployment
 
-### v1 (boxtracker.minisaas.nl)
-
-Deploys gaan over **FTP** naar `web0098.zxcs.nl` via `deploy.php` (niet in git, staat in
-`.gitignore`; credentials in `credentials.md`). Het script **weigert** te draaien als je niet
-op branch `familie` staat — anders zou v2-code op de v1-database terechtkomen.
+### dev (boxtracker.minisaas.nl)
 
 ```bash
-git checkout familie
-php deploy.php          # verwerk de deploy-queue (deploy-queue.txt)
-php deploy.php all      # upload alles (skipt .git, node_modules, .local, tests, …)
-php deploy.php app      # upload één map/bestand
+bash deploy-dev.sh     # elke branch; deployt de gecommitte HEAD via SSH
 ```
 
-Queue-modus is git-gated: een bestand gaat alleen mee als het gecommit is én identiek aan
-HEAD. Het FTP-account `boxtrackerboy@minisaas.nl` is gechroot op `~/domains/minisaas.nl/`,
-dus remote path `public_html/boxtracker`. Document Root van boxtracker.minisaas.nl moet naar
-`public_html/boxtracker/public` wijzen.
+Werkt als `deploy-v2.sh` (hieronder), maar weigert als de server-`.env` geen
+`boxtracker.omgeving = dev` bevat — zo kan het nooit prd raken. Schemawijzigingen ook hier
+apart draaien (phpMyAdmin of `mysql`).
 
-### v2 (app.boxtracker.nl)
+### prd (app.boxtracker.nl)
 
 ```bash
 bash deploy-v2.sh      # alleen vanaf master; deployt de gecommitte HEAD via SSH
