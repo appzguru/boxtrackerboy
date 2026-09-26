@@ -158,12 +158,14 @@ class Auth extends BaseController
             $users = new UserModel();
             if ($user = $users->findByEmail($email)) {
                 $token = $users->issueToken((int) $user['id'], 'reset', 3600);
-                (new Mailer())->send(
+                (new Mailer())->sendAction(
                     $user['email'],
+                    $user['naam'],
                     'Nieuw wachtwoord — Boxtracker',
-                    "Hoi {$user['naam']},\n\nKies een nieuw wachtwoord via deze link:\n\n"
-                    . site_url('wachtwoord/' . $token)
-                    . "\n\nDe link is een uur geldig. Heb je dit niet zelf aangevraagd? Dan kun je deze mail negeren.\n"
+                    'Je hebt een nieuw wachtwoord aangevraagd voor je Boxtracker-account.',
+                    site_url('wachtwoord/' . $token),
+                    'Nieuw wachtwoord kiezen',
+                    'De link is een uur geldig. Heb je dit niet zelf aangevraagd? Dan kun je deze mail negeren.'
                 );
             }
         }

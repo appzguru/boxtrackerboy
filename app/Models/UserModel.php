@@ -94,12 +94,14 @@ class UserModel extends Model
     public function sendVerification(array $user): void
     {
         $token = $this->issueToken((int) $user['id'], 'verify', 7 * 86400);
-        (new \App\Libraries\Mailer())->send(
+        (new \App\Libraries\Mailer())->sendAction(
             $user['email'],
+            $user['naam'],
             'Bevestig je e-mailadres — Boxtracker',
-            "Hoi {$user['naam']},\n\nBevestig je e-mailadres via deze link:\n\n"
-            . site_url('verifieer/' . $token)
-            . "\n\nDe link is 7 dagen geldig. Heb je geen account aangemaakt bij Boxtracker? Dan kun je deze mail negeren.\n"
+            'Bevestig je e-mailadres om je Boxtracker-account te activeren.',
+            site_url('verifieer/' . $token),
+            'E-mailadres bevestigen',
+            'De link is 7 dagen geldig. Heb je geen account aangemaakt bij Boxtracker? Dan kun je deze mail negeren.'
         );
     }
 }
