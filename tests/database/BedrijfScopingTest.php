@@ -45,10 +45,15 @@ final class BedrijfScopingTest extends CIUnitTestCase
         parent::setUp();
         helper('access');
         $this->laadSchema();
+        // Onafhankelijk van de lokale .env (die kan tenantDomein = localtest.me hebben).
+        $cfg               = config(Boxtracker::class);
+        $cfg->tenantDomein = 'boxtracker.nl';
+        $cfg->omgeving     = '';
+        $cfg->devBedrijf   = '';
         $db = db_connect();
 
         foreach (['a' => 'verhuizer-a', 'b' => 'verhuizer-b', 'x' => 'dicht'] as $k => $sub) {
-            $db->table('bedrijven')->insert(['naam' => 'Bedrijf ' . strtoupper($k), 'subdomein' => $sub, 'status' => $k === 'x' ? 'geblokkeerd' : 'actief']);
+            $db->table('bedrijven')->insert(['naam' => 'Bedrijf ' . strtoupper($k), 'subdomein' => $sub, 'status' => $k === 'x' ? 'hardblock' : 'actief']);
             $this->bedrijf[$k] = (int) $db->insertID();
         }
 
@@ -69,7 +74,8 @@ final class BedrijfScopingTest extends CIUnitTestCase
             'bewa'  => 'w', // bewoner van A1 (geen medewerker)
             'ouda'  => 'o', // gedeactiveerde inpakker bij A, nog lid van A1
             'planb' => 'r', // planner bij B
-            'planx' => 'x', // planner bij het geblokkeerde bedrijf
+            'planx' => 'x', // planner bij het bedrijf met hardblock
+            'bewx'  => 'y', // bewoner van X1 (klant van het bedrijf met hardblock)
             'admin' => 'z', // global-admin
         ];
         foreach ($mensen as $naam => $letter) {
@@ -87,12 +93,17 @@ final class BedrijfScopingTest extends CIUnitTestCase
             $db->table('bedrijf_medewerkers')->insert(['bedrijf_id' => $this->bedrijf[$b], 'user_id' => $this->user[$naam], 'rol' => $rol, 'actief' => $actief]);
         }
 
-        $leden = [['pia', 'P', 'admin'], ['inka', 'A1', 'helper'], ['sjoa', 'A1', 'sjouwer'], ['bewa', 'A1', 'admin'], ['ouda', 'A1', 'helper']];
+        $leden = [['pia', 'P', 'admin'], ['inka', 'A1', 'helper'], ['sjoa', 'A1', 'sjouwer'], ['bewa', 'A1', 'admin'], ['ouda', 'A1', 'helper'], ['bewx', 'X1', 'admin'], ['planx', 'X1', 'admin']];
         foreach ($leden as [$naam, $v, $rol]) {
             $db->table('memberships')->insert(['verhuizing_id' => $this->vh[$v], 'user_id' => $this->user[$naam], 'rol' => $rol]);
         }
 
         $db->table('platform_admins')->insert(['user_id' => $this->user['admin']]);
+    }
+
+    private function cfg(): Boxtracker
+    {
+        return clone config(Boxtracker::class);
     }
 
     protected function tearDown(): void
@@ -104,7 +115,7 @@ final class BedrijfScopingTest extends CIUnitTestCase
 
     private function tenant(string $host): Tenant
     {
-        return new Tenant($host, new Boxtracker());
+        return new Tenant($host, $this->cfg());
     }
 
     /** Doet alsof het volgende request op deze hostnaam binnenkomt met deze cookies. */
@@ -122,7 +133,7 @@ final class BedrijfScopingTest extends CIUnitTestCase
 
     private function als(string $naam, string $host): Access
     {
-        $letters = ['pia' => 'p', 'plana' => 'q', 'sala' => 's', 'inka' => 'i', 'sjoa' => 'j', 'bewa' => 'w', 'ouda' => 'o', 'planb' => 'r', 'planx' => 'x', 'admin' => 'z'];
+        $letters = ['pia' => 'p', 'plana' => 'q', 'sala' => 's', 'inka' => 'i', 'sjoa' => 'j', 'bewa' => 'w', 'ouda' => 'o', 'planb' => 'r', 'planx' => 'x', 'bewx' => 'y', 'admin' => 'z'];
 
         return $this->actAs($host, [Access::USER_COOKIE => str_repeat($letters[$naam], 64)]);
     }
@@ -162,15 +173,15 @@ final class BedrijfScopingTest extends CIUnitTestCase
         $this->assertSame(Tenant::ONBEKEND, $this->tenant("verhuizer-a'--.boxtracker.nl")->status());
 
         $dicht = $this->tenant(self::HOST_DICHT);
-        $this->assertSame(Tenant::GEBLOKKEERD, $dicht->status());
-        $this->assertNull($dicht->bedrijfId());
-        $this->assertFalse($dicht->owns($this->bedrijf['x']));
+        $this->assertSame(Tenant::BEDRIJF, $dicht->status(), 'geblokkeerd bedrijf blijft bereikbaar voor zijn klanten');
+        $this->assertSame(Tenant::HARDBLOCK, $dicht->blok());
+        $this->assertTrue($dicht->owns($this->bedrijf['x']));
         $this->assertFalse($dicht->owns(null));
     }
 
     public function testDevBedrijfAlleenOpDev(): void
     {
-        $config             = new Boxtracker();
+        $config             = $this->cfg();
         $config->devBedrijf = 'verhuizer-b';
         $this->assertSame(Tenant::KLANT, (new Tenant('boxtracker.minisaas.nl', $config))->status(), 'prd negeert devBedrijf');
 
@@ -186,7 +197,7 @@ final class BedrijfScopingTest extends CIUnitTestCase
         $this->assertSame(1, $tel(self::HOST_KLANT));
         $this->assertSame(2, $tel(self::HOST_A));
         $this->assertSame(1, $tel(self::HOST_B));
-        $this->assertSame(0, $tel(self::HOST_DICHT));
+        $this->assertSame(1, $tel(self::HOST_DICHT));
         $this->assertSame(0, $tel('bestaatniet.boxtracker.nl'));
     }
 
@@ -272,11 +283,59 @@ final class BedrijfScopingTest extends CIUnitTestCase
         $this->assertFalse($access->hasAccessTo($this->vh['A1']));
     }
 
-    public function testGeblokkeerdBedrijfIsDicht(): void
+    public function testHardblockTreftMedewerkersNietKlanten(): void
     {
-        $access = $this->als('planx', self::HOST_DICHT);
-        $this->assertSame([], $this->zichtbaar($access));
-        $this->assertFalse($access->switchTo($this->vh['X1']));
+        $planner = $this->als('planx', self::HOST_DICHT);
+        $this->assertTrue($planner->isGeblokkeerd());
+        $this->assertSame([], $this->zichtbaar($planner), 'ook niet via zijn eigen lidmaatschap');
+        $this->assertFalse($planner->switchTo($this->vh['X1']));
+        $this->assertNull($planner->verhuizingId());
+
+        $bewoner = $this->als('bewx', self::HOST_DICHT);
+        $this->assertFalse($bewoner->isGeblokkeerd());
+        $this->assertSame($this->vh['X1'], $bewoner->verhuizingId());
+        $this->assertTrue($bewoner->can('admin'));
+        $this->assertSame(['geheim X1'], array_column((new BoxModel())->findAll(), 'omschrijving'));
+    }
+
+    public function testHardblockGastenVanDePloegEruitVanDeBewonerNiet(): void
+    {
+        $db = db_connect();
+        foreach (['planx' => 'k', 'bewx' => 'h'] as $door => $letter) {
+            $db->table('guest_passes')->insert(['verhuizing_id' => $this->vh['X1'], 'code' => str_repeat($letter, 32), 'rol' => 'sjouwer', 'code_expires_at' => date('Y-m-d H:i:s', time() + 600), 'created_by' => $this->user[$door]]);
+            $db->table('guest_sessions')->insert([
+                'guest_pass_id' => $db->insertID(), 'verhuizing_id' => $this->vh['X1'], 'rol' => 'sjouwer', 'naam' => 'Gast ' . $door,
+                'token' => str_repeat($letter, 64), 'expires_at' => date('Y-m-d H:i:s', time() + 3600),
+            ]);
+        }
+
+        $ploeg = $this->actAs(self::HOST_DICHT, [Access::GUEST_COOKIE => str_repeat('k', 64)]);
+        $this->assertTrue($ploeg->isGeblokkeerd());
+        $this->assertFalse($ploeg->isAuthenticated());
+
+        $helper = $this->actAs(self::HOST_DICHT, [Access::GUEST_COOKIE => str_repeat('h', 64)]);
+        $this->assertFalse($helper->isGeblokkeerd());
+        $this->assertSame($this->vh['X1'], $helper->verhuizingId());
+
+        // Zonder blokkade mag de ploeg gewoon.
+        $db->table('bedrijven')->where('id', $this->bedrijf['x'])->update(['status' => 'actief']);
+        $this->assertSame($this->vh['X1'], $this->actAs(self::HOST_DICHT, [Access::GUEST_COOKIE => str_repeat('k', 64)])->verhuizingId());
+    }
+
+    public function testSoftblockAlleenGeenNieuweVerhuizingen(): void
+    {
+        db_connect()->table('bedrijven')->where('id', $this->bedrijf['a'])->update(['status' => 'softblock']);
+
+        $this->assertFalse($this->tenant(self::HOST_A)->magNieuweVerhuizingen());
+        $this->assertFalse($this->tenant(self::HOST_DICHT)->magNieuweVerhuizingen());
+        $this->assertTrue($this->tenant(self::HOST_B)->magNieuweVerhuizingen());
+        $this->assertTrue($this->tenant(self::HOST_KLANT)->magNieuweVerhuizingen());
+
+        $planner = $this->als('plana', self::HOST_A);
+        $this->assertFalse($planner->isGeblokkeerd());
+        $this->assertSame($this->ids('A1', 'A2'), $this->zichtbaar($planner));
+        $this->assertTrue($planner->switchTo($this->vh['A1']));
+        $this->assertTrue($planner->can('admin'));
     }
 
     public function testGastAlleenOpEigenIngang(): void
@@ -389,6 +448,6 @@ final class BedrijfScopingTest extends CIUnitTestCase
         $this->assertNull($status(self::HOST_KLANT));
         $this->assertNull($status(self::HOST_A));
         $this->assertSame(404, $status('bestaatniet.boxtracker.nl'));
-        $this->assertSame(503, $status(self::HOST_DICHT));
+        $this->assertNull($status(self::HOST_DICHT), 'blokkade zit in Access, niet aan de voordeur');
     }
 }

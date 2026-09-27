@@ -80,7 +80,7 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            'tenant',     // onbekend subdomein → 404, geblokkeerd bedrijf → dicht
+            'tenant',     // onbekend subdomein → 404
             'meekijken',  // global-admin die meekijkt: alleen lezen
             'csrf',
             // 'honeypot',

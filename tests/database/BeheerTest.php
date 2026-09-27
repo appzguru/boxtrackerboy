@@ -35,6 +35,11 @@ final class BeheerTest extends CIUnitTestCase
         parent::setUp();
         helper('access');
         $this->laadSchema();
+        // Onafhankelijk van de lokale .env (die kan tenantDomein = localtest.me hebben).
+        $cfg               = config(Boxtracker::class);
+        $cfg->tenantDomein = 'boxtracker.nl';
+        $cfg->omgeving     = '';
+        $cfg->devBedrijf   = '';
 
         // CSRF hoort niet bij wat hier getest wordt; tenant- en meekijkfilter blijven aan.
         $filters                    = config('Filters');
@@ -62,6 +67,11 @@ final class BeheerTest extends CIUnitTestCase
         $this->mailVoor = glob(WRITEPATH . 'mail/*.txt') ?: [];
     }
 
+    private function cfg(): Boxtracker
+    {
+        return clone config(Boxtracker::class);
+    }
+
     protected function tearDown(): void
     {
         // Testmails opruimen.
@@ -77,7 +87,7 @@ final class BeheerTest extends CIUnitTestCase
     private function als(?string $wie, string $host = self::HOST_KLANT): void
     {
         $cookies = $wie ? [Access::USER_COOKIE => str_repeat(['pia' => 'p', 'admin' => 'z', 'nieuw' => 'n'][$wie], 64)] : [];
-        $tenant  = new Tenant($host, new Boxtracker());
+        $tenant  = new Tenant($host, $this->cfg());
         $request = Services::incomingrequest(null, false);
         $request->setGlobal('cookie', $cookies);
         Services::injectMock('tenant', $tenant);
@@ -134,19 +144,103 @@ final class BeheerTest extends CIUnitTestCase
         $this->assertSame('Kwiek Verhuizingen', $row['naam']);
         $this->assertSame('actief', $row['status']);
         $this->assertSame(['bedrijf_aangemaakt'], $this->log());
-        $this->assertSame(Tenant::BEDRIJF, (new Tenant('kwiek.boxtracker.nl', new Boxtracker()))->status());
+        $this->assertSame(Tenant::BEDRIJF, (new Tenant('kwiek.boxtracker.nl', $this->cfg()))->status());
     }
 
-    public function testBlokkerenEnActiveren(): void
+    private function blok(): array
     {
-        $this->als('admin');
-        $this->post('/beheer/bedrijven/' . $this->ids['bedrijf'] . '/status', ['status' => 'geblokkeerd']);
-        $this->assertSame(Tenant::GEBLOKKEERD, (new Tenant(self::HOST_A, new Boxtracker()))->status());
+        return db_connect()->table('bedrijven')->select('status, blok_memo, blok_sinds')->where('id', $this->ids['bedrijf'])->get()->getRowArray();
+    }
+
+    public function testBlokkerenMetMemo(): void
+    {
+        $url = '/beheer/bedrijven/' . $this->ids['bedrijf'] . '/status';
 
         $this->als('admin');
-        $this->post('/beheer/bedrijven/' . $this->ids['bedrijf'] . '/status', ['status' => 'actief']);
-        $this->assertSame(Tenant::BEDRIJF, (new Tenant(self::HOST_A, new Boxtracker()))->status());
-        $this->assertSame(['bedrijf_geblokkeerd', 'bedrijf_geactiveerd'], $this->log());
+        $this->post($url, ['status' => 'hardblock', 'memo' => '  ']);
+        $this->assertSame('actief', $this->blok()['status'], 'zonder memo geen blokkade');
+
+        $this->als('admin');
+        $this->post($url, ['status' => 'softblock', 'memo' => 'Factuur september over tijd']);
+        $this->assertSame('softblock', $this->blok()['status']);
+        $this->assertSame('Factuur september over tijd', $this->blok()['blok_memo']);
+        $this->assertNotNull($this->blok()['blok_sinds']);
+
+        $this->als('admin');
+        $this->post($url, ['status' => 'hardblock', 'memo' => 'Na 3 herinneringen nog niet betaald']);
+        $this->assertSame('hardblock', $this->blok()['status']);
+
+        $this->als('admin');
+        $this->get('/beheer/bedrijven/' . $this->ids['bedrijf'])->assertSee('Na 3 herinneringen nog niet betaald');
+        $this->als('admin');
+        $this->get('/beheer')->assertSee('Hardblock');
+
+        $this->als('admin');
+        $this->post($url, ['status' => 'actief', 'memo' => '']);
+        $this->assertSame(['status' => 'actief', 'blok_memo' => null, 'blok_sinds' => null], $this->blok());
+
+        $this->assertSame(['bedrijf_softblock', 'bedrijf_hardblock', 'bedrijf_geactiveerd'], $this->log());
+        $this->assertSame('Factuur september over tijd', db_connect()->table('beheer_log')->where('actie', 'bedrijf_softblock')->get()->getRow()->detail);
+    }
+
+    /** Planner (cookie n) en bewoner (cookie b) bij verhuizing A1 van bedrijf A. */
+    private function plannerEnBewoner(string $status, ?string $memo): void
+    {
+        $db = db_connect();
+        $db->table('users')->insert(['naam' => 'Plan', 'email' => 'plan@test.nl', 'password_hash' => 'x']);
+        $planner = (int) $db->insertID();
+        $db->table('bedrijf_medewerkers')->insert(['bedrijf_id' => $this->ids['bedrijf'], 'user_id' => $planner, 'rol' => 'planner']);
+        $db->table('sessions')->insert(['user_id' => $planner, 'token' => str_repeat('n', 64)]);
+        $db->table('users')->insert(['naam' => 'Bewoner', 'email' => 'bew@test.nl', 'password_hash' => 'x']);
+        $bewoner = (int) $db->insertID();
+        $db->table('memberships')->insert(['verhuizing_id' => $this->ids['A1'], 'user_id' => $bewoner, 'rol' => 'admin']);
+        $db->table('sessions')->insert(['user_id' => $bewoner, 'token' => str_repeat('b', 64)]);
+        $db->table('bedrijven')->where('id', $this->ids['bedrijf'])->update(['status' => $status, 'blok_memo' => $memo]);
+    }
+
+    private function alsCookie(string $letter, string $host): void
+    {
+        $tenant  = new Tenant($host, $this->cfg());
+        $request = Services::incomingrequest(null, false);
+        $request->setGlobal('cookie', [Access::USER_COOKIE => str_repeat($letter, 64)]);
+        Services::injectMock('tenant', $tenant);
+        Services::injectMock('access', new Access($request, $tenant));
+    }
+
+    public function testHardblockVoeltHetBedrijfNietDeKlant(): void
+    {
+        $this->plannerEnBewoner('hardblock', 'geheime memo');
+
+        $this->alsCookie('n', self::HOST_A);
+        $response = $this->get('/d/1-toka1');
+        $this->assertSame(403, $response->response()->getStatusCode());
+        $response->assertSee('Je account is geblokkeerd');
+        $response->assertDontSee('geheim A1');
+        $response->assertDontSee('geheime memo');
+
+        // Bewoner: gewoon doorgaan, ook invoeren.
+        $this->alsCookie('b', self::HOST_A);
+        $this->get('/d/1-toka1')->assertSee('geheim A1');
+        $this->alsCookie('b', self::HOST_A);
+        $this->post('/d/1-toka1/status', ['status' => 'uitgepakt']);
+        $this->assertSame('uitgepakt', db_connect()->table('boxes')->where('token', 'toka1')->get()->getRow()->status);
+    }
+
+    public function testSoftblockMeldingAlleenVoorMedewerkers(): void
+    {
+        $this->plannerEnBewoner('softblock', 'geheime memo');
+
+        $this->alsCookie('n', self::HOST_A);
+        $response = $this->get('/d/1-toka1');
+        $response->assertOK();
+        $response->assertSee('geheim A1');
+        $response->assertSee('Account beperkt');
+        $response->assertDontSee('geheime memo');
+
+        $this->alsCookie('b', self::HOST_A);
+        $response = $this->get('/d/1-toka1');
+        $response->assertSee('geheim A1');
+        $response->assertDontSee('Account beperkt');
     }
 
     public function testPlannerUitnodigenEnRegistreren(): void

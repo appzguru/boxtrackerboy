@@ -30,6 +30,15 @@ class AccessFilter implements FilterInterface
 
         $access = access();
 
+        // Hardblock: het bedrijf voelt het, zijn klanten niet (die zijn nooit "geblokkeerd").
+        if ($access->isGeblokkeerd()) {
+            return service('response')->setStatusCode(403)->setBody(view('auth_message', [
+                'title' => 'Account geblokkeerd',
+                'kop'   => 'Je account is geblokkeerd',
+                'tekst' => 'De toegang van ' . (tenant()->bedrijf()['naam'] ?? 'dit bedrijf') . ' tot Boxtracker is tijdelijk geblokkeerd. Neem contact op met Boxtracker om dit op te lossen.',
+            ]));
+        }
+
         if (! $access->isAuthenticated() || ($need === 'user' && ! $access->user())) {
             $path = '/' . ltrim($request->getUri()->getPath(), '/');
             if (strtolower($request->getMethod()) === 'get' && $path !== '/') {

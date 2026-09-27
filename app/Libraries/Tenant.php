@@ -9,18 +9,24 @@ use Config\Boxtracker;
  *
  * - klant       — app.boxtracker.nl, boxtracker.nl, localhost, gereserveerde subdomeinen:
  *                 de klant-app, alleen particuliere verhuizingen (bedrijf_id NULL);
- * - bedrijf     — <sub>.boxtracker.nl van een actief bedrijf: alleen diens verhuizingen;
- * - onbekend    — subdomein zonder bedrijf: 404;
- * - geblokkeerd — bedrijf bestaat maar is geblokkeerd: dicht.
+ * - bedrijf     — <sub>.boxtracker.nl van een bedrijf: alleen diens verhuizingen;
+ * - onbekend    — subdomein zonder bedrijf: 404.
+ *
+ * Een bedrijf kan geblokkeerd zijn (blok()): softblock = geen nieuwe verhuizingen,
+ * hardblock = medewerkers kunnen nergens meer bij. Klanten (bewoners) merken van
+ * geen van beide iets — zie Access.
  *
  * Eén plek voor de vraag "welk bedrijf?" — nergens anders in de code naar hostnamen kijken.
  */
 class Tenant
 {
-    public const KLANT       = 'klant';
-    public const BEDRIJF     = 'bedrijf';
-    public const ONBEKEND    = 'onbekend';
-    public const GEBLOKKEERD = 'geblokkeerd';
+    public const KLANT    = 'klant';
+    public const BEDRIJF  = 'bedrijf';
+    public const ONBEKEND = 'onbekend';
+
+    public const ACTIEF    = 'actief';
+    public const SOFTBLOCK = 'softblock';
+    public const HARDBLOCK = 'hardblock';
 
     private string $status   = self::KLANT;
     private ?array $bedrijf  = null;
@@ -40,8 +46,8 @@ class Tenant
 
         $row = db_connect()->table('bedrijven')->where('subdomein', $sub)->get()->getRowArray();
         if ($row) {
-            $this->bedrijf = ['id' => (int) $row['id'], 'naam' => $row['naam'], 'subdomein' => $row['subdomein']];
-            $this->status  = $row['status'] === 'actief' ? self::BEDRIJF : self::GEBLOKKEERD;
+            $this->bedrijf = ['id' => (int) $row['id'], 'naam' => $row['naam'], 'subdomein' => $row['subdomein'], 'blok' => $row['status']];
+            $this->status  = self::BEDRIJF;
         }
     }
 
@@ -89,7 +95,7 @@ class Tenant
         return $this->status;
     }
 
-    /** Actief bedrijf bij deze hostnaam (niet: geblokkeerd of onbekend). */
+    /** Bedrijfssubdomein (bestaand bedrijf, ook als het geblokkeerd is). */
     public function isBedrijf(): bool
     {
         return $this->status === self::BEDRIJF;
@@ -100,13 +106,29 @@ class Tenant
         return $this->status === self::KLANT;
     }
 
-    /** Het bedrijf bij deze hostnaam — ook als het geblokkeerd is. */
     public function bedrijf(): ?array
     {
         return $this->bedrijf;
     }
 
-    /** Id van het actieve bedrijf, anders null. */
+    /** actief, softblock of hardblock; null in de klant-app. */
+    public function blok(): ?string
+    {
+        return $this->bedrijf['blok'] ?? null;
+    }
+
+    public function isHardblock(): bool
+    {
+        return $this->blok() === self::HARDBLOCK;
+    }
+
+    /** Softblock (en hardblock): alsof de credits op zijn — geen nieuwe verhuizingen. */
+    public function magNieuweVerhuizingen(): bool
+    {
+        return $this->isKlant() || $this->blok() === self::ACTIEF;
+    }
+
+    /** Id van het bedrijf bij deze hostnaam, anders null. */
     public function bedrijfId(): ?int
     {
         return $this->isBedrijf() ? $this->bedrijf['id'] : null;
@@ -133,7 +155,7 @@ class Tenant
 
     /**
      * Hoort een verhuizing (met deze bedrijf_id) bij deze ingang? Klant-app: alleen NULL.
-     * Bedrijf: alleen dat bedrijf. Onbekend of geblokkeerd: nooit.
+     * Bedrijf: alleen dat bedrijf (ook geblokkeerd — de blokkade zit in Access). Onbekend: nooit.
      */
     public function owns(?int $verhuizingBedrijfId): bool
     {

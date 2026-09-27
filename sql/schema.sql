@@ -34,11 +34,15 @@ CREATE TABLE IF NOT EXISTS user_tokens (
 
 -- Bedrijven (whitelabel, whitelabel-plan.md): subdomein = het deel vóór .boxtracker.nl.
 -- De huisstijl staat niet hier maar als bestanden in public/merken/<subdomein>/.
+-- status: softblock = geen nieuwe verhuizingen, hardblock = medewerkers kunnen nergens bij.
+-- Klanten van het bedrijf merken van beide niets. blok_memo: waarom (alleen voor beheer).
 CREATE TABLE IF NOT EXISTS bedrijven (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     naam VARCHAR(120) NOT NULL,
     subdomein VARCHAR(40) NOT NULL,
-    status ENUM('actief', 'geblokkeerd') NOT NULL DEFAULT 'actief',
+    status ENUM('actief', 'softblock', 'hardblock') NOT NULL DEFAULT 'actief',
+    blok_memo VARCHAR(500) NULL,
+    blok_sinds DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_bedrijven_subdomein (subdomein)

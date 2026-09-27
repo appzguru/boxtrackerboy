@@ -12,7 +12,7 @@ class BedrijfModel extends Model
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['naam', 'subdomein', 'status'];
+    protected $allowedFields = ['naam', 'subdomein', 'status', 'blok_memo', 'blok_sinds'];
 
     /** Alle bedrijven met aantallen medewerkers (actief) en verhuizingen. */
     public function overzicht(): array

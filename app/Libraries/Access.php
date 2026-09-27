@@ -17,6 +17,9 @@ use CodeIgniter\HTTP\IncomingRequest;
  * Een global-admin kan op de klant-app meekijken in een bedrijfsverhuizing (alleen-lezen,
  * afgedwongen door App\Filters\MeekijkFilter).
  *
+ * Hardblock van een bedrijf: medewerkers (en gasten die een medewerker heeft aangemaakt)
+ * kunnen nergens meer bij — isGeblokkeerd(). Bewoners en hun gasten merken niets.
+ *
  * Alles wat verhuizing-data raakt, vraagt hier de verhuizing en rol op. Eén instantie per
  * request (shared service), lui opgebouwd bij het eerste gebruik.
  */
@@ -38,6 +41,7 @@ class Access
     private ?array $verhuizing  = null;
     private ?string $rol        = null;
     private bool $meekijken     = false;
+    private bool $geblokkeerd   = false;
 
     /** false = nog niet opgezocht. */
     private array|false|null $medewerker = false;
@@ -103,6 +107,12 @@ class Access
             $db->table('sessions')->where('id', $this->session['id'])->update(['last_used_at' => date('Y-m-d H:i:s')]);
         }
 
+        if ($this->tenant()->isHardblock() && $this->medewerker() !== null) {
+            $this->geblokkeerd = true;
+
+            return true;
+        }
+
         if ($row['meekijk_verhuizing_id'] && $this->startMeekijken((int) $row['meekijk_verhuizing_id'])) {
             return true;
         }
@@ -161,7 +171,7 @@ class Access
             ->get()->getRowArray();
 
         $bedrijfId = isset($row['bedrijf_id']) ? (int) $row['bedrijf_id'] : null;
-        if (! $row || ! $this->tenant()->owns($bedrijfId) || $this->isInactieveMedewerker()) {
+        if (! $row || ! $this->tenant()->owns($bedrijfId) || $this->medewerkerZonderToegang()) {
             return null;
         }
 
@@ -190,14 +200,23 @@ class Access
     {
         $db  = db_connect();
         $row = $db->table('guest_sessions')
-            ->select('guest_sessions.*, verhuizingen.naam AS verhuizing_naam, verhuizingen.bedrijf_id')
+            ->select('guest_sessions.*, verhuizingen.naam AS verhuizing_naam, verhuizingen.bedrijf_id, bedrijf_medewerkers.id AS door_medewerker')
             ->join('verhuizingen', 'verhuizingen.id = guest_sessions.verhuizing_id')
+            ->join('guest_passes', 'guest_passes.id = guest_sessions.guest_pass_id', 'left')
+            ->join('bedrijf_medewerkers', 'bedrijf_medewerkers.user_id = guest_passes.created_by AND bedrijf_medewerkers.bedrijf_id = verhuizingen.bedrijf_id', 'left')
             ->where('guest_sessions.token', $token)
             ->where('guest_sessions.revoked_at IS NULL')
             ->where('guest_sessions.expires_at >', date('Y-m-d H:i:s'))
             ->get()->getRowArray();
 
         if (! $row || ! $this->tenant()->owns($row['bedrijf_id'] === null ? null : (int) $row['bedrijf_id'])) {
+            return;
+        }
+
+        // Hardblock: de ploeg van het bedrijf (gast via een medewerker) ligt eruit, de helpers van de bewoner niet.
+        if ($this->tenant()->isHardblock() && $row['door_medewerker'] !== null) {
+            $this->geblokkeerd = true;
+
             return;
         }
 
@@ -268,6 +287,14 @@ class Access
         return $rol !== null && (self::RANK[$rol] ?? 0) >= (self::RANK[$minRol] ?? PHP_INT_MAX);
     }
 
+    /** Medewerker (of diens gast) van een bedrijf met een hardblock: alleen de blokkadepagina. */
+    public function isGeblokkeerd(): bool
+    {
+        $this->resolve();
+
+        return $this->geblokkeerd;
+    }
+
     /** Global-admin die nu meekijkt in een bedrijfsverhuizing (alleen-lezen). */
     public function meekijken(): bool
     {
@@ -332,18 +359,21 @@ class Access
         return $m !== null && $m['actief'] && in_array($m['rol'], self::BEDRIJF_ADMINS, true);
     }
 
-    /** Gedeactiveerde medewerker: bij dit bedrijf nergens meer toegang, ook niet via memberships. */
-    private function isInactieveMedewerker(): bool
+    /**
+     * Gedeactiveerde medewerker, of medewerker van een bedrijf met een hardblock: bij dit
+     * bedrijf nergens toegang, ook niet via memberships.
+     */
+    private function medewerkerZonderToegang(): bool
     {
         $m = $this->medewerker();
 
-        return $m !== null && ! $m['actief'];
+        return $m !== null && (! $m['actief'] || $this->tenant()->isHardblock());
     }
 
     /** Verhuizingen bij deze ingang waar het account bij kan, met rol en aantal dozen. */
     public function memberships(): array
     {
-        if (! $this->user() || $this->isInactieveMedewerker()) {
+        if (! $this->user() || $this->medewerkerZonderToegang()) {
             return [];
         }
 

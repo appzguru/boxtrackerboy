@@ -11,8 +11,8 @@ use App\Models\MedewerkerUitnodigingModel;
 use App\Models\UserModel;
 
 /**
- * Global-admin (whitelabel-plan.md stap 2): bedrijven aanmaken, activeren/blokkeren en de
- * eerste planner uitnodigen. Een bedrijf aanmaken = het subdomein aanmaken; door het
+ * Global-admin (whitelabel-plan.md stap 2): bedrijven aanmaken, blokkeren (soft/hard, met
+ * memo) en de eerste planner uitnodigen. Een bedrijf aanmaken = het subdomein aanmaken; door het
  * wildcard-subdomein werkt het meteen. Route-filter `beheer` doet de toegangscontrole.
  */
 class Bedrijven extends BaseController
@@ -23,6 +23,12 @@ class Bedrijven extends BaseController
     {
         parent::initController($request, $response, $logger);
         $this->bedrijven = new BedrijfModel();
+    }
+
+    /** Beheer is een bureaubladscherm: brede indeling, geen verhuizing-balk. */
+    protected function view(string $name, array $data = []): string
+    {
+        return parent::view($name, $data + ['beheer' => true]);
     }
 
     public function index()
@@ -72,16 +78,43 @@ class Bedrijven extends BaseController
         ]);
     }
 
+    /**
+     * actief / softblock / hardblock. Blokkeren vraagt een memo (waarom), die bij het bedrijf
+     * en in het logboek komt. Klanten van het bedrijf merken van een blokkade niets.
+     */
     public function setStatus(int $id)
     {
         $bedrijf = $this->bedrijven->find($id);
-        $status  = $this->request->getPost('status') === 'geblokkeerd' ? 'geblokkeerd' : 'actief';
-        if ($bedrijf && $bedrijf['status'] !== $status) {
-            $this->bedrijven->update($id, ['status' => $status]);
-            BeheerLog::schrijf($status === 'actief' ? 'bedrijf_geactiveerd' : 'bedrijf_geblokkeerd', $id);
+        if (! $bedrijf) {
+            return redirect()->to('/beheer');
         }
 
-        return redirect()->to('/beheer/bedrijven/' . $id);
+        $status = $this->request->getPost('status');
+        $status = in_array($status, [Tenant::SOFTBLOCK, Tenant::HARDBLOCK], true) ? $status : Tenant::ACTIEF;
+        $memo   = trim((string) $this->request->getPost('memo'));
+
+        if ($status !== Tenant::ACTIEF && $memo === '') {
+            return redirect()->to('/beheer/bedrijven/' . $id)->with('fout', 'Schrijf erbij waarom je blokkeert.');
+        }
+        if (mb_strlen($memo) > 500) {
+            return redirect()->to('/beheer/bedrijven/' . $id)->with('fout', 'De memo is te lang (max. 500 tekens).');
+        }
+        if ($status === $bedrijf['status'] && $memo === (string) $bedrijf['blok_memo']) {
+            return redirect()->to('/beheer/bedrijven/' . $id);
+        }
+
+        $this->bedrijven->update($id, [
+            'status'     => $status,
+            'blok_memo'  => $status === Tenant::ACTIEF ? null : $memo,
+            'blok_sinds' => $status === Tenant::ACTIEF ? null : ($status === $bedrijf['status'] ? $bedrijf['blok_sinds'] : date('Y-m-d H:i:s')),
+        ]);
+        BeheerLog::schrijf('bedrijf_' . ($status === Tenant::ACTIEF ? 'geactiveerd' : $status), $id, null, $memo !== '' ? $memo : null);
+
+        return redirect()->to('/beheer/bedrijven/' . $id)->with('message', match ($status) {
+            Tenant::SOFTBLOCK => 'Softblock staat aan: geen nieuwe verhuizingen meer.',
+            Tenant::HARDBLOCK => 'Hardblock staat aan: medewerkers kunnen nergens meer bij. Klanten merken niets.',
+            default           => 'Bedrijf is weer actief.',
+        });
     }
 
     /** Medewerker uitnodigen per mail (voor de eerste planner; daarna doet de planner dat zelf). */
