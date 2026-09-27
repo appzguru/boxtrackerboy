@@ -10,7 +10,7 @@ class VerhuizingModel extends Model
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['naam', 'created_by', 'bedrijf_id'];
+    protected $allowedFields = ['naam', 'created_by', 'bedrijf_id', 'verhuisdatum', 'adres_van', 'adres_naar'];
 
     /** Nieuwe verhuizing met de maker als admin. bedrijf_id null = particulier (klant-app). */
     public function createFor(int $userId, string $naam, ?int $bedrijfId = null): int

@@ -172,6 +172,9 @@ body.beheer .content { padding: 4px 32px 48px; }
 .tile { background: var(--card); border: var(--outline); border-radius: var(--radius-lg); box-sizing: border-box; padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
 .chip { min-height: 44px; padding: 0 18px; border-radius: 999px; font-size: 15px; font-weight: 500; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 6px; background: var(--card); color: var(--text); }
 .chip.on { background: var(--text); color: var(--card); border-color: var(--text); }
+/* Keuzechips met een radio of vinkje volgen wat er aangevinkt is (niet alleen de beginstand). */
+label.chip:has(input) { background: var(--card); color: var(--text); border-color: var(--border); }
+label.chip:has(input:checked) { background: var(--text); color: var(--card); border-color: var(--text); }
 .pill { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; }
 .pill-sm { height: 26px; padding: 0 10px; font-size: 12px; }
 .tag { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); font-size: 14px; font-weight: 600; }

@@ -8,6 +8,7 @@
   <?php endif ?>
   <div class="content" style="gap:20px;<?= $activeId ? '' : 'padding-top:40px;' ?>">
     <h1 class="page-title"><?= $memberships ? 'Welke verhuizing?' : 'Nog geen verhuizing' ?></h1>
+    <?php if (access()->isBedrijfAdmin()): ?><a href="<?= base_url('bedrijf') ?>" class="btn btn-secondary"><?= icon('list') ?> Naar de planning</a><?php endif ?>
     <?php if (session()->getFlashdata('message')): ?><div class="msg msg-info"><?= esc(session()->getFlashdata('message')) ?></div><?php endif ?>
 
     <?php if ($memberships): ?>

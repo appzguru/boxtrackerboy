@@ -20,6 +20,19 @@ if (! function_exists('nl_datetime')) {
     }
 }
 
+if (! function_exists('nl_date')) {
+    /** "di 14 okt 2026" (of '' zonder datum). */
+    function nl_date(?string $date): string
+    {
+        if (! $date) {
+            return '';
+        }
+        $ts = strtotime($date);
+
+        return strftime_nl($ts) . ' ' . date('Y', $ts);
+    }
+}
+
 if (! function_exists('strftime_nl')) {
     function strftime_nl(int $ts): string
     {

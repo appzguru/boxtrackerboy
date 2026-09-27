@@ -34,11 +34,7 @@ class AccessFilter implements FilterInterface
 
         // Hardblock: het bedrijf voelt het, zijn klanten niet (die zijn nooit "geblokkeerd").
         if ($access->isGeblokkeerd()) {
-            return service('response')->setStatusCode(403)->setBody(view('auth_message', [
-                'title' => 'Account geblokkeerd',
-                'kop'   => 'Je account is geblokkeerd',
-                'tekst' => 'De toegang van ' . (tenant()->bedrijf()['naam'] ?? 'dit bedrijf') . ' tot Boxtracker is tijdelijk geblokkeerd. Neem contact op met Boxtracker om dit op te lossen.',
-            ]));
+            return self::geblokkeerd();
         }
 
         if (! $access->isAuthenticated() || ($need === 'user' && ! $access->user())) {
@@ -56,7 +52,8 @@ class AccessFilter implements FilterInterface
         }
 
         if ($access->verhuizingId() === null) {
-            return redirect()->to('/verhuizingen');
+            // Planner en sales beginnen op hun planningsoverzicht.
+            return redirect()->to($access->isBedrijfAdmin() ? '/bedrijf' : '/verhuizingen');
         }
 
         if (! $access->can($need)) {
@@ -66,6 +63,16 @@ class AccessFilter implements FilterInterface
         }
 
         return null;
+    }
+
+    /** Blokkadepagina voor medewerkers van een bedrijf met een hardblock. */
+    public static function geblokkeerd(): ResponseInterface
+    {
+        return service('response')->setStatusCode(403)->setBody(view('auth_message', [
+            'title' => 'Account geblokkeerd',
+            'kop'   => 'Je account is geblokkeerd',
+            'tekst' => 'De toegang van ' . (tenant()->bedrijf()['naam'] ?? 'dit bedrijf') . ' tot Boxtracker is tijdelijk geblokkeerd. Neem contact op met Boxtracker om dit op te lossen.',
+        ]));
     }
 
     private function stickerFallback(RequestInterface $request): ?string

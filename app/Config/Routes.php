@@ -108,3 +108,23 @@ $routes->group('beheer', ['filter' => 'beheer'], static function ($routes) {
     $routes->post('meekijken/stop', 'Beheer\Meekijken::stop');
     $routes->post('meekijken/(:num)', 'Beheer\Meekijken::start/$1');
 });
+
+// Bedrijf (whitelabel): planner en sales op hun eigen subdomein. Filter `bedrijf` controleert
+// ingang en rol: `kantoor` = planner of sales, `planner` = alleen planner.
+$routes->group('bedrijf', ['filter' => 'bedrijf:kantoor'], static function ($routes) {
+    $routes->get('/', 'Bedrijf\Planning::index');
+    $routes->get('verhuizingen/(:num)', 'Bedrijf\Planning::show/$1');
+});
+$routes->group('bedrijf', ['filter' => 'bedrijf:planner'], static function ($routes) {
+    $routes->get('verhuizingen/nieuw', 'Bedrijf\Planning::nieuw');
+    $routes->post('verhuizingen', 'Bedrijf\Planning::create');
+    $routes->get('verhuizingen/(:num)/bewerken', 'Bedrijf\Planning::edit/$1');
+    $routes->post('verhuizingen/(:num)', 'Bedrijf\Planning::update/$1');
+    $routes->post('verhuizingen/(:num)/ploeg', 'Bedrijf\Planning::ploeg/$1');
+    $routes->post('verhuizingen/(:num)/bewoner', 'Bedrijf\Planning::bewoner/$1');
+    $routes->get('medewerkers', 'Bedrijf\Medewerkers::index');
+    $routes->post('medewerkers/uitnodigen', 'Bedrijf\Medewerkers::invite');
+    $routes->post('medewerkers/(:num)/rol', 'Bedrijf\Medewerkers::setRol/$1');
+    $routes->post('medewerkers/(:num)/actief', 'Bedrijf\Medewerkers::setActief/$1');
+    $routes->post('uitnodigingen/(:num)/intrekken', 'Bedrijf\Medewerkers::revokeInvite/$1');
+});

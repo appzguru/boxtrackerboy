@@ -20,6 +20,9 @@
         <a href="<?= base_url('verhuizing') ?>" class="menu-row row"><?= icon('settings') ?><span style="flex:1;">Verhuizing en export</span></a>
       <?php endif ?>
       <?php if ($user): ?>
+        <?php if (access()->isBedrijfAdmin()): ?>
+        <a href="<?= base_url('bedrijf') ?>" class="menu-row row"><?= icon('list') ?><span style="flex:1;">Planning</span></a>
+        <?php endif ?>
         <?php if ($aantal > 1 || tenant()->isKlant()): ?>
         <a href="<?= base_url('verhuizingen') ?>" class="menu-row row"><?= icon('swap') ?><span style="flex:1;"><?= $aantal > 1 ? 'Andere verhuizing' : 'Nieuwe verhuizing starten' ?></span></a>
         <?php endif ?>

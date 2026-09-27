@@ -98,6 +98,11 @@ class Verhuizingen extends BaseController
     public function delete()
     {
         $verhuizing = access()->verhuizing();
+        // Een verhuizing van een bedrijf verwijdert alleen het kantoor, niet de bewoner.
+        $bedrijfId = db_connect()->table('verhuizingen')->select('bedrijf_id')->where('id', $verhuizing['id'])->get()->getRow()->bedrijf_id;
+        if ($bedrijfId !== null && ! access()->isBedrijfAdmin()) {
+            return redirect()->to('/verhuizing')->with('message', 'Deze verhuizing hoort bij ' . tenant()->merk()['naam'] . '; alleen zij kunnen hem verwijderen.');
+        }
         if (trim((string) $this->request->getPost('bevestig')) !== $verhuizing['naam']) {
             return redirect()->to('/verhuizing')->with('message', 'Typ de naam precies over om te verwijderen.');
         }

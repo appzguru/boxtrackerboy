@@ -13,6 +13,7 @@ use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
 use App\Filters\AccessFilter;
+use App\Filters\BedrijfFilter;
 use App\Filters\BeheerFilter;
 use App\Filters\MeekijkFilter;
 use App\Filters\TenantFilter;
@@ -39,6 +40,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'access'        => AccessFilter::class,
+        'bedrijf'       => BedrijfFilter::class,
         'beheer'        => BeheerFilter::class,
         'meekijken'     => MeekijkFilter::class,
         'tenant'        => TenantFilter::class,
