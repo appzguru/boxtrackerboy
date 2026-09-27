@@ -2,8 +2,9 @@
 <?= $this->section('content') ?>
 <div class="screen">
   <div class="content" style="gap:22px;padding-top:40px;">
-    <div style="width:48px;height:48px;border-radius:14px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;"><?= icon('box', 24) ?></div>
+    <?= merk_mark(48, 24) ?>
     <h1 class="page-title">Inloggen</h1>
+    <?php if (tenant()->isBedrijf()): ?><p class="page-sub merk-naam">bij <?= esc(tenant()->merk()['naam']) ?></p><?php endif ?>
     <?php if (str_starts_with($next, '/d/')): ?>
       <div class="msg msg-info">Deze doos hoort bij een verhuizing. Log in als je lid bent, of vraag de admin om een uitnodiging of een handjes-QR.</div>
     <?php endif ?>

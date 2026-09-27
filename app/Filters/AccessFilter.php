@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Libraries\Tenant;
 use App\Models\BoxModel;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
@@ -23,7 +24,8 @@ class AccessFilter implements FilterInterface
         helper(['access', 'url', 'icon', 'csrf', 'format']);
         $need   = $arguments[0] ?? 'sjouwer';
 
-        // Vóór de inlogcheck: een onbekende sticker hoort bij een andere omgeving.
+        // Vóór de inlogcheck: een sticker van een andere ingang (bedrijf ↔ klant-app) of een
+        // onbekende sticker (andere omgeving) gaat door naar waar hij hoort.
         if ($need === 'any' && ($fallback = $this->stickerFallback($request)) !== null) {
             return redirect()->to($fallback);
         }
@@ -69,17 +71,52 @@ class AccessFilter implements FilterInterface
     private function stickerFallback(RequestInterface $request): ?string
     {
         $base = rtrim(config('Boxtracker')->stickerFallbackURL, '/');
-        if ($base === '' || strtolower($request->getMethod()) !== 'get'
+        if (strtolower($request->getMethod()) !== 'get'
             || ! preg_match('#^/?d/(\d+)-([^/]+)$#', $request->getUri()->getPath(), $m)) {
             return null;
         }
 
         $loc = BoxModel::locateToken($m[2]);
         if ($loc && (int) $loc['nummer'] === (int) $m[1]) {
+            return $this->andereIngang((int) $loc['verhuizing_id'], '/d/' . $m[1] . '-' . rawurlencode($m[2]));
+        }
+
+        return $base !== '' ? $base . '/d/' . $m[1] . '-' . rawurlencode($m[2]) : null;
+    }
+
+    /**
+     * Hoort deze verhuizing bij een andere ingang, dan de URL daar (subdomein van het bedrijf,
+     * of de klant-app). Anders null. Niet op dev met devBedrijf: daar is alles één host.
+     */
+    private function andereIngang(int $verhuizingId, string $path): ?string
+    {
+        $config = config('Boxtracker');
+        if ($config->isDev() && $config->devBedrijf !== '') {
             return null;
         }
 
-        return $base . '/d/' . $m[1] . '-' . rawurlencode($m[2]);
+        $row = db_connect()->table('verhuizingen')
+            ->select('verhuizingen.bedrijf_id, bedrijven.subdomein')
+            ->join('bedrijven', 'bedrijven.id = verhuizingen.bedrijf_id', 'left')
+            ->where('verhuizingen.id', $verhuizingId)
+            ->get()->getRowArray();
+        $bedrijfId = isset($row['bedrijf_id']) ? (int) $row['bedrijf_id'] : null;
+        if (! $row || tenant()->owns($bedrijfId)) {
+            return null;
+        }
+        // Global-admin die meekijkt: de doos opent gewoon hier (alleen-lezen).
+        if (access()->meekijken() && access()->verhuizingId() === $verhuizingId) {
+            return null;
+        }
+
+        $url = $bedrijfId === null
+            ? rtrim(config('App')->baseURL, '/') . $path
+            : rtrim(Tenant::urlVoor($row['subdomein']), '/') . $path;
+
+        // Nooit naar dezelfde host terug (geen redirect-lus).
+        [$host] = explode(':', (string) service('request')->getServer('HTTP_HOST'), 2);
+
+        return strcasecmp((string) parse_url($url, PHP_URL_HOST), $host) === 0 ? null : $url;
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

@@ -19,6 +19,22 @@ if (! function_exists('tenant')) {
     }
 }
 
+if (! function_exists('merk_mark')) {
+    /**
+     * Logo van de ingang: het logo.svg van het bedrijf, of het Boxtracker-blokje (doos-icoon op
+     * de merkkleur). $px = hoogte van het blok, $icon = grootte van het doos-icoon.
+     */
+    function merk_mark(int $px = 48, ?int $icon = null): string
+    {
+        $merk = tenant()->merk();
+        if ($merk['logo']) {
+            return '<img class="merk-logo" src="' . esc(base_url($merk['logo']), 'attr') . '" alt="' . esc($merk['naam'], 'attr') . '" style="height:' . $px . 'px;width:auto;max-width:' . ($px * 4) . 'px;display:block;">';
+        }
+
+        return '<div class="merk-mark" style="width:' . $px . 'px;height:' . $px . 'px;border-radius:' . round($px * .3) . 'px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;">' . icon('box', $icon ?? (int) round($px / 2)) . '</div>';
+    }
+}
+
 if (! function_exists('random_code')) {
     /** Willekeurige code uit het overtypbare alfabet (zonder i, l, o, 0 en 1). */
     function random_code(int $length): string

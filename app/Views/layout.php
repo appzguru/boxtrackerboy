@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<?php $dev = config('Boxtracker')->isDev(); ?>
-<title><?= $dev ? 'DEV · ' : '' ?><?= esc($title ?? 'Boxtracker') ?></title>
+<?php $dev = config('Boxtracker')->isDev(); $merk = tenant()->merk(); ?>
+<title><?= $dev ? 'DEV · ' : '' ?><?= esc(str_replace('Boxtracker', $merk['naam'], $title ?? 'Boxtracker')) ?></title>
 <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
+<?php if ($merk['css']): ?><link rel="stylesheet" href="<?= base_url($merk['css']) ?>"><?php endif ?>
 <link rel="manifest" href="<?= base_url($dev ? 'manifest-dev.json' : 'manifest.json') ?>">
 <meta name="theme-color" content="<?= $dev ? '#3E6F87' : '#CA9E67' ?>">
 <link rel="icon" href="<?= base_url('assets/icons/favicon.ico') ?>">

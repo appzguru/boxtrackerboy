@@ -179,6 +179,23 @@ final class BedrijfScopingTest extends CIUnitTestCase
         $this->assertFalse($dicht->owns(null));
     }
 
+    public function testStickerBasePerIngang(): void
+    {
+        $this->assertStringContainsString('://verhuizer-a.boxtracker.nl', $this->tenant(self::HOST_A)->stickerBase());
+        $this->assertStringNotContainsString('verhuizer', $this->tenant(self::HOST_KLANT)->stickerBase());
+
+        // Op dev blijven stickers op dev, ook voor een bedrijf.
+        $cfg                = $this->cfg();
+        $cfg->omgeving      = 'dev';
+        $cfg->devBedrijf    = 'verhuizer-a';
+        $cfg->stickerBaseURL = 'https://dev.example';
+        config(Boxtracker::class)->omgeving       = 'dev';
+        config(Boxtracker::class)->stickerBaseURL = 'https://dev.example';
+        $this->assertSame('https://dev.example', (new Tenant('boxtracker.minisaas.nl', $cfg))->stickerBase());
+        config(Boxtracker::class)->omgeving       = '';
+        config(Boxtracker::class)->stickerBaseURL = '';
+    }
+
     public function testDevBedrijfAlleenOpDev(): void
     {
         $config             = $this->cfg();

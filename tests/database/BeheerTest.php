@@ -336,6 +336,43 @@ final class BeheerTest extends CIUnitTestCase
         $this->assertNull(db_connect()->table('sessions')->where('user_id', $this->ids['admin'])->get()->getRow()->meekijk_verhuizing_id);
     }
 
+    public function testStickerOpVerkeerdeIngangGaatDoor(): void
+    {
+        $this->als(null);
+        $response = $this->get('/d/1-toka1');
+        $response->assertRedirect();
+        $this->assertMatchesRegularExpression('#^https?://verhuizer-a\.boxtracker\.nl(:\d+)?/d/1-toka1$#', $response->getRedirectUrl());
+
+        $this->als(null, self::HOST_A);
+        $response = $this->get('/d/1-tokp');
+        $this->assertSame(rtrim(config('App')->baseURL, '/') . '/d/1-tokp', $response->getRedirectUrl());
+
+        // Op de eigen ingang: gewoon naar inloggen.
+        $this->als(null, self::HOST_A);
+        $this->assertStringContainsString('/login?next=', $this->get('/d/1-toka1')->getRedirectUrl());
+    }
+
+    public function testHuisstijlAlleenOpBedrijfsSubdomein(): void
+    {
+        db_connect()->table('bedrijven')->insert(['naam' => 'Kwiek Verhuist', 'subdomein' => 'kwiek']);
+
+        $this->als(null);
+        $response = $this->get('/login');
+        $response->assertDontSee('merken/');
+        $response->assertSee('<title>Inloggen — Boxtracker</title>');
+
+        $this->als(null, 'kwiek.boxtracker.nl');
+        $response = $this->get('/login');
+        $response->assertSee('merken/kwiek/merk.css');
+        $response->assertSee('merken/kwiek/logo.svg');
+        $response->assertSee('<title>Inloggen — Kwiek Verhuist</title>');
+        $response->assertSee('bij Kwiek Verhuist');
+
+        // Bedrijf zonder merkmap: gewone Boxtracker-stijl.
+        $this->als(null, self::HOST_A);
+        $this->get('/login')->assertDontSee('merken/');
+    }
+
     public function testMeekijkenNietBijParticulierOfZonderRechten(): void
     {
         $this->als('admin');

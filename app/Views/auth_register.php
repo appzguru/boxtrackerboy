@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <div class="screen">
   <div class="content" style="gap:22px;padding-top:40px;">
-    <div style="width:48px;height:48px;border-radius:14px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;"><?= icon('box', 24) ?></div>
+    <?= merk_mark(48, 24) ?>
     <?php $medewerker ??= null; ?>
     <?php if ($medewerker): ?>
       <h1 class="page-title">Welkom bij <?= esc($medewerker['bedrijf_naam']) ?></h1>

@@ -4,7 +4,7 @@
   <div class="content" style="padding:24px 20px 20px;gap:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;border-radius:11px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;"><?= icon('box', 20) ?></div>
+        <?= merk_mark(36, 20) ?>
         <div style="font-size:17px;font-weight:600;letter-spacing:-0.02em;">Boxtracker</div>
       </div>
       <a href="<?= base_url('menu') ?>" style="font-size:13px;font-weight:600;color:var(--text-dim);"><?= esc($account_naam) ?></a>

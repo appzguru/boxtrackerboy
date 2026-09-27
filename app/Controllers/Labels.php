@@ -70,7 +70,8 @@ class Labels extends BaseController
 
         return view('labels_print', [
             'title'   => 'Stickers printen — Boxtracker',
-            'baseUrl' => config('Boxtracker')->stickerBase(),
+            'baseUrl' => tenant()->stickerBase(),
+            'merk'    => tenant()->merk(),
             'preset'  => $preset,
             'sheets'  => $sheets,
             'aantal'  => count($batch['items']),
@@ -87,7 +88,7 @@ class Labels extends BaseController
         $this->response->setHeader('Content-Type', 'text/csv; charset=utf-8');
         $this->response->setHeader('Content-Disposition', 'attachment; filename="boxtracker-labels-' . date('Y-m-d-His') . '.csv"');
 
-        $base = config('Boxtracker')->stickerBase();
+        $base = tenant()->stickerBase();
         $out  = fopen('php://temp', 'w+');
         fwrite($out, "\xEF\xBB\xBF");
         fputcsv($out, ['nummer', 'code', 'url'], ';');

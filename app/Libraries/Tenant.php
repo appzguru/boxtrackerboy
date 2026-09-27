@@ -128,6 +128,46 @@ class Tenant
         return $this->isKlant() || $this->blok() === self::ACTIEF;
     }
 
+    /**
+     * Huisstijl van deze ingang (whitelabel-plan.md stap 3): handwerk per klant, als bestanden in
+     * public/merken/<subdomein>/ (merk.css, logo.svg). Ontbreekt iets, dan de Boxtracker-stijl.
+     *
+     * @return array{naam: string, css: ?string, logo: ?string, host: string}
+     */
+    public function merk(): array
+    {
+        $merk = ['naam' => 'Boxtracker', 'css' => null, 'logo' => null, 'host' => 'boxtracker.nl'];
+        if (! $this->isBedrijf()) {
+            return $merk;
+        }
+
+        $sub          = $this->bedrijf['subdomein'];
+        $merk['naam'] = $this->bedrijf['naam'];
+        $merk['host'] = $sub . '.' . config(Boxtracker::class)->tenantDomein;
+        foreach (['css' => 'merk.css', 'logo' => 'logo.svg'] as $key => $file) {
+            $pad = FCPATH . 'merken/' . $sub . '/' . $file;
+            if (is_file($pad)) {
+                $merk[$key] = 'merken/' . $sub . '/' . $file . '?v=' . filemtime($pad);
+            }
+        }
+
+        return $merk;
+    }
+
+    /**
+     * Basis-URL in de QR-code van nieuwe stickers: op een bedrijfssubdomein dat subdomein, anders
+     * boxtracker.stickerBaseURL. Op dev altijd de dev-URL (stickers blijven dan op dev).
+     */
+    public function stickerBase(): string
+    {
+        $config = config(Boxtracker::class);
+        if ($this->isBedrijf() && ! $config->isDev()) {
+            return rtrim(self::urlVoor($this->bedrijf['subdomein']), '/');
+        }
+
+        return $config->stickerBase();
+    }
+
     /** Id van het bedrijf bij deze hostnaam, anders null. */
     public function bedrijfId(): ?int
     {
