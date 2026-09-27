@@ -13,7 +13,7 @@ class Mailer
     public function sendAction(string $to, string $naam, string $subject, string $intro, string $url, string $buttonLabel, string $footer): bool
     {
         $html = view('emails/action', compact('subject', 'naam', 'intro', 'url', 'buttonLabel', 'footer'));
-        $text = "Hoi {$naam},\n\n{$intro}\n\n{$url}\n\n{$footer}\n";
+        $text = ($naam !== '' ? "Hoi {$naam}," : 'Hallo,') . "\n\n{$intro}\n\n{$url}\n\n{$footer}\n";
 
         return $this->dispatch($to, $subject, $html, $text);
     }

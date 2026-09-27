@@ -13,6 +13,9 @@ use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
 use App\Filters\AccessFilter;
+use App\Filters\BeheerFilter;
+use App\Filters\MeekijkFilter;
+use App\Filters\TenantFilter;
 
 class Filters extends BaseFilters
 {
@@ -36,6 +39,9 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'access'        => AccessFilter::class,
+        'beheer'        => BeheerFilter::class,
+        'meekijken'     => MeekijkFilter::class,
+        'tenant'        => TenantFilter::class,
     ];
 
     /**
@@ -74,6 +80,8 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
+            'tenant',     // onbekend subdomein → 404, geblokkeerd bedrijf → dicht
+            'meekijken',  // global-admin die meekijkt: alleen lezen
             'csrf',
             // 'honeypot',
             // 'invalidchars',

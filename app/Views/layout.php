@@ -14,8 +14,15 @@
 <meta name="apple-mobile-web-app-title" content="<?= $dev ? 'Boxtracker DEV' : 'Boxtracker' ?>">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
-<body<?= $dev ? ' class="env-dev"' : '' ?>>
+<?php $meekijken = access()->meekijken(); $bodyClass = trim(($dev ? 'env-dev ' : '') . ($meekijken ? 'meekijken' : '')); ?>
+<body<?= $bodyClass !== '' ? ' class="' . $bodyClass . '"' : '' ?>>
 <?php if ($dev): ?><div class="env-strip">DEV · testomgeving — niet je echte verhuizing</div><?php endif ?>
+<?php if ($meekijken): ?>
+<div class="meekijk-strip">
+  <span>Je kijkt mee · alleen lezen</span>
+  <form method="post" action="<?= base_url('beheer/meekijken/stop') ?>"><?= csrf_field() ?><button type="submit">Stoppen</button></form>
+</div>
+<?php endif ?>
 <?php if (access()->verhuizingId()): ?>
 <div class="app-topbar" id="app-topbar">
   <a href="<?= base_url('/') ?>" class="app-topbar-btn" aria-label="Naar start"><?= icon('box', 20) ?></a>

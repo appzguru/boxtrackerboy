@@ -15,14 +15,27 @@ class Verhuizingen extends BaseController
             'title'       => 'Verhuizingen — Boxtracker',
             'memberships' => $access->memberships(),
             'activeId'    => $access->verhuizingId(),
-            'magNieuw'    => count($access->memberships()) < config('Boxtracker')->maxVerhuizingenPerAccount,
+            'magNieuw'    => $this->magNieuw(),
         ]);
+    }
+
+    /**
+     * Zelf een verhuizing beginnen kan alleen in de klant-app. Op een bedrijfssubdomein maakt
+     * de planner verhuizingen aan (whitelabel-plan.md stap 4).
+     */
+    private function magNieuw(): bool
+    {
+        return tenant()->isKlant() && count(access()->memberships()) < config('Boxtracker')->maxVerhuizingenPerAccount;
     }
 
     public function create()
     {
         $user = access()->user();
         $naam = trim((string) $this->request->getPost('naam'));
+
+        if (! tenant()->isKlant()) {
+            return redirect()->to('/verhuizingen');
+        }
 
         if ($naam === '' || mb_strlen($naam) > 80) {
             return redirect()->to('/verhuizingen')->with('message', 'Geef de verhuizing een naam (max. 80 tekens).');

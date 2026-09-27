@@ -23,11 +23,13 @@ $routes->get('/verifieer/(:segment)', 'Auth::verify/$1');
 $routes->get('/uitnodiging/(:segment)', 'Uitnodiging::show/$1');
 $routes->get('/h/(:segment)', 'Handjes::join/$1');
 $routes->post('/h/(:segment)', 'Handjes::doJoin/$1');
+$routes->get('/medewerker/(:segment)', 'Bedrijf\Medewerker::show/$1');
 
 // Account (verhuizing niet nodig)
 $routes->group('', ['filter' => 'access:user'], static function ($routes) {
     $routes->post('/verifieer/opnieuw', 'Auth::resendVerification');
     $routes->post('/uitnodiging/(:segment)', 'Uitnodiging::accept/$1');
+    $routes->post('/medewerker/(:segment)', 'Bedrijf\Medewerker::accept/$1');
     $routes->get('/verhuizingen', 'Verhuizingen::index');
     $routes->post('/verhuizingen', 'Verhuizingen::create');
     $routes->post('/verhuizingen/(:num)/kies', 'Verhuizingen::choose/$1');
@@ -93,4 +95,16 @@ $routes->group('', ['filter' => 'access:admin'], static function ($routes) {
     $routes->get('/verhuizing', 'Verhuizingen::settings');
     $routes->post('/verhuizing', 'Verhuizingen::rename');
     $routes->post('/verhuizing/verwijderen', 'Verhuizingen::delete');
+});
+
+// Global-admin (whitelabel): alleen op app.boxtracker.nl en alleen voor platform_admins.
+$routes->group('beheer', ['filter' => 'beheer'], static function ($routes) {
+    $routes->get('/', 'Beheer\Bedrijven::index');
+    $routes->post('bedrijven', 'Beheer\Bedrijven::create');
+    $routes->get('bedrijven/(:num)', 'Beheer\Bedrijven::show/$1');
+    $routes->post('bedrijven/(:num)/status', 'Beheer\Bedrijven::setStatus/$1');
+    $routes->post('bedrijven/(:num)/uitnodigen', 'Beheer\Bedrijven::invite/$1');
+    $routes->post('uitnodigingen/(:num)/intrekken', 'Beheer\Bedrijven::revokeInvite/$1');
+    $routes->post('meekijken/stop', 'Beheer\Meekijken::stop');
+    $routes->post('meekijken/(:num)', 'Beheer\Meekijken::start/$1');
 });

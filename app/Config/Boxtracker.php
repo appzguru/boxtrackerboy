@@ -30,6 +30,24 @@ class Boxtracker extends BaseConfig
         return $this->omgeving === 'dev';
     }
 
+    /**
+     * Whitelabel: `<subdomein>.<tenantDomein>` is de ingang van een bedrijf (App\Libraries\Tenant).
+     * Lokaal testen kan met `boxtracker.tenantDomein = localtest.me` en dan
+     * http://<subdomein>.localtest.me:8080 (wijst altijd naar je eigen machine).
+     */
+    public string $tenantDomein = 'boxtracker.nl';
+
+    /** Subdomeinen die nooit een bedrijf zijn. */
+    public array $gereserveerdeSubdomeinen = [
+        'app', 'www', 'mail', 'ftp', 'pop', 'smtp', 'portfolio', 'beheer', 'api', 'dev',
+    ];
+
+    /**
+     * Alleen op de testomgeving (omgeving = dev): doe alsof elk verzoek op het subdomein van
+     * dit bedrijf binnenkomt. Zo is de bedrijfsversie te testen zonder eigen hostnaam.
+     */
+    public string $devBedrijf = '';
+
     /** Limieten tegen misbruik (handoff.md §9). */
     public int $maxLabelsPerKeer          = 60;
     public int $maxDozenPerVerhuizing     = 1000;

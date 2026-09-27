@@ -18,7 +18,7 @@
             <button type="submit" class="menu-row row" style="width:100%;text-align:left;<?= (int) $m['id'] === $activeId ? 'background:var(--blue-tint);' : '' ?>">
               <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
                 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= esc($m['naam']) ?></span>
-                <span class="sub"><?= $m['rol'] === 'admin' ? 'Admin' : 'Helper' ?> · <?= (int) $m['dozen'] ?> <?= (int) $m['dozen'] === 1 ? 'doos' : 'dozen' ?></span>
+                <span class="sub"><?= ['admin' => 'Admin', 'helper' => 'Helper', 'sjouwer' => 'Sjouwer'][$m['rol']] ?? 'Helper' ?> · <?= (int) $m['dozen'] ?> <?= (int) $m['dozen'] === 1 ? 'doos' : 'dozen' ?></span>
               </span>
               <?php if ((int) $m['id'] === $activeId): ?><span style="color:var(--blue);"><?= icon('check') ?></span><?php endif ?>
             </button>
@@ -26,7 +26,9 @@
         <?php endforeach ?>
       </div>
     <?php else: ?>
-      <p class="page-sub">Je bent nog geen lid van een verhuizing. Start er zelf een, of vraag iemand om een uitnodigingslink.</p>
+      <p class="page-sub"><?= tenant()->isKlant()
+          ? 'Je bent nog geen lid van een verhuizing. Start er zelf een, of vraag iemand om een uitnodigingslink.'
+          : 'Je bent nog niet aan een verhuizing toegewezen. Zodra de planner dat doet, staat hij hier.' ?></p>
     <?php endif ?>
 
     <?php if ($magNieuw): ?>

@@ -29,12 +29,18 @@ class InviteModel extends Model
         return $this->find($id);
     }
 
-    /** Geldige (niet gebruikte, ingetrokken of verlopen) uitnodiging, met naam van verhuizing en uitnodiger. */
+    /**
+     * Geldige (niet gebruikte, ingetrokken of verlopen) uitnodiging, met naam van verhuizing en
+     * uitnodiger. Alleen voor een verhuizing die bij deze ingang hoort (klant-app of bedrijf).
+     */
     public function findUsable(string $token): ?array
     {
         if (! preg_match('/^[a-f0-9]{32}$/', $token)) {
             return null;
         }
+
+        helper('access');
+        tenant()->scope($this);
 
         return $this->select('invites.*, verhuizingen.naam AS verhuizing_naam, users.naam AS door_naam')
             ->join('verhuizingen', 'verhuizingen.id = invites.verhuizing_id')

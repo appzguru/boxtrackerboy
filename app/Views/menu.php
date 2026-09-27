@@ -20,8 +20,13 @@
         <a href="<?= base_url('verhuizing') ?>" class="menu-row row"><?= icon('settings') ?><span style="flex:1;">Verhuizing en export</span></a>
       <?php endif ?>
       <?php if ($user): ?>
+        <?php if ($aantal > 1 || tenant()->isKlant()): ?>
         <a href="<?= base_url('verhuizingen') ?>" class="menu-row row"><?= icon('swap') ?><span style="flex:1;"><?= $aantal > 1 ? 'Andere verhuizing' : 'Nieuwe verhuizing starten' ?></span></a>
+        <?php endif ?>
         <a href="<?= base_url('account') ?>" class="menu-row row"><?= icon('user') ?><span style="flex:1;">Mijn account</span></a>
+        <?php if (tenant()->isKlant() && access()->isPlatformAdmin()): ?>
+        <a href="<?= base_url('beheer') ?>" class="menu-row row"><?= icon('settings') ?><span style="flex:1;">Beheer</span></a>
+        <?php endif ?>
       <?php endif ?>
       <form method="post" action="<?= base_url('logout') ?>" style="margin:0;">
         <?= csrf_field() ?>

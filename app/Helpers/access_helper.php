@@ -11,6 +11,14 @@ if (! function_exists('access')) {
     }
 }
 
+if (! function_exists('tenant')) {
+    /** Klant-app of bedrijfssubdomein — zie App\Libraries\Tenant. */
+    function tenant(): App\Libraries\Tenant
+    {
+        return service('tenant');
+    }
+}
+
 if (! function_exists('random_code')) {
     /** Willekeurige code uit het overtypbare alfabet (zonder i, l, o, 0 en 1). */
     function random_code(int $length): string

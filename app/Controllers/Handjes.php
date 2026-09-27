@@ -78,14 +78,14 @@ class Handjes extends BaseController
         return redirect()->to('/handjes');
     }
 
-    /** Geldige pass bij deze QR-code (nog binnen de 15 minuten), met verhuizingnaam. */
+    /** Geldige pass bij deze QR-code (nog binnen de 15 minuten), met verhuizingnaam — alleen bij deze ingang. */
     private function usablePass(string $code): ?array
     {
         if (! preg_match('/^[a-f0-9]{32}$/', $code)) {
             return null;
         }
 
-        return db_connect()->table('guest_passes')
+        return tenant()->scope(db_connect()->table('guest_passes'))
             ->select('guest_passes.*, verhuizingen.naam AS verhuizing_naam')
             ->join('verhuizingen', 'verhuizingen.id = guest_passes.verhuizing_id')
             ->where('guest_passes.code', $code)

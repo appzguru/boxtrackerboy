@@ -32,13 +32,32 @@ CREATE TABLE IF NOT EXISTS user_tokens (
     CONSTRAINT fk_user_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Bedrijven (whitelabel, whitelabel-plan.md): subdomein = het deel vóór .boxtracker.nl.
+-- De huisstijl staat niet hier maar als bestanden in public/merken/<subdomein>/.
+CREATE TABLE IF NOT EXISTS bedrijven (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    naam VARCHAR(120) NOT NULL,
+    subdomein VARCHAR(40) NOT NULL,
+    status ENUM('actief', 'geblokkeerd') NOT NULL DEFAULT 'actief',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_bedrijven_subdomein (subdomein)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- bedrijf_id NULL = particuliere verhuizing (klant-app op app.boxtracker.nl).
 CREATE TABLE IF NOT EXISTS verhuizingen (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     naam VARCHAR(80) NOT NULL,
+    bedrijf_id INT UNSIGNED NULL,
+    verhuisdatum DATE NULL,
+    adres_van VARCHAR(160) NULL,
+    adres_naar VARCHAR(160) NULL,
     created_by INT UNSIGNED NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    CONSTRAINT fk_verhuizingen_user FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL
+    KEY idx_verhuizingen_bedrijf (bedrijf_id, verhuisdatum),
+    CONSTRAINT fk_verhuizingen_user FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT fk_verhuizingen_bedrijf FOREIGN KEY (bedrijf_id) REFERENCES bedrijven (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -46,20 +65,22 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id INT UNSIGNED NOT NULL,
     token CHAR(64) NOT NULL,
     active_verhuizing_id INT UNSIGNED NULL,
+    meekijk_verhuizing_id INT UNSIGNED NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_used_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_sessions_token (token),
     KEY idx_sessions_user (user_id),
     CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT fk_sessions_verhuizing FOREIGN KEY (active_verhuizing_id) REFERENCES verhuizingen (id) ON DELETE SET NULL
+    CONSTRAINT fk_sessions_verhuizing FOREIGN KEY (active_verhuizing_id) REFERENCES verhuizingen (id) ON DELETE SET NULL,
+    CONSTRAINT fk_sessions_meekijk FOREIGN KEY (meekijk_verhuizing_id) REFERENCES verhuizingen (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS memberships (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     verhuizing_id INT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
-    rol ENUM('admin', 'helper') NOT NULL DEFAULT 'helper',
+    rol ENUM('admin', 'helper', 'sjouwer') NOT NULL DEFAULT 'helper',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_memberships (verhuizing_id, user_id),
@@ -187,4 +208,64 @@ CREATE TABLE IF NOT EXISTS photos (
     KEY idx_photos_box_id (box_id),
     CONSTRAINT fk_photos_box FOREIGN KEY (box_id) REFERENCES boxes (id) ON DELETE CASCADE,
     CONSTRAINT fk_photos_verhuizing FOREIGN KEY (verhuizing_id) REFERENCES verhuizingen (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Vaste medewerkers van een bedrijf (whitelabel). Een medewerker is een gewoon account.
+-- planner en sales zijn admin in álle verhuizingen van hun bedrijf, inpakker en sjouwer
+-- alleen in de verhuizingen waar ze via memberships aan zijn toegewezen.
+-- Voor de pilot hoort een account bij hooguit één bedrijf (uq_bedrijf_medewerkers_user).
+CREATE TABLE IF NOT EXISTS bedrijf_medewerkers (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    bedrijf_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    rol ENUM('planner', 'sales', 'inpakker', 'sjouwer') NOT NULL,
+    actief TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_bedrijf_medewerkers_user (user_id),
+    KEY idx_bedrijf_medewerkers_bedrijf (bedrijf_id),
+    CONSTRAINT fk_bedrijf_medewerkers_bedrijf FOREIGN KEY (bedrijf_id) REFERENCES bedrijven (id) ON DELETE CASCADE,
+    CONSTRAINT fk_bedrijf_medewerkers_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Uitnodiging om medewerker van een bedrijf te worden (7 dagen, eenmalig). Landt op het subdomein.
+CREATE TABLE IF NOT EXISTS medewerker_uitnodigingen (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    bedrijf_id INT UNSIGNED NOT NULL,
+    email VARCHAR(190) NOT NULL,
+    rol ENUM('planner', 'sales', 'inpakker', 'sjouwer') NOT NULL,
+    token CHAR(32) NOT NULL,
+    created_by INT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    used_by INT UNSIGNED NULL,
+    used_at DATETIME NULL,
+    revoked_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_medewerker_uitnodigingen_token (token),
+    KEY idx_medewerker_uitnodigingen_bedrijf (bedrijf_id),
+    CONSTRAINT fk_medewerker_uitnodigingen_bedrijf FOREIGN KEY (bedrijf_id) REFERENCES bedrijven (id) ON DELETE CASCADE,
+    CONSTRAINT fk_medewerker_uitnodigingen_creator FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT fk_medewerker_uitnodigingen_user FOREIGN KEY (used_by) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Global-admins (beheer op app.boxtracker.nl/beheer). Alleen met de hand vullen.
+CREATE TABLE IF NOT EXISTS platform_admins (
+    user_id INT UNSIGNED NOT NULL,
+    PRIMARY KEY (user_id),
+    CONSTRAINT fk_platform_admins_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Wat een global-admin deed: bedrijf aanmaken/blokkeren, uitnodigen, meekijken.
+-- Geen foreign keys: het log blijft staan als een bedrijf of verhuizing weg is.
+CREATE TABLE IF NOT EXISTS beheer_log (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INT UNSIGNED NULL,
+    bedrijf_id INT UNSIGNED NULL,
+    verhuizing_id INT UNSIGNED NULL,
+    actie VARCHAR(60) NOT NULL,
+    detail VARCHAR(200) NULL,
+    op DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_beheer_log_bedrijf (bedrijf_id, op)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

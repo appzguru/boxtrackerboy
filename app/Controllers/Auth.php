@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Libraries\Access;
 use App\Libraries\Mailer;
 use App\Models\InviteModel;
+use App\Models\MedewerkerUitnodigingModel;
 use App\Models\UserModel;
 use App\Models\VerhuizingModel;
 
@@ -31,13 +32,37 @@ class Auth extends BaseController
             return redirect()->to('/');
         }
 
-        $invite = $this->inviteFromRequest();
+        $invite     = $this->inviteFromRequest();
+        $medewerker = $this->medewerkerInviteFromRequest();
+        if (! $invite && ! $medewerker && ! tenant()->isKlant()) {
+            return $this->alleenMetUitnodiging();
+        }
 
         return $this->view('auth_register', [
-            'title'  => 'Account aanmaken — Boxtracker',
-            'invite' => $invite,
-            'old'    => [],
+            'title'      => 'Account aanmaken — Boxtracker',
+            'invite'     => $invite,
+            'medewerker' => $medewerker,
+            'old'        => $medewerker ? ['email' => $medewerker['email']] : [],
         ]);
+    }
+
+    /** Op een bedrijfssubdomein maak je alleen een account aan via een uitnodiging. */
+    private function alleenMetUitnodiging(): string
+    {
+        return $this->view('auth_message', [
+            'title' => 'Account aanmaken',
+            'kop'   => 'Alleen met een uitnodiging',
+            'tekst' => 'Hier maak je een account aan via de uitnodigingslink die je van je verhuizer hebt gekregen. Heb je al een account? Log dan in.',
+            'knop'  => ['url' => '/login', 'label' => 'Inloggen'],
+        ]);
+    }
+
+    /** Uitnodiging als medewerker van het bedrijf van deze ingang (whitelabel). */
+    private function medewerkerInviteFromRequest(): ?array
+    {
+        $token = (string) ($this->request->getGetPost('medewerker') ?? '');
+
+        return $token !== '' ? (new MedewerkerUitnodigingModel())->findUsable($token) : null;
     }
 
     private function inviteFromRequest(): ?array
@@ -49,28 +74,46 @@ class Auth extends BaseController
 
     public function register()
     {
-        $invite   = $this->inviteFromRequest();
+        $invite     = $this->inviteFromRequest();
+        $medewerker = $invite ? null : $this->medewerkerInviteFromRequest();
+        if (! $invite && ! $medewerker && ! tenant()->isKlant()) {
+            return $this->alleenMetUitnodiging();
+        }
         $naam     = trim((string) $this->request->getPost('naam'));
-        $email    = trim((string) $this->request->getPost('email'));
+        // Een medewerker-uitnodiging hoort bij één e-mailadres.
+        $email    = $medewerker ? $medewerker['email'] : trim((string) $this->request->getPost('email'));
         $password = (string) $this->request->getPost('password');
         $vhNaam   = trim((string) $this->request->getPost('verhuizing'));
 
         $users = new UserModel();
         $fout  = $this->throttle('register' . $this->request->getIPAddress(), 5) ? $users->validateNew($naam, $email, $password) : 'Te veel pogingen. Probeer het over een kwartier opnieuw.';
-        if (! $fout && ! $invite && mb_strlen($vhNaam) > 80) {
+        if (! $fout && ! $invite && ! $medewerker && mb_strlen($vhNaam) > 80) {
             $fout = 'De naam van de verhuizing is te lang.';
         }
 
         if ($fout) {
             return $this->view('auth_register', [
-                'title'  => 'Account aanmaken — Boxtracker',
-                'invite' => $invite,
-                'fout'   => $fout,
-                'old'    => ['naam' => $naam, 'email' => $email, 'verhuizing' => $vhNaam],
+                'title'      => 'Account aanmaken — Boxtracker',
+                'invite'     => $invite,
+                'medewerker' => $medewerker,
+                'fout'       => $fout,
+                'old'        => ['naam' => $naam, 'email' => $email, 'verhuizing' => $vhNaam],
             ]);
         }
 
         $userId = $users->createUser($naam, $email, $password);
+
+        // Medewerker: de uitnodigingsmail bewijst het e-mailadres al. Geen eigen verhuizing;
+        // de planner wijst verhuizingen toe.
+        if ($medewerker) {
+            $users->update($userId, ['email_verified_at' => date('Y-m-d H:i:s')]);
+            (new MedewerkerUitnodigingModel())->accept($medewerker, $users->find($userId));
+            $response = redirect()->to('/verhuizingen');
+            login_user($userId, $response);
+
+            return $response;
+        }
+
         $users->sendVerification($users->find($userId));
 
         // Via een uitnodiging: direct lid, géén eigen verhuizing. Anders: eigen verhuizing als admin.

@@ -21,7 +21,7 @@
     <span style="font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#1A140E;">Boxtracker</span>
   </td></tr>
   <tr><td style="padding:28px 28px 8px;font-family:Arial,Helvetica,sans-serif;">
-    <p style="margin:0 0 16px;font-size:15px;line-height:1.5;color:#1A140E;">Hoi <?= esc($naam) ?>,</p>
+    <p style="margin:0 0 16px;font-size:15px;line-height:1.5;color:#1A140E;"><?= $naam !== '' ? 'Hoi ' . esc($naam) . ',' : 'Hallo,' ?></p>
     <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#1A140E;"><?= esc($intro) ?></p>
     <table role="presentation" cellpadding="0" cellspacing="0">
       <tr><td style="border-radius:10px;background:#936037;border:2px solid #1A140E;">

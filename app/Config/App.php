@@ -199,4 +199,20 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    /**
+     * Whitelabel: een bedrijfssubdomein (`<sub>.boxtracker.nl`) toestaan als hostnaam, zodat
+     * links, redirects en mails op dat subdomein blijven. Of het bedrijf echt bestaat,
+     * controleert de tenant-filter (App\Filters\TenantFilter).
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        [$host] = explode(':', (string) ($_SERVER['HTTP_HOST'] ?? ''), 2);
+        $domein = strtolower(config(Boxtracker::class)->tenantDomein);
+        if ($domein !== '' && preg_match('/^[a-z0-9-]+\.' . preg_quote($domein, '/') . '$/', strtolower($host))) {
+            $this->allowedHostnames[] = $host;
+        }
+    }
 }

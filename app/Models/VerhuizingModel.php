@@ -10,14 +10,14 @@ class VerhuizingModel extends Model
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['naam', 'created_by'];
+    protected $allowedFields = ['naam', 'created_by', 'bedrijf_id'];
 
-    /** Nieuwe verhuizing met de maker als admin. */
-    public function createFor(int $userId, string $naam): int
+    /** Nieuwe verhuizing met de maker als admin. bedrijf_id null = particulier (klant-app). */
+    public function createFor(int $userId, string $naam, ?int $bedrijfId = null): int
     {
         $db = db_connect();
         $db->transStart();
-        $id = (int) $this->insert(['naam' => $naam, 'created_by' => $userId], true);
+        $id = (int) $this->insert(['naam' => $naam, 'created_by' => $userId, 'bedrijf_id' => $bedrijfId], true);
         $db->table('memberships')->insert([
             'verhuizing_id' => $id,
             'user_id'       => $userId,

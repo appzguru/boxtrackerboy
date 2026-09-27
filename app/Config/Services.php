@@ -29,6 +29,16 @@ class Services extends BaseService
         return new \App\Libraries\Access();
     }
 
+    /** Via welke ingang (klant-app of bedrijfssubdomein) komt dit verzoek. Zie App\Libraries\Tenant. */
+    public static function tenant(bool $getShared = true): \App\Libraries\Tenant
+    {
+        if ($getShared) {
+            return static::getSharedInstance('tenant');
+        }
+
+        return new \App\Libraries\Tenant((string) service('request')->getServer('HTTP_HOST'));
+    }
+
     /*
      * public static function example($getShared = true)
      * {
