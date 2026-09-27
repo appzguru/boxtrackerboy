@@ -10,6 +10,7 @@ use CodeIgniter\Router\RouteCollection;
 //   access:sjouwer / helper / admin — minstens die rol in de actieve verhuizing
 
 // Publiek
+$routes->get('/health', 'Health::index');  // externe uptimecheck, zie Controllers/Health
 $routes->get('/login', 'Auth::loginForm');
 $routes->post('/login', 'Auth::login');
 $routes->post('/logout', 'Auth::logout');

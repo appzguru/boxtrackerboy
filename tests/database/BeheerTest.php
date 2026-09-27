@@ -384,4 +384,15 @@ final class BeheerTest extends CIUnitTestCase
         $this->assertSame([], $this->log());
         $this->assertSame(0, db_connect()->table('sessions')->where('meekijk_verhuizing_id IS NOT NULL')->countAllResults());
     }
+
+    public function testHealth(): void
+    {
+        $this->als(null);
+        $response = $this->get('/health');
+        $json     = json_decode($response->getJSON(), true);
+        $this->assertSame('ok', $json['checks']['database']);
+        $this->assertSame('ok', $json['checks']['opslag']);
+        $this->assertArrayHasKey('mail', $json['checks']);
+        $this->assertStringNotContainsString(WRITEPATH, $response->getJSON());
+    }
 }

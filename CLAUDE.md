@@ -102,6 +102,46 @@ Schemawijzigingen gaan niet mee — apart live draaien.
   Stuurt `http://boxtracker.nl` nog **niet** door naar https.
 - Landingspagina + privacyverklaring (`landing/`) staan live via `bash deploy-landing.sh`.
 
+## Whitelabel (bedrijven op `<sub>.boxtracker.nl`)
+
+Plan: [whitelabel-plan.md](whitelabel-plan.md). Eén codebase, twee ingangen:
+
+- **Ingang = hostnaam** ([app/Libraries/Tenant.php](app/Libraries/Tenant.php), `tenant()`):
+  klant-app (app., hoofddomein, gereserveerde subdomeinen) of een bedrijf. Onbekend subdomein →
+  404 ([TenantFilter](app/Filters/TenantFilter.php)). Nergens anders naar hostnamen kijken.
+- **Scheiding** in [Access](app/Libraries/Access.php): alleen verhuizingen van de eigen ingang
+  (`bedrijf_id` NULL = particulier). Planner/sales = admin in alle verhuizingen van hun bedrijf;
+  inpakker (helper), sjouwer en bewoner via `memberships`. Lektests:
+  `tests/database/BedrijfScopingTest.php`, `BeheerTest.php`, `PlanningTest.php` — elke nieuwe
+  bedrijfsroute krijgt een test "bedrijf B kan hier niet bij".
+- **Blokkeren** (beheer): softblock = geen nieuwe verhuizingen; hardblock = medewerkers (en hun
+  gasten) kunnen nergens bij. Klanten (bewoners) merken van beide niets.
+- **Beheer** op app.boxtracker.nl/beheer voor `platform_admins` (met de hand vullen): bedrijven,
+  blokkeren met memo, eerste planner uitnodigen, meekijken (alleen-lezen, gelogd in `beheer_log`).
+- **Kantoor** op `<sub>/bedrijf` (planner, sales): planning, verhuizing aanmaken/toewijzen,
+  medewerkers, opname met risico's. **Opname** op `/opname` (bewoner, inpakker).
+- **Huisstijl** = handwerk per klant: `public/merken/<subdomein>/merk.css` + `logo.svg` (zie het
+  fictieve demomerk `public/merken/kwiek`). Stickers krijgen dan logo en subdomein, de QR wijst
+  naar het subdomein. Nooit een echt merk live zonder toestemming.
+- **Wildcard-subdomein** `*.boxtracker.nl` moet in het zxcs-paneel naar `public_html/app/public`
+  wijzen (nog regelen vóór de eerste klant).
+- **Lokaal testen**: `boxtracker.tenantDomein = localtest.me` in `.env` (staat er), dan
+  http://kwiek.localtest.me:8080. **Op dev**: `boxtracker.devBedrijf = <subdomein>` in de server-`.env`
+  laat heel dev dat bedrijf zijn (`/beheer` werkt dan niet; weer leegmaken).
+- **Schema-upgrades** voor bestaande databases: `sql/upgrade-2026-09-*.sql` (eenmalig), plus
+  `sql/schema.sql` voor nieuwe tabellen. Dev en prd zijn bijgewerkt t/m de opname-tabellen: prd
+  nog niet voor `opname_*` (draai `sql/schema.sql` vóór de volgende prd-deploy).
+
+## Bewaking en back-up
+
+- **`/health`** ([Controllers/Health.php](app/Controllers/Health.php)): JSON met database, opslag
+  en mail als ok/fout; 200 of 503. Voor een externe uptimecheck (UptimeRobot / Better Stack) elke
+  minuut op https://app.boxtracker.nl/health, plus de inlogpagina.
+- **Back-up op de server**: [scripts/backup.sh](scripts/backup.sh) (database + uploads naar
+  `~/backups/boxtracker`, 14 dagen). Cronjob instellen in het zxcs-paneel (geen crontab via SSH).
+- **Buiten zxcs**: [scripts/backup-ophalen.sh](scripts/backup-ophalen.sh) op een eigen machine of
+  NAS, dagelijks. Eén keer een terugzet-test doen.
+
 ## Repository
 
 GitHub: `git@github.com:appzguru/boxtrackerboy.git` (zie credentials.md). `master`, `familie`
