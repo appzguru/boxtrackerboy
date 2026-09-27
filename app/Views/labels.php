@@ -6,6 +6,7 @@
   </div>
   <div class="content" style="gap:20px;">
     <h1 style="font-size:32px;font-weight:700;letter-spacing:-0.035em;">Labels</h1>
+    <?php if (session()->getFlashdata('message')): ?><div class="card" style="font-size:15px;"><?= esc(session()->getFlashdata('message')) ?></div><?php endif ?>
 
     <div class="card" style="display:flex;flex-direction:column;gap:16px;">
       <div>
@@ -16,18 +17,20 @@
         <?= csrf_field() ?>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <label class="label" for="aantal">Aantal dozen</label>
-          <input class="field" type="number" id="aantal" name="aantal" value="6" min="1" max="300" style="height:52px;">
+          <input class="field" type="number" id="aantal" name="aantal" value="6" min="1" max="<?= (int) $max ?>" style="height:52px;">
         </div>
         <button type="submit" class="btn btn-primary"><?= icon('labels') ?> Genereren en printen</button>
       </form>
     </div>
 
+    <?php if (access()->can('admin')): ?>
     <a href="<?= base_url('import') ?>" class="card row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
       <div>
         <div style="font-size:16px;font-weight:600;">CSV importeren</div>
         <div style="font-size:14px;color:var(--text-dim);margin-top:2px;">Heb je elders al een lijst met nummer/code gemaakt? Lees die hier in.</div>
       </div>
     </a>
+    <?php endif ?>
   </div>
 </div>
 <?= $this->endSection() ?>

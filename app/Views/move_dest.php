@@ -60,7 +60,7 @@ document.querySelectorAll('.pick-dest').forEach(function (btn) {
 
   function startPress() {
     longPressed = false;
-    btn.style.backgroundColor = '#FDE8E8';
+    btn.style.backgroundColor = '#FDECEA';
     pressTimer = setTimeout(function () {
       longPressed = true;
       if (navigator.vibrate) navigator.vibrate(30);

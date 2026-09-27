@@ -20,32 +20,30 @@ class Overview extends BaseController
 
     public function index()
     {
-        $db     = db_connect();
-        $eigenaar = trim((string) $this->request->getGet('eigenaar'));
+        // Eigenaar is inhoud-informatie: sjouwers filteren er niet op (handoff.md §2).
+        $magEigenaar = access()->can('helper');
+        $eigenaar    = $magEigenaar ? trim((string) $this->request->getGet('eigenaar')) : '';
 
-        $builder = $db->table('boxes')->where('status !=', 'leeg');
+        $boxes = new BoxModel();
+        $boxes->where('status !=', 'leeg');
         if ($eigenaar !== '') {
-            $builder->where('eigenaar', $eigenaar);
+            $boxes->where('eigenaar', $eigenaar);
         }
-        $rows = $builder->get()->getResultArray();
+        $rows = $boxes->findAll();
 
-        $eigenaars = array_column(
-            $db->table('boxes')->distinct()->select('eigenaar')->where('eigenaar IS NOT NULL')->where('eigenaar !=', '')->orderBy('eigenaar')->get()->getResultArray(),
+        $eigenaars = $magEigenaar ? array_column(
+            (new BoxModel())->distinct()->select('eigenaar')->where('eigenaar IS NOT NULL')->where('eigenaar !=', '')->orderBy('eigenaar')->findAll(),
             'eigenaar'
-        );
-
-        $perStatus = $this->groupBy($rows, 'status');
-        $perPlek   = $this->groupBy($rows, 'huidige_locatie');
-        $perDoel   = $this->groupBy($rows, 'einddoel');
+        ) : [];
 
         return $this->view('overview', [
             'title'     => 'Overzicht — Boxtracker',
             'totaal'    => count($rows),
             'eigenaar'  => $eigenaar,
             'eigenaars' => $eigenaars,
-            'perStatus' => $perStatus,
-            'perPlek'   => $perPlek,
-            'perDoel'   => $perDoel,
+            'perStatus' => $this->groupBy($rows, 'status'),
+            'perPlek'   => $this->groupBy($rows, 'huidige_locatie'),
+            'perDoel'   => $this->groupBy($rows, 'einddoel'),
         ]);
     }
 
@@ -55,8 +53,7 @@ class Overview extends BaseController
         $val  = $this->request->getGet('val');
         $sort = $this->request->getGet('sort') === 'recent' ? 'recent' : 'nr';
 
-        $boxes = new BoxModel();
-        $builder = $boxes->where('status !=', 'leeg');
+        $builder = (new BoxModel())->where('status !=', 'leeg');
 
         $titel = 'Alle dozen';
         if ($kind === 'status' && $val) {
@@ -74,7 +71,7 @@ class Overview extends BaseController
         } elseif ($kind === 'doel' && $val) {
             $builder->where('einddoel', $val === 'Nog niet bepaald' ? null : $val);
             $titel = $val;
-        } elseif ($kind === 'eigenaar' && $val) {
+        } elseif ($kind === 'eigenaar' && $val && access()->can('helper')) {
             $builder->where('eigenaar', $val);
             $titel = $val;
         }

@@ -25,7 +25,7 @@ abstract class BaseController extends Controller
      * The creation of dynamic property is deprecated in PHP 8.2.
      */
 
-    protected $helpers = ['url', 'form', 'account', 'format', 'icon', 'filesystem', 'csrf'];
+    protected $helpers = ['url', 'form', 'access', 'format', 'icon', 'filesystem', 'csrf'];
 
     /**
      * @return void
@@ -36,11 +36,19 @@ abstract class BaseController extends Controller
         parent::initController($request, $response, $logger);
     }
 
-    /** Rendert een view met de ingelogde naam er altijd bij (voor "niet {naam}?"-links). */
+    /** Rendert een view met de naam van de bezoeker erbij. */
     protected function view(string $name, array $data = []): string
     {
-        $data['account_naam'] = current_account_naam();
+        $data['account_naam'] = access()->naam();
 
         return view($name, $data);
+    }
+
+    /** 403 met uitleg: de rol in deze verhuizing is niet genoeg. */
+    protected function forbidden(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        return $this->response->setStatusCode(403)->setBody(
+            $this->view('errors/forbidden', ['title' => 'Geen toegang — Boxtracker'])
+        );
     }
 }

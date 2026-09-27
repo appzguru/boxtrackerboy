@@ -8,6 +8,11 @@ use App\Models\MovementModel;
 use App\Models\PhotoModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Doospagina's onder /d/{nummer}-{token}. De route-filter eist alleen dat je ingelogd
+ * bent (account of gast); de verhuizing volgt uit het token, en de rol wordt hier per
+ * actie gecontroleerd (handoff.md §2, §3.4).
+ */
 class Box extends BaseController
 {
     private BoxModel $boxes;
@@ -24,26 +29,26 @@ class Box extends BaseController
         $this->locations = new LocationModel();
     }
 
-    /** Zoekt de doos op nummer en controleert het token. Maakt een lege doos aan bij een nieuw nummer. */
+    /**
+     * Zoekt de doos op token (globaal uniek) en controleert het nummer. Hoort hij bij een
+     * andere verhuizing waar je lid van bent, dan wordt die de actieve. Geen toegang,
+     * onbekend token of verkeerd nummer: allemaal dezelfde 404, zodat niets af te tasten is.
+     */
     private function loadBox(int $nummer, string $token): array|ResponseInterface
     {
-        $box = $this->boxes->findByNummer($nummer);
+        $loc    = BoxModel::locateToken($token);
+        $access = access();
 
-        if ($box) {
-            if (! hash_equals($box['token'], $token)) {
-                return $this->unknown($token);
-            }
-
-            return $box;
+        if (! $loc || (int) $loc['nummer'] !== $nummer) {
+            return $this->unknown($token);
         }
 
-        $id = $this->boxes->insert([
-            'nummer' => $nummer,
-            'token'  => $token,
-            'status' => 'leeg',
-        ], true);
+        $verhuizingId = (int) $loc['verhuizing_id'];
+        if ($access->verhuizingId() !== $verhuizingId && ! $access->switchTo($verhuizingId)) {
+            return $this->unknown($token);
+        }
 
-        return $this->boxes->find($id);
+        return $this->boxes->find((int) $loc['id']) ?? $this->unknown($token);
     }
 
     private function unknown(string $badCode = ''): ResponseInterface
@@ -53,11 +58,24 @@ class Box extends BaseController
         );
     }
 
+    private function url(array $box, string $suffix = ''): string
+    {
+        return '/d/' . $box['nummer'] . '-' . $box['token'] . $suffix;
+    }
+
     public function show(int $nummer, string $token)
     {
         $box = $this->loadBox($nummer, $token);
         if ($box instanceof ResponseInterface) {
             return $box;
+        }
+
+        if (! access()->can('helper')) {
+            return $this->view('box_sjouwer', [
+                'title' => '#' . box_nr($box['nummer']) . ' — Boxtracker',
+                'box'   => $box,
+                'pill'  => status_pill($box['status']),
+            ]);
         }
 
         if ($box['status'] === 'leeg') {
@@ -90,13 +108,16 @@ class Box extends BaseController
             }
         }
 
+        $photos = $this->photos->forBox((int) $box['id']);
+
         return $this->view('box_view', [
-            'title'   => '#' . box_nr($box['nummer']) . ' — Boxtracker',
-            'box'     => $box,
-            'pill'    => status_pill($box['status']),
-            'photos'  => $this->photos->forBox((int) $box['id']),
-            'journey' => $journey,
-            'removed' => $removed,
+            'title'     => '#' . box_nr($box['nummer']) . ' — Boxtracker',
+            'box'       => $box,
+            'pill'      => status_pill($box['status']),
+            'photos'    => $photos,
+            'photosMax' => PhotoModel::MAX_PER_BOX,
+            'journey'   => $journey,
+            'removed'   => $removed,
         ]);
     }
 
@@ -122,13 +143,16 @@ class Box extends BaseController
         if ($box instanceof ResponseInterface) {
             return $box;
         }
+        if (! access()->can('helper')) {
+            return $this->forbidden();
+        }
 
         $omschrijving = trim((string) $this->request->getPost('omschrijving'));
         $eigenaar     = trim((string) $this->request->getPost('eigenaar'));
         $einddoel     = trim((string) $this->request->getPost('einddoel'));
         $fragiel      = (bool) $this->request->getPost('fragiel');
         $eerstOpenen  = (bool) $this->request->getPost('eerst_openen');
-        $naam         = current_account_naam();
+        $naam         = access()->naam();
 
         if ($einddoel !== '') {
             $this->locations->remember($einddoel, 'nieuw huis');
@@ -140,6 +164,8 @@ class Box extends BaseController
                 $this->locations->remember($plek, 'huis');
             }
 
+            $db = db_connect();
+            $db->transStart();
             $this->boxes->update((int) $box['id'], [
                 'omschrijving'    => $omschrijving,
                 'eigenaar'        => $eigenaar,
@@ -151,7 +177,6 @@ class Box extends BaseController
                 'ingepakt_door'   => $naam,
                 'ingepakt_op'     => date('Y-m-d H:i:s'),
             ]);
-
             $this->movements->insert([
                 'box_id'       => (int) $box['id'],
                 'van_locatie'  => null,
@@ -160,13 +185,14 @@ class Box extends BaseController
                 'op'           => date('Y-m-d H:i:s'),
                 'batch_id'     => null,
             ]);
+            $db->transComplete();
 
             $session = session();
             $session->set('last_owner', $eigenaar);
             $session->set('last_dest', $einddoel);
             $session->set('last_place', $plek);
 
-            return redirect()->to('/d/' . $nummer . '-' . $token . '?saved=1');
+            return redirect()->to($this->url($box, '?saved=1'));
         }
 
         $this->boxes->update((int) $box['id'], [
@@ -177,22 +203,29 @@ class Box extends BaseController
             'eerst_openen' => $eerstOpenen,
         ]);
 
-        return redirect()->to('/d/' . $nummer . '-' . $token);
+        return redirect()->to($this->url($box));
     }
 
     public function photo(int $nummer, string $token)
     {
         $box = $this->loadBox($nummer, $token);
-        if ($box instanceof ResponseInterface) {
+        if ($box instanceof ResponseInterface || ! access()->can('helper')) {
             return $this->response->setStatusCode(404)->setJSON(['ok' => false]);
+        }
+
+        if (count($this->photos->forBox((int) $box['id'])) >= PhotoModel::MAX_PER_BOX) {
+            return $this->response->setStatusCode(400)->setJSON(['ok' => false, 'error' => 'Maximaal ' . PhotoModel::MAX_PER_BOX . " foto's per doos"]);
         }
 
         $file = $this->request->getFile('foto');
         if (! $file || ! $file->isValid()) {
             return $this->response->setStatusCode(400)->setJSON(['ok' => false, 'error' => 'Geen geldig bestand']);
         }
+        if ($file->getSize() > 1024 * 1024 || $file->getMimeType() !== 'image/jpeg') {
+            return $this->response->setStatusCode(400)->setJSON(['ok' => false, 'error' => 'Alleen JPEG, maximaal 1 MB']);
+        }
 
-        $dir = WRITEPATH . 'uploads/boxes/' . $box['id'];
+        $dir = PhotoModel::dirFor($box);
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
@@ -215,6 +248,9 @@ class Box extends BaseController
         if ($box instanceof ResponseInterface) {
             return $box;
         }
+        if (! access()->can('helper')) {
+            return $this->forbidden();
+        }
 
         $status = $this->request->getPost('status');
         $data   = [];
@@ -234,9 +270,10 @@ class Box extends BaseController
             $this->boxes->update((int) $box['id'], $data);
         }
 
-        return redirect()->to('/d/' . $nummer . '-' . $token);
+        return redirect()->to($this->url($box));
     }
 
+    /** Losse verplaatsing — mag ook een sjouwer. */
     public function move(int $nummer, string $token)
     {
         $box = $this->loadBox($nummer, $token);
@@ -245,16 +282,17 @@ class Box extends BaseController
         }
 
         $naar = trim((string) $this->request->getPost('naar_locatie'));
-        if ($naar === '') {
-            return redirect()->to('/d/' . $nummer . '-' . $token);
+        if ($naar === '' || $box['status'] === 'leeg') {
+            return redirect()->to($this->url($box));
         }
 
-        $naam = current_account_naam();
+        $db = db_connect();
+        $db->transStart();
         $this->movements->insert([
             'box_id'       => (int) $box['id'],
             'van_locatie'  => $box['huidige_locatie'],
             'naar_locatie' => $naar,
-            'door'         => $naam,
+            'door'         => access()->naam(),
             'op'           => date('Y-m-d H:i:s'),
             'batch_id'     => null,
         ]);
@@ -264,26 +302,31 @@ class Box extends BaseController
             $update['status'] = 'opgeslagen';
         }
         $this->boxes->update((int) $box['id'], $update);
+        $db->transComplete();
         $this->locations->remember($naar);
 
-        return redirect()->to('/d/' . $nummer . '-' . $token);
+        return redirect()->to($this->url($box));
     }
 
-    /** Verwijdert een doos definitief. Alleen toegestaan als hij al uitgepakt is. */
+    /** Verwijdert een doos definitief. Alleen admin, en alleen als hij al uitgepakt is. */
     public function delete(int $nummer, string $token)
     {
         $box = $this->loadBox($nummer, $token);
         if ($box instanceof ResponseInterface) {
             return $box;
         }
-
-        if ($box['status'] !== 'uitgepakt') {
-            return redirect()->to('/d/' . $nummer . '-' . $token);
+        if (! access()->can('admin')) {
+            return $this->forbidden();
         }
 
-        $dir = WRITEPATH . 'uploads/boxes/' . $box['id'];
+        if ($box['status'] !== 'uitgepakt') {
+            return redirect()->to($this->url($box));
+        }
+
+        $dir = PhotoModel::dirFor($box);
         if (is_dir($dir)) {
             delete_files($dir, true);
+            @rmdir($dir);
         }
 
         $this->boxes->delete((int) $box['id']);

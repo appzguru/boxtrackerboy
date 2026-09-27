@@ -1,0 +1,2 @@
+# Shellscripts altijd met LF (ook in git archive / deploy), anders faalt bash op de server.
+*.sh text eol=lf

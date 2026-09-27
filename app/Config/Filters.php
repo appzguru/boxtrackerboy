@@ -12,7 +12,11 @@ use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
-use App\Filters\AccountFilter;
+use App\Filters\AccessFilter;
+use App\Filters\BedrijfFilter;
+use App\Filters\BeheerFilter;
+use App\Filters\MeekijkFilter;
+use App\Filters\TenantFilter;
 
 class Filters extends BaseFilters
 {
@@ -35,7 +39,11 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'accountauth'   => AccountFilter::class,
+        'access'        => AccessFilter::class,
+        'bedrijf'       => BedrijfFilter::class,
+        'beheer'        => BeheerFilter::class,
+        'meekijken'     => MeekijkFilter::class,
+        'tenant'        => TenantFilter::class,
     ];
 
     /**
@@ -74,7 +82,8 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            'accountauth' => ['except' => ['login', 'foto/*']],
+            'tenant',     // onbekend subdomein → 404
+            'meekijken',  // global-admin die meekijkt: alleen lezen
             'csrf',
             // 'honeypot',
             // 'invalidchars',

@@ -20,6 +20,19 @@ if (! function_exists('nl_datetime')) {
     }
 }
 
+if (! function_exists('nl_date')) {
+    /** "di 14 okt 2026" (of '' zonder datum). */
+    function nl_date(?string $date): string
+    {
+        if (! $date) {
+            return '';
+        }
+        $ts = strtotime($date);
+
+        return strftime_nl($ts) . ' ' . date('Y', $ts);
+    }
+}
+
 if (! function_exists('strftime_nl')) {
     function strftime_nl(int $ts): string
     {
@@ -43,17 +56,17 @@ if (! function_exists('first_line')) {
     }
 }
 
-/** Statuslabel + kleuren voor pill-badges, zie boxtracker-ontwerp. */
+/** Statuslabel + kleuren voor pill-badges, zie boxtracker-ontwerp_v2 (kartonlook). */
 if (! function_exists('status_pill')) {
     function status_pill(string $status): array
     {
         return match ($status) {
-            'leeg'      => ['label' => 'Nieuwe doos', 'bg' => '#0F1216', 'fg' => '#FFFFFF'],
-            'ingepakt'  => ['label' => 'Ingepakt', 'bg' => '#FFF1D0', 'fg' => '#7A4B00'],
-            'opgeslagen' => ['label' => 'In opslag', 'bg' => '#EAEDFF', 'fg' => '#2433C7'],
-            'geopend'   => ['label' => 'Geopend', 'bg' => '#EAEDFF', 'fg' => '#2433C7'],
-            'uitgepakt' => ['label' => 'Uitgepakt', 'bg' => '#DDF4E7', 'fg' => '#10633B'],
-            default     => ['label' => $status, 'bg' => '#EEF0F5', 'fg' => '#5B6573'],
+            'leeg'      => ['label' => 'Nieuwe doos', 'bg' => '#1A140E', 'fg' => '#FFFDF8'],
+            'ingepakt'  => ['label' => 'Ingepakt', 'bg' => '#EBD5B3', 'fg' => '#6E4424'],
+            'opgeslagen' => ['label' => 'In opslag', 'bg' => '#F0DFC4', 'fg' => '#6E4424'],
+            'geopend'   => ['label' => 'Geopend', 'bg' => '#F0DFC4', 'fg' => '#6E4424'],
+            'uitgepakt' => ['label' => 'Uitgepakt', 'bg' => '#DFF3E8', 'fg' => '#1A7F4B'],
+            default     => ['label' => $status, 'bg' => '#EFE3CF', 'fg' => '#6B5C4A'],
         };
     }
 }

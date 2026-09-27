@@ -6,7 +6,7 @@
   </div>
   <div class="content">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
-      <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#7C8696;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
+      <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#9A8A74;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
       <span class="pill" style="background:<?= $pill['bg'] ?>;color:<?= $pill['fg'] ?>;margin-bottom:6px;"><?= esc($pill['label']) ?></span>
     </div>
 
@@ -47,10 +47,12 @@
             <img src="<?= base_url('foto/' . $p['id']) ?>" alt="Foto van de doos" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
           </a>
         <?php endforeach ?>
-        <label style="position:relative;aspect-ratio:1/1;border-radius:16px;border:1.5px dashed #B3BBCB;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer;">
+        <?php if (count($photos) < $photosMax): ?>
+        <label style="position:relative;aspect-ratio:1/1;border-radius:16px;border:1.5px dashed #C9B08A;background:#FFFDF8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer;">
           <?= icon('camera', 24) ?><span>Foto</span>
           <input type="file" accept="image/*" capture="environment" id="photo-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
         </label>
+        <?php endif ?>
       </div>
     </div>
 
@@ -60,7 +62,7 @@
         <?php foreach ($journey as $i => $j): ?>
           <div style="display:flex;gap:14px;">
             <div style="display:flex;flex-direction:column;align-items:center;width:14px;flex:none;">
-              <div style="width:14px;height:14px;border-radius:50%;margin-top:4px;background:<?= $i === 0 ? 'var(--blue)' : '#C3C9D6' ?>;"></div>
+              <div style="width:14px;height:14px;border-radius:50%;margin-top:4px;background:<?= $i === 0 ? 'var(--blue)' : '#D2BC98' ?>;"></div>
               <?php if ($i < count($journey) - 1): ?><div style="flex:1;width:2px;background:var(--border);margin-top:4px;"></div><?php endif ?>
             </div>
             <div style="padding-bottom:18px;display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -85,7 +87,9 @@
     <?php else: ?>
       <div style="display:flex;gap:8px;">
         <a href="<?= base_url('d/' . $box['nummer'] . '-' . $box['token'] . '?edit=1') ?>" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px;"><?= icon('edit', 18) ?> Bewerken</a>
+        <?php if (access()->can('admin')): ?>
         <button type="button" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px;color:var(--red-fg);" onclick="document.getElementById('delete-sheet').style.display='block';document.getElementById('delete-backdrop').style.display='block';"><?= icon('trash', 18) ?> Verwijderen</button>
+        <?php endif ?>
       </div>
     <?php endif ?>
   </div>

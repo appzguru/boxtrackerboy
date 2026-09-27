@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
-
-class LocationModel extends Model
+class LocationModel extends ScopedModel
 {
     protected $table         = 'locations';
     protected $primaryKey    = 'id';
@@ -25,7 +23,7 @@ class LocationModel extends Model
         }
     }
 
-    public function suggestions(string $soort = null, int $limit = 12): array
+    public function suggestions(?string $soort = null, int $limit = 12): array
     {
         $builder = $this->where('actief', 1);
         if ($soort) {

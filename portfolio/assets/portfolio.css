@@ -1,0 +1,79 @@
+@font-face { font-family: 'Geist'; font-weight: 400 700; font-display: swap; src: url('geist.woff2') format('woff2'); }
+@font-face { font-family: 'Geist Mono'; font-weight: 400 600; font-display: swap; src: url('geist-mono.woff2') format('woff2'); }
+
+:root {
+  --kraft: #F3E9D8; --paper: #FFFDF8; --ink: #1A140E; --ink-2: #54483A; --ink-3: #6B5C4A;
+  --bruin: #936037; --lijn: #D2BC98;
+  --sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+  --s: .64; --pw: 390px; --ph: 844px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--kraft); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased;
+  background-image: repeating-linear-gradient(90deg, rgba(120,80,40,.035) 0 2px, transparent 2px 11px);
+}
+a { color: inherit; }
+code { font-family: var(--mono); font-size: .92em; }
+h1, h2, h3, p { margin: 0; }
+
+.top, .intro, .merk, .uitleg, .voet { max-width: 1180px; margin-inline: auto; padding-inline: 20px; }
+.top { display: flex; align-items: center; justify-content: space-between; padding-block: 20px; }
+.top-merk { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; text-decoration: none; letter-spacing: -.02em; }
+.top-mark { width: 34px; height: 34px; border-radius: 10px; background: var(--bruin); color: #fff; padding: 7px; display: flex; }
+.top-mark svg { width: 100%; height: 100%; }
+.top-sub { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+
+.intro { padding-block: 36px 28px; display: flex; flex-direction: column; gap: 16px; max-width: 1180px; }
+.intro h1 { font-size: clamp(40px, 7vw, 76px); line-height: .98; letter-spacing: -.045em; font-weight: 700; }
+.intro p { font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 640px; }
+.intro .intro-let { font-size: 14px; color: var(--ink-3); }
+
+.kiezer { position: sticky; top: 0; z-index: 10; background: rgba(243,233,216,.92); backdrop-filter: blur(8px); border-block: 2px solid var(--ink); }
+.kiezer-rij { max-width: 1180px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; align-items: center; }
+.kiezer-rij::-webkit-scrollbar { display: none; }
+.kiezer-groep { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; padding: 0 4px 0 10px; white-space: nowrap; }
+.knop {
+  flex: none; display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 14px 0 8px;
+  border: 2px solid var(--ink); border-radius: 12px; background: var(--paper); color: var(--ink);
+  font: 600 14px/1 var(--sans); cursor: pointer; white-space: nowrap; transition: transform .08s;
+}
+.knop:hover { transform: translateY(-1px); }
+.knop-mark { width: 26px; height: 26px; border-radius: 7px; display: flex; padding: 4px; }
+.knop-mark svg { width: 100%; height: 100%; }
+.knop[aria-pressed="true"] { background: var(--ink); color: var(--paper); box-shadow: 0 3px 0 var(--bruin); }
+
+.merk { padding-block: 34px 8px; display: grid; gap: 14px; }
+.merk-kop { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.merk-kop h2 { font-size: clamp(30px, 4.5vw, 46px); letter-spacing: -.03em; line-height: 1; transition: font-family .1s; }
+.merk-kop code { color: var(--ink-3); background: var(--paper); border: 1px solid var(--lijn); padding: 4px 8px; border-radius: 8px; }
+.merk-soort { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; background: var(--ink); color: var(--paper); padding: 5px 8px; border-radius: 6px; align-self: center; }
+.merk-concept { font-size: 17px; line-height: 1.5; color: var(--ink-2); max-width: 700px; }
+.merk-feit { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.swatches { display: flex; gap: 6px; }
+.swatches span { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink); }
+.merk-letters { font-family: var(--mono); font-size: 13px; color: var(--ink-3); }
+
+/* 4 × (390·.64 + 16) + 3 × 24 = 1134px: past binnen 1140px, dus op brede schermen geen schuifbalk.
+   Procent i.p.v. vw, zodat de verticale schuifbalk van de pagina niet meetelt. */
+.telefoons { display: flex; gap: 24px; padding: 28px max(20px, calc((100% - 1180px) / 2 + 20px)) 40px; overflow-x: auto; scroll-snap-type: x mandatory; }
+.telefoons figure { margin: 0; flex: none; scroll-snap-align: center; display: flex; flex-direction: column; gap: 14px; width: calc(var(--pw) * var(--s) + 16px); }
+.phone { width: calc(var(--pw) * var(--s) + 16px); height: calc(var(--ph) * var(--s) + 16px); padding: 8px; border-radius: 36px; background: var(--ink); box-shadow: 0 24px 50px -24px rgba(40,25,10,.55); overflow: hidden; }
+.phone iframe { width: var(--pw); height: var(--ph); border: 0; border-radius: calc(28px / var(--s)); transform: scale(var(--s)); transform-origin: 0 0; background: #fff; display: block; }
+figcaption { font-size: 14px; line-height: 1.45; color: var(--ink-2); display: flex; flex-direction: column; gap: 2px; padding-inline: 4px; }
+figcaption b { color: var(--ink); font-size: 15px; }
+
+.uitleg { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 28px; padding-block: 28px 44px; border-top: 1px solid var(--lijn); }
+.uitleg h3 { font-size: 19px; letter-spacing: -.02em; margin-bottom: 6px; }
+.uitleg p { font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+.voet { padding-block: 28px 48px; border-top: 2px solid var(--ink); display: flex; flex-direction: column; gap: 8px; }
+.voet p { font-size: 16px; }
+.voet a { color: var(--bruin); font-weight: 600; }
+.voet-klein { font-size: 13px !important; color: var(--ink-3); }
+
+@media (max-width: 760px) {
+  :root { --s: .72; }
+  .uitleg { grid-template-columns: 1fr; gap: 18px; }
+  .intro p { font-size: 16px; }
+}

@@ -7,8 +7,8 @@
   <form id="boxform" class="content" method="post" action="<?= base_url('d/' . $box['nummer'] . '-' . $box['token']) ?>" enctype="multipart/form-data" style="gap:26px;">
     <?= csrf_field() ?>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
-      <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#7C8696;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
-      <span class="pill" style="background:<?= $isNew ? '#0F1216' : '#FFF1D0' ?>;color:<?= $isNew ? '#fff' : '#7A4B00' ?>;margin-bottom:6px;"><?= $isNew ? 'Nieuwe doos' : 'Bewerken' ?></span>
+      <div class="mono" style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:.95;"><span style="color:#9A8A74;font-size:38px;">#</span><?= box_nr($box['nummer']) ?></div>
+      <span class="pill" style="background:<?= $isNew ? '#1A140E' : '#EBD5B3' ?>;color:<?= $isNew ? '#FFFDF8' : '#6E4424' ?>;margin-bottom:6px;"><?= $isNew ? 'Nieuwe doos' : 'Bewerken' ?></span>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
@@ -66,12 +66,12 @@
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div class="label">Foto's</div>
       <div id="photo-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;">
-        <label style="position:relative;aspect-ratio:1/1;border-radius:16px;border:1.5px dashed #B3BBCB;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer;">
+        <label style="position:relative;aspect-ratio:1/1;border-radius:16px;border:1.5px dashed #C9B08A;background:#FFFDF8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer;">
           <?= icon('camera', 24) ?><span>Foto</span>
           <input type="file" accept="image/*" capture="environment" id="photo-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
         </label>
       </div>
-      <div style="font-size:14px;color:var(--text-dim);">Ingepakt door <strong><?= esc(current_account_naam()) ?></strong></div>
+      <div style="font-size:14px;color:var(--text-dim);">Ingepakt door <strong><?= esc(access()->naam()) ?></strong></div>
     </div>
     <?php endif ?>
   </form>

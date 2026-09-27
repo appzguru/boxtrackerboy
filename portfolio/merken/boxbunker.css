@@ -1,0 +1,59 @@
+/* BoxBunker Opslag — industrieel: staal, signaaloranje, waarschuwingsstrepen, smalle kapitalen. */
+:root {
+  --blue: #FF6B00; --blue-dark: #E65F00; --blue-tint: #DDE1E6; --blue-tint-fg: #2E353F;
+  --bg: #E4E7EB; --card: #F6F7F8; --border: #B9C0C8; --field-line: #2E353F;
+  --text: #1C2127; --text-dim: #5D6671; --text-mid: #3C444E;
+  --amber-bg: #2E353F; --amber-fg: #FF8A33;
+  --radius-lg: 3px; --radius-md: 3px; --radius-sm: 3px;
+  --outline: 2px solid #2E353F; --drop: 0 3px 0 #1C2127;
+  --corrugated: repeating-linear-gradient(0deg, rgba(0,0,0,.025) 0 1px, transparent 1px 4px);
+  --corrugated-strong: none;
+  --font: 'Barlow', system-ui, sans-serif;
+  --font-head: 'Barlow Condensed', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --staal: #2E353F;
+  --gevaar: repeating-linear-gradient(-45deg, #FF6B00 0 10px, #1C2127 10px 20px);
+}
+.app-topbar { background: var(--staal); border-bottom: 0; }
+.app-topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 7px; background: var(--gevaar); }
+.screen { padding-top: 71px; }
+.app-topbar .app-topbar-btn { background: #3C444E; border: 2px solid #1C2127; color: #fff; }
+.app-topbar .app-topbar-btn-primary { background: var(--blue); color: #1C2127; }
+.vh-switch { color: #fff; font-family: var(--font-head); text-transform: uppercase; letter-spacing: .08em; font-size: 18px; font-weight: 700; }
+.tb-home .merk-mark { color: #fff; width: 24px; height: 24px; }
+
+.home-brand .merk-mark { background: none; padding: 0; color: var(--staal); width: 40px; height: 40px; }
+.merk-naam { font-family: var(--font-head); font-weight: 800; font-size: 26px; text-transform: uppercase; letter-spacing: .02em; }
+.home-user { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: var(--text-dim); }
+.home-title { font-weight: 800; text-transform: uppercase; font-size: 56px; line-height: .88; letter-spacing: 0; }
+.field { border: 2px solid var(--staal); background: #fff; }
+
+.stat { background: var(--staal); border: 0; position: relative; }
+.stat::before, .stat::after { content: ""; position: absolute; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: #5D6671; box-shadow: inset 0 1px 1px rgba(0,0,0,.5); }
+.stat::before { left: 8px; } .stat::after { right: 8px; }
+.stat-num { font-family: var(--font-mono); font-weight: 600; color: var(--blue); font-size: 34px; margin-top: 8px; }
+.stat-label { color: #C5CCD4; font-family: var(--font-head); text-transform: uppercase; letter-spacing: .07em; font-size: 15px; font-weight: 600; }
+
+.btn { font-family: var(--font-head); text-transform: uppercase; letter-spacing: .07em; font-weight: 700; font-size: 20px; }
+.btn-primary { color: #1C2127; }
+.btn-secondary { box-shadow: inset 0 0 0 2px var(--staal); background: #fff; font-size: 17px; }
+.btn-icon { box-shadow: inset 0 0 0 2px var(--staal); }
+.bottombar { background: var(--staal); border-top: 0; position: sticky; }
+.bottombar::before { content: ""; position: absolute; left: 0; right: 0; top: -7px; height: 7px; background: var(--gevaar); }
+
+.card { border: 2px solid var(--staal); }
+.label { font-family: var(--font-mono); font-weight: 500; letter-spacing: .1em; font-size: 11px; }
+.box-num { font-family: var(--font-head); font-weight: 800; font-size: 80px; letter-spacing: 0; }
+.box-num .hash { color: var(--blue); }
+.box-status { text-transform: uppercase; font-family: var(--font-head); letter-spacing: .08em; font-size: 15px; }
+.tag { border: 2px solid var(--staal); text-transform: uppercase; font-family: var(--font-head); letter-spacing: .06em; font-size: 15px; }
+.tag-fragiel { background: var(--blue); color: #1C2127; border-color: #1C2127; }
+.box-plek, .box-bestemming-groot { font-family: var(--font-head); text-transform: uppercase; font-weight: 800; letter-spacing: .01em; }
+.reis-dot { border-radius: 0; }
+
+.scr-sticker { background: #9AA2AB; background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 5px); }
+.sticker { border-radius: 2px; border: 3px solid #1C2127; position: relative; overflow: hidden; padding-top: 24px; transform: none; }
+.sticker::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 9px; background: repeating-linear-gradient(-45deg, #FF6B00 0 10px, #1C2127 10px 20px); }
+.sticker-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 58px; }
+.sticker-hint { font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; }
+.sticker-merk { color: #1C2127; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; letter-spacing: .06em; font-size: 12px; }

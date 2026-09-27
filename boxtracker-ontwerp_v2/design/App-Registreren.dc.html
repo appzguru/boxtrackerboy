@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Registreren</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Geist',system-ui,sans-serif;background:#F3E9D8;color:#1A140E;-webkit-font-smoothing:antialiased}
+a{color:#6E4424}a:hover{color:#1A140E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background-color: #F3E9D8; background-image: repeating-linear-gradient(90deg, rgba(120,80,40,0.035) 0 2px, transparent 2px 11px); font-family: 'Geist', system-ui, sans-serif; color: #1A140E">
+<div style="padding: 28px 20px 0; display: flex; align-items: center; gap: 8px">
+<img src="/_blob/0d50963b69e6124487c30bac27c5e0ed" alt="" style="width: 36px; height: 36px; border-radius: 9px; display: block">
+<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em">Boxtracker</span>
+</div>
+
+<div style="flex-grow: 1; padding: 32px 20px 0; display: flex; flex-direction: column; gap: 24px">
+<sc-if value="{{uitnodiging}}" hint-placeholder-val="{{ false }}">
+<div style="background: #FFFDF8; border-radius: 16px; padding: 16px; display: flex; gap: 12px; align-items: center">
+<span style="width: 44px; height: 44px; border-radius: 12px; background: #FFFDF8; color: #1A140E; border: 2px solid #1A140E; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-5 9 5v10l-9 5-9-5z"></path><path d="M3 9l9 5 9-5"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #6B5C4A">Je bent uitgenodigd voor</span><span style="font-size: 16px; font-weight: 600">Verhuizing Lindelaan</span></div>
+</div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em">Account maken</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #6B5C4A">{{intro}}</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 500">Naam<input type="text" placeholder="Hoe noemen je helpers je?" style="height: 52px; border-radius: 14px; border: 1.5px solid #9A8A74; background: #FFFDF8; padding: 0 16px; font-family: inherit; font-size: 17px; color: #1A140E"></label>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 500">E-mail<input type="email" placeholder="naam@voorbeeld.nl" style="height: 52px; border-radius: 14px; border: 1.5px solid #9A8A74; background: #FFFDF8; padding: 0 16px; font-family: inherit; font-size: 17px; color: #1A140E"></label>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 500">Wachtwoord<input type="password" placeholder="Minstens [N] tekens" style="height: 52px; border-radius: 14px; border: 1.5px solid #9A8A74; background: #FFFDF8; padding: 0 16px; font-family: inherit; font-size: 17px; color: #1A140E"></label>
+<sc-if value="{{nieuw}}" hint-placeholder-val="{{ true }}">
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 500">Naam van je verhuizing<input type="text" placeholder="bijv. Verhuizing Lindelaan" style="height: 52px; border-radius: 14px; border: 1.5px solid #9A8A74; background: #FFFDF8; padding: 0 16px; font-family: inherit; font-size: 17px; color: #1A140E"></label>
+</sc-if>
+</div>
+</div>
+
+<div style="padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 12px; align-items: center">
+<button type="button" style="width: 100%; height: 56px; border-radius: 16px; border: 0; background: #936037; color: #FFFDF8; border: 2px solid #1A140E; box-shadow: 0 3px 0 #1A140E; font-family: inherit; font-size: 17px; font-weight: 600">{{knop}}</button>
+<a href="App-Inloggen.dc.html" style="height: 44px; display: flex; align-items: center; font-size: 15px; text-decoration: none">Al een account? Inloggen</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"variant":{"editor":"enum","options":["nieuw","uitnodiging"],"default":"nieuw"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var inv = this.props.variant === 'uitnodiging';
+    return {
+      uitnodiging: inv,
+      nieuw: !inv,
+      intro: inv ? 'Daarna doe je meteen mee.' : 'Gratis. Daarna maak je je eerste stickers.',
+      knop: inv ? 'Account maken en meedoen' : 'Account maken'
+    };
+  }
+}
+</script>
+</body>
+</html>

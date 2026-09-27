@@ -17,7 +17,14 @@ class Home extends BaseController
         $uitgepakt = $counts['uitgepakt'] ?? 0;
         $hasBoxes  = ($openDoos + $opslag + $uitgepakt) > 0;
 
+        // Foto-opname (whitelabel): alleen bij een verhuizing van een bedrijf, niet voor sjouwers.
+        $opname = null;
+        if (access()->can('helper') && db_connect()->table('verhuizingen')->where('id', access()->verhuizingId())->where('bedrijf_id IS NOT NULL')->countAllResults()) {
+            $opname = (new \App\Models\OpnameItemModel())->overzicht();
+        }
+
         return $this->view('home', [
+            'opname'     => $opname,
             'title'      => 'Boxtracker',
             'hasAny'     => $totaalAlles > 0,
             'hasBoxes'   => $hasBoxes,
