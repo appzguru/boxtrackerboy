@@ -15,7 +15,7 @@
     <div class="card" style="padding:0;overflow:auto;">
       <?php if ($verhuizingen): ?>
         <table class="beheer-tabel">
-          <thead><tr><th>Verhuisdatum</th><th>Klant</th><th>Van → naar</th><th class="num" title="Dozen met inhoud / stickers">Dozen</th><th class="num">Fragiel</th><th>Ploeg</th></tr></thead>
+          <thead><tr><th>Verhuisdatum</th><th>Klant</th><th>Van → naar</th><th class="num" title="Dozen met inhoud / stickers">Dozen</th><th class="num">Fragiel</th><th class="num" title="Vaste punten met foto / items">Opname</th><th class="num">Risico's</th><th>Ploeg</th></tr></thead>
           <tbody>
             <?php foreach ($verhuizingen as $v): ?>
               <?php $url = base_url('bedrijf/verhuizingen/' . $v['id']); $voorbij = $v['verhuisdatum'] && $v['verhuisdatum'] < $vandaag; ?>
@@ -25,6 +25,8 @@
                 <td class="dim" style="white-space:normal;"><?= esc($v['adres_van'] ?? '—') ?> → <?= esc($v['adres_naar'] ?? '—') ?></td>
                 <td class="num"><?= (int) $v['ingepakt'] ?><span class="dim"> / <?= (int) $v['stickers'] ?></span></td>
                 <td class="num"><?= (int) $v['fragiel'] ?: '<span class="dim">0</span>' ?></td>
+                <td class="num"><?= (int) $v['punten'] ?>/4<span class="dim"> · <?= (int) $v['items'] ?> items</span></td>
+                <td class="num"><?= (int) $v['risicos'] ? '<strong style="color:var(--red-fg);">' . (int) $v['risicos'] . '</strong>' : '<span class="dim">0</span>' ?></td>
                 <td class="dim" style="white-space:normal;"><?= esc($v['ploeg'] ?? '—') ?></td>
               </tr>
             <?php endforeach ?>

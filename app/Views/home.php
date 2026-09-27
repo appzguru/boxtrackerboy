@@ -33,6 +33,10 @@
       <div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:10px;">
         <a href="<?= base_url('overzicht') ?>" class="btn btn-secondary"><?= icon('grid') ?> Overzicht</a>
         <?php if (access()->can('helper')): ?><a href="<?= base_url('labels') ?>" class="btn btn-secondary"><?= icon('labels') ?> Labels</a><?php endif ?>
+        <?php if ($opname !== null): ?>
+          <?php $klaar = count(array_filter($opname['punten'], static fn ($p) => (int) $p['fotos'] > 0)); ?>
+          <a href="<?= base_url('opname') ?>" class="btn btn-secondary"><?= icon('camera') ?> Opname · <?= $klaar ?>/4 punten, <?= count($opname['items']) ?> items</a>
+        <?php endif ?>
       </div>
     <?php else: ?>
       <div class="card" style="display:flex;flex-direction:column;gap:18px;">
@@ -47,6 +51,7 @@
       <a href="<?= base_url('verplaats') ?>" class="btn btn-primary"><?= icon('move') ?> Dozen verplaatsen</a>
     <?php else: ?>
       <?php if (access()->can('helper')): ?><a href="<?= base_url('labels') ?>" class="btn btn-primary"><?= icon('labels') ?> Stickers maken</a><?php endif ?>
+      <?php if ($opname !== null): ?><a href="<?= base_url('opname') ?>" class="btn btn-secondary"><?= icon('camera') ?> Foto-opname voor de verhuizer</a><?php endif ?>
     <?php endif ?>
   </div>
 </div>

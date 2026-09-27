@@ -266,4 +266,106 @@ final class PlanningTest extends CIUnitTestCase
         $this->als('inka');
         $this->assertStringEndsWith('/verhuizingen', $this->get('/')->getRedirectUrl());
     }
+
+    private function opnameItem(string $vh, string $omschrijving): int
+    {
+        db_connect()->table('opname_items')->insert(['verhuizing_id' => $this->vh[$vh], 'soort' => 'item', 'omschrijving' => $omschrijving]);
+
+        return (int) db_connect()->insertID();
+    }
+
+    public function testOpnameVoorBewonerEnInpakkerNietVoorSjouwer(): void
+    {
+        db_connect()->table('memberships')->insert(['verhuizing_id' => $this->vh['A1'], 'user_id' => $this->user['inka'], 'rol' => 'helper']);
+        db_connect()->table('memberships')->insert(['verhuizing_id' => $this->vh['A1'], 'user_id' => $this->user['sjoa'], 'rol' => 'sjouwer']);
+
+        $this->als('sjoa');
+        $this->assertSame(403, $this->statusVan('GET', '/opname'));
+        $this->als('sjoa');
+        $this->assertSame(403, $this->statusVan('POST', '/opname/items', ['omschrijving' => 'Door sjouwer']));
+
+        $this->als('inka');
+        $response = $this->get('/opname');
+        $response->assertOK();
+        $response->assertSee('Trappenhuis');
+        $this->als('inka');
+        $this->post('/opname/items', ['omschrijving' => 'Hoekbank', 'kamer' => 'Woonkamer']);
+        $row = db_connect()->table('opname_items')->where('omschrijving', 'Hoekbank')->get()->getRowArray();
+        $this->assertSame((string) $this->vh['A1'], (string) $row['verhuizing_id']);
+        $this->assertSame('item', $row['soort']);
+
+        $this->als('bewa');
+        $this->get('/opname')->assertSee('Hoekbank');
+
+        // Onbekend punt en upload zonder bestand worden geweigerd.
+        $this->als('inka');
+        $this->assertSame(404, $this->statusVan('POST', '/opname/punt/zolder/foto'));
+        $this->als('inka');
+        $this->assertSame(400, $this->statusVan('POST', '/opname/punt/trappenhuis/foto'));
+    }
+
+    public function testOpnameNietInDeKlantApp(): void
+    {
+        $db = db_connect();
+        $db->table('verhuizingen')->insert(['naam' => 'Particulier']);
+        $vid = (int) $db->insertID();
+        $db->table('memberships')->insert(['verhuizing_id' => $vid, 'user_id' => $this->user['bewa'], 'rol' => 'admin']);
+        $db->table('memberships')->where('verhuizing_id', $this->vh['A1'])->delete();
+
+        $this->als('bewa', self::HOST_KLANT);
+        $this->assertStringEndsWith('/', (string) $this->get('/opname')->getRedirectUrl());
+        $this->als('bewa', self::HOST_KLANT);
+        $this->post('/opname/items', ['omschrijving' => 'Kast']);
+        $this->assertSame(0, $this->aantal('opname_items'));
+    }
+
+    public function testOpnameIsGescoped(): void
+    {
+        $eigen   = $this->opnameItem('A1', 'Piano A1');
+        $vreemd  = $this->opnameItem('B1', 'Piano B1');
+        db_connect()->table('memberships')->insert(['verhuizing_id' => $this->vh['A1'], 'user_id' => $this->user['inka'], 'rol' => 'helper']);
+
+        $this->als('inka');
+        $this->get('/opname')->assertDontSee('Piano B1');
+        $this->als('inka');
+        $this->assertSame(404, $this->statusVan('GET', '/opname/items/' . $vreemd));
+        $this->als('inka');
+        $this->statusVan('POST', '/opname/items/' . $vreemd, ['omschrijving' => 'Overschreven']);
+        $this->als('inka');
+        $this->statusVan('POST', '/opname/items/' . $vreemd . '/verwijderen');
+        $this->assertSame('Piano B1', db_connect()->table('opname_items')->where('id', $vreemd)->get()->getRow()->omschrijving);
+
+        $access = $this->als('inka');
+        $access->switchTo($this->vh['A1']);
+        $this->assertSame([$eigen], array_map('intval', array_column((new \App\Models\OpnameItemModel())->findAll(), 'id')));
+    }
+
+    public function testSalesMarkeertRisico(): void
+    {
+        $item   = $this->opnameItem('A1', 'Piano');
+        $vreemd = $this->opnameItem('B1', 'Kast B1');
+
+        $this->als('sala');
+        $response = $this->get('/bedrijf/verhuizingen/' . $this->vh['A1'] . '/opname');
+        $response->assertOK();
+        $response->assertSee('Piano');
+        $response->assertDontSee('Kast B1');
+
+        $this->als('sala');
+        $this->post('/bedrijf/verhuizingen/' . $this->vh['A1'] . '/opname/' . $item . '/risico', ['risico' => '1', 'risico_notitie' => 'Verhuislift nodig']);
+        $row = db_connect()->table('opname_items')->where('id', $item)->get()->getRowArray();
+        $this->assertSame('1', (string) $row['risico']);
+        $this->assertSame('Verhuislift nodig', $row['risico_notitie']);
+
+        // Item van een ander bedrijf via de eigen verhuizing-URL: niets.
+        $this->als('sala');
+        $this->post('/bedrijf/verhuizingen/' . $this->vh['A1'] . '/opname/' . $vreemd . '/risico', ['risico' => '1']);
+        $this->assertSame('0', (string) db_connect()->table('opname_items')->where('id', $vreemd)->get()->getRow()->risico);
+
+        $this->als('plana');
+        $this->assertSame(404, $this->statusVan('GET', '/bedrijf/verhuizingen/' . $this->vh['B1'] . '/opname'));
+
+        $this->als('sala');
+        $this->get('/bedrijf')->assertSee('color:var(--red-fg);">1</strong>');
+    }
 }

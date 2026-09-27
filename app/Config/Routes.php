@@ -78,6 +78,19 @@ $routes->group('', ['filter' => 'access:helper'], static function ($routes) {
     $routes->get('/labels/csv', 'Labels::csv');
 });
 
+// Foto-opname vooraf (whitelabel, alleen bedrijfsverhuizingen): bewoner en inpakkers, geen sjouwers.
+$routes->group('opname', ['filter' => 'access:helper'], static function ($routes) {
+    $routes->get('/', 'Bedrijf\Opname::index');
+    $routes->post('items', 'Bedrijf\Opname::createItem');
+    $routes->get('items/(:num)', 'Bedrijf\Opname::item/$1');
+    $routes->post('items/(:num)', 'Bedrijf\Opname::updateItem/$1');
+    $routes->post('items/(:num)/verwijderen', 'Bedrijf\Opname::deleteItem/$1');
+    $routes->post('items/(:num)/foto', 'Bedrijf\Opname::fotoItem/$1');
+    $routes->post('punt/(:segment)/foto', 'Bedrijf\Opname::fotoPunt/$1');
+    $routes->get('foto/(:num)', 'Bedrijf\Opname::foto/$1');
+    $routes->post('foto/(:num)/verwijderen', 'Bedrijf\Opname::deleteFoto/$1');
+});
+
 // Alleen admins
 $routes->group('', ['filter' => 'access:admin'], static function ($routes) {
     $routes->get('/import', 'Csv::importForm');
@@ -114,6 +127,8 @@ $routes->group('beheer', ['filter' => 'beheer'], static function ($routes) {
 $routes->group('bedrijf', ['filter' => 'bedrijf:kantoor'], static function ($routes) {
     $routes->get('/', 'Bedrijf\Planning::index');
     $routes->get('verhuizingen/(:num)', 'Bedrijf\Planning::show/$1');
+    $routes->get('verhuizingen/(:num)/opname', 'Bedrijf\Planning::opname/$1');
+    $routes->post('verhuizingen/(:num)/opname/(:num)/risico', 'Bedrijf\Planning::risico/$1/$2');
 });
 $routes->group('bedrijf', ['filter' => 'bedrijf:planner'], static function ($routes) {
     $routes->get('verhuizingen/nieuw', 'Bedrijf\Planning::nieuw');

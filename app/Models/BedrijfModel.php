@@ -78,6 +78,10 @@ class BedrijfModel extends Model
                 (SELECT COUNT(*) FROM boxes b WHERE b.verhuizing_id = v.id) AS stickers,
                 (SELECT COUNT(*) FROM boxes b WHERE b.verhuizing_id = v.id AND b.status != 'leeg') AS ingepakt,
                 (SELECT COUNT(*) FROM boxes b WHERE b.verhuizing_id = v.id AND b.status != 'leeg' AND b.fragiel = 1) AS fragiel,
+                (SELECT COUNT(*) FROM opname_items o WHERE o.verhuizing_id = v.id AND o.soort = 'punt'
+                    AND EXISTS (SELECT 1 FROM opname_fotos f WHERE f.item_id = o.id)) AS punten,
+                (SELECT COUNT(*) FROM opname_items o WHERE o.verhuizing_id = v.id AND o.soort = 'item') AS items,
+                (SELECT COUNT(*) FROM opname_items o WHERE o.verhuizing_id = v.id AND o.risico = 1) AS risicos,
                 (SELECT GROUP_CONCAT(u.naam ORDER BY u.naam SEPARATOR ', ') FROM memberships m
                     JOIN users u ON u.id = m.user_id
                     JOIN bedrijf_medewerkers bm ON bm.user_id = m.user_id AND bm.bedrijf_id = v.bedrijf_id

@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Libraries\Mailer;
 use App\Models\BedrijfModel;
 use App\Models\InviteModel;
+use App\Models\OpnameFotoModel;
+use App\Models\OpnameItemModel;
 use App\Models\UserModel;
 use App\Models\VerhuizingModel;
 
@@ -175,5 +177,38 @@ class Planning extends BaseController
         }
 
         return redirect()->to('/bedrijf/verhuizingen/' . $id)->with('message', $melding)->with('nieuweLink', $link);
+    }
+
+    /**
+     * Opname voor sales (stap 5): alle foto's van de verhuizing op één scherm, items als risico
+     * markeren. Maakt de verhuizing actief, zodat foto's via de gewone gescopede route komen.
+     */
+    public function opname(int $id)
+    {
+        $v = $this->verhuizingOf404($id);
+        access()->switchTo($id);
+
+        return $this->view('bedrijf/opname_kantoor', [
+            'title'      => 'Opname ' . $v['naam'] . ' — Boxtracker',
+            'verhuizing' => $v,
+            'opname'     => (new OpnameItemModel())->overzicht(),
+            'fotos'      => (new OpnameFotoModel())->perItem(),
+            'message'    => session()->getFlashdata('message'),
+        ]);
+    }
+
+    public function risico(int $id, int $itemId)
+    {
+        $this->verhuizingOf404($id);
+        access()->switchTo($id);
+
+        $items   = new OpnameItemModel();
+        $risico  = $this->request->getPost('risico') === '1' ? 1 : 0;
+        $notitie = mb_substr(trim((string) $this->request->getPost('risico_notitie')), 0, 200);
+        if ($items->find($itemId)) {
+            $items->update($itemId, ['risico' => $risico, 'risico_notitie' => $risico && $notitie !== '' ? $notitie : null]);
+        }
+
+        return redirect()->to('/bedrijf/verhuizingen/' . $id . '/opname#item-' . $itemId)->with('message', 'Opgeslagen.');
     }
 }

@@ -12,6 +12,7 @@ $rolNaam  = ['inpakker' => 'Inpakker', 'sjouwer' => 'Sjouwer'];
     <div class="beheer-kop">
       <a href="<?= base_url('bedrijf') ?>" class="btn-icon" aria-label="Terug naar planning"><?= icon('back') ?></a>
       <h1 class="page-title"><?= esc($v['naam']) ?></h1>
+      <a href="<?= base_url('bedrijf/verhuizingen/' . $v['id'] . '/opname') ?>" class="btn btn-secondary" style="width:auto;padding:0 18px;"><?= icon('camera') ?> Opname</a>
       <form method="post" action="<?= base_url('verhuizingen/' . $v['id'] . '/kies') ?>" style="margin:0;">
         <?= csrf_field() ?>
         <button type="submit" class="btn btn-secondary" style="width:auto;padding:0 18px;"><?= icon('box') ?> Openen in de app</button>

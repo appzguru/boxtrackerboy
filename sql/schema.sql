@@ -273,3 +273,35 @@ CREATE TABLE IF NOT EXISTS beheer_log (
     PRIMARY KEY (id),
     KEY idx_beheer_log_bedrijf (bedrijf_id, op)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Foto-opname vooraf (whitelabel, alleen bedrijfsverhuizingen). soort = punt: vaste punten
+-- (straat, voordeur, trappenhuis, raam), soort = item: meubels en andere losse spullen.
+-- Sales markeert risico's. Foto's staan in writable/uploads/<verhuizing>/opname/<item>/.
+CREATE TABLE IF NOT EXISTS opname_items (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    verhuizing_id INT UNSIGNED NOT NULL,
+    soort ENUM('punt', 'item') NOT NULL,
+    punt VARCHAR(40) NULL,
+    omschrijving VARCHAR(200) NULL,
+    kamer VARCHAR(80) NULL,
+    risico TINYINT(1) NOT NULL DEFAULT 0,
+    risico_notitie VARCHAR(200) NULL,
+    created_by VARCHAR(60) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_opname_punt (verhuizing_id, punt),
+    KEY idx_opname_verhuizing (verhuizing_id, soort),
+    CONSTRAINT fk_opname_items_verhuizing FOREIGN KEY (verhuizing_id) REFERENCES verhuizingen (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS opname_fotos (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    verhuizing_id INT UNSIGNED NOT NULL,
+    item_id INT UNSIGNED NOT NULL,
+    bestandsnaam VARCHAR(120) NOT NULL,
+    op DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_opname_fotos_item (item_id),
+    CONSTRAINT fk_opname_fotos_item FOREIGN KEY (item_id) REFERENCES opname_items (id) ON DELETE CASCADE,
+    CONSTRAINT fk_opname_fotos_verhuizing FOREIGN KEY (verhuizing_id) REFERENCES verhuizingen (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

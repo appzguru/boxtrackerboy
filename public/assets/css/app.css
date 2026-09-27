@@ -104,6 +104,21 @@ body.has-strip .app-topbar { top: 34px; }
 body.has-strip .app-topbar.hidden { transform: translateY(calc(-100% - 34px)); }
 body.has-strip .screen { padding-top: 98px; }
 
+/* ---- foto-opname (whitelabel) ---- */
+.opname-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.opname-grid.breed { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.opname-foto { position: relative; aspect-ratio: 1 / 1; border-radius: var(--radius-sm); overflow: hidden; display: block; background: var(--blue-tint); }
+.opname-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.opname-foto form { position: absolute; top: 6px; right: 6px; margin: 0; }
+.opname-foto button { width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(0,0,0,.55); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.opname-plus { position: relative; aspect-ratio: 1 / 1; border-radius: var(--radius-sm); border: 1.5px dashed var(--border); background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--blue); font-size: 13px; font-weight: 600; cursor: pointer; }
+.opname-plus input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.opname-rij { display: flex; flex-direction: column; gap: 14px; }
+.opname-rij.risico { box-shadow: 0 0 0 3px var(--red-fg); }
+.opname-rij-kop { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.opname-risico { display: flex; gap: 8px; align-items: center; margin: 0; flex-wrap: wrap; }
+.opname-risico .field { min-height: 40px; width: 260px; font-size: 15px; }
+
 /* ---- beheer (global-admin): bureaublad eerst, breed, twee kolommen ---- */
 body.beheer .screen { max-width: 1180px; padding-top: 16px; }
 body.beheer.env-dev .screen { padding-top: 38px; }
